@@ -62,6 +62,11 @@ public class Robot extends SampleRobot{
     
     public void operatorControl() {
     	//long last_time = 0;
+    	double motor_speed = 0.0;
+		double desired_speed = 0.0;
+		double step_up = 0.0001;
+		double step_down = -0.0001;
+		
     	while ( isOperatorControl() && isEnabled() ) {
     		//last_time = System.nanoTime();
 			// Reset the gyro with the A button.
@@ -74,7 +79,13 @@ public class Robot extends SampleRobot{
 //    			System.out.println( heading_pid.get() );
 //    			drive.arcadeDrive( 0, -1 * heading_pid.get() );
 //    		} else {
-    			drive.arcadeDrive( -1 * drive_controller.get_left_y_axis(), -1 * drive_controller.get_right_x_axis() );
+    			desired_speed = drive_controller.get_left_y_axis();
+    			if( motor_speed <  desired_speed ){
+    				motor_speed += step_up;
+    			}else if( motor_speed >  desired_speed ){
+    				motor_speed += step_down;
+    			}
+    			drive.arcadeDrive( -1 * motor_speed, -1 * drive_controller.get_right_x_axis() );
 //    		}
     		//heading_pid.update( (double) ( last_time - System.nanoTime() ) * 1e-9 );
     	}
