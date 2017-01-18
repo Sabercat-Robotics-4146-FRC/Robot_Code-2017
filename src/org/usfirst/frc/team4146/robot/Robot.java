@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 
@@ -53,7 +52,7 @@ public class Robot extends SampleRobot{
     }
     
     public void robotInit() {
-        System.out.println("Hello from robotInit!");
+        
     }
 	
     public void autonomous() {
@@ -62,12 +61,10 @@ public class Robot extends SampleRobot{
     
     public void operatorControl() {
     	//long last_time = 0;
-    	double motor_speed = 0.0;
-		double desired_speed = 0.0;
-		double step_up = 0.0001;
-		double step_down = -0.0001;
-		
+    	Drive_Train dTrain = new Drive_Train( drive_controller, drive );
+    	
     	while ( isOperatorControl() && isEnabled() ) {
+    		dTrain.ramp_drive();
     		//last_time = System.nanoTime();
 			// Reset the gyro with the A button.
 //    		if ( drive_controller.get_a_button() ) {
@@ -79,13 +76,7 @@ public class Robot extends SampleRobot{
 //    			System.out.println( heading_pid.get() );
 //    			drive.arcadeDrive( 0, -1 * heading_pid.get() );
 //    		} else {
-    			desired_speed = drive_controller.get_left_y_axis();
-    			if( motor_speed <  desired_speed ){
-    				motor_speed += step_up;
-    			}else if( motor_speed >  desired_speed ){
-    				motor_speed += step_down;
-    			}
-    			drive.arcadeDrive( -1 * motor_speed, -1 * drive_controller.get_right_x_axis() );
+    		
 //    		}
     		//heading_pid.update( (double) ( last_time - System.nanoTime() ) * 1e-9 );
     	}
