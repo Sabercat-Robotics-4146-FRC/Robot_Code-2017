@@ -10,6 +10,7 @@ public class Ramp_Drive {
 	public double dt = 1e-3;
 	public long system_time = System.nanoTime();
 	private double ctrl_deadband = 0.1;
+	private double mech_deadband = 0.4;
 	
 	private Controller drive_controller;
 	private RobotDrive drive;
@@ -28,11 +29,11 @@ public class Ramp_Drive {
 		check_speed(left_y);
 		drive.arcadeDrive( speed, -1 * drive_controller.get_right_x_axis() );
 		System.out.println( speed );
-		Timer.delay(0.005);	
+		//Timer.delay(0.005);	
 	}
 	public void check_speed(double left_y) {
 		left_y = controller_deadband(left_y);
-		//mechanical_deadband(left_y);    //FINISH THIS SHITLORD
+		mechanical_deadband(left_y);    //FINISH THIS SHITLORD
 		quick_stop(left_y);
 		
 		if ( (left_y > speed) && (left_y > 0)){ //Traveling forward but speed is not fast enough
@@ -51,7 +52,7 @@ public class Ramp_Drive {
 	}
 	private void quick_stop(double left_y){	//if speed is opposite sign of left y then instant stop
 		if(((left_y > 0) && (speed < 0)) || ((left_y < 0) && (speed > 0))){
-			speed = 0;
+			speed = 0.0;
 		}
 	}
 	private double controller_deadband(double left_y){
@@ -66,7 +67,10 @@ public class Ramp_Drive {
 	}
 	private void mechanical_deadband(double left_y){
 		if((left_y > 0) && (speed == 0.0)){
-			//speed = mech_deadband;
+			speed = mech_deadband;
+		}
+		else if((left_y < 0) && (speed == 0.0)){
+			speed = -mech_deadband;
 		}
 	}
 	

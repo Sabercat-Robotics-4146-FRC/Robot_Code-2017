@@ -41,7 +41,7 @@ public class Robot extends SampleRobot{
 		gyro.reset();
 		
 		// Instantiate robot's drive with Talons
-		drive      = new RobotDrive( front_left, rear_left, front_right, rear_right );
+		drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
 		heading_pid = new PID( new signal() {
 			public double getValue() {
 				return gyro.getAngle();
@@ -65,20 +65,6 @@ public class Robot extends SampleRobot{
     	
     	while ( isOperatorControl() && isEnabled() ) {
     		dTrain.ramp_drive();
-    		//last_time = System.nanoTime();
-			// Reset the gyro with the A button.
-//    		if ( drive_controller.get_a_button() ) {
-//    			gyro.reset();
-//    		}
-//    		System.out.println( gyro.getAngle() );
-    		// Initiate goto angle with left trigger.
-//    		if ( drive_controller.get_left_trigger() ) {
-//    			System.out.println( heading_pid.get() );
-//    			drive.arcadeDrive( 0, -1 * heading_pid.get() );
-//    		} else {
-    		
-//    		}
-    		//heading_pid.update( (double) ( last_time - System.nanoTime() ) * 1e-9 );
     	}
     }// end operatorControl
 
