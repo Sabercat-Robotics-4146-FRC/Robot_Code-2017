@@ -61,7 +61,7 @@ public class Robot extends SampleRobot{
     
     public void operatorControl() {
     	//long last_time = 0;
-    	Drive_Train dTrain = new Drive_Train( drive_controller, drive );
+    	Ramp_Drive dTrain = new Ramp_Drive( drive_controller, drive );
     	
     	while ( isOperatorControl() && isEnabled() ) {
     		dTrain.ramp_drive();
