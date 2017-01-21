@@ -28,6 +28,8 @@ public class Controller {
     public static final int right_trigger = 3;
     private static final int right_x_axis = 4;
     private static final int right_y_axis = 5;
+    // Constants
+    public static final double ctrl_deadband = 0.15; // This is the threshold for the controller joystick deadband
 	/**
 	 * Constructor takes the controller number (0 or 1 with two controllers)
 	 * 
@@ -127,12 +129,18 @@ public class Controller {
 	public double get_left_x_axis( ){
 		return joy.getRawAxis( left_x_axis );
 	}
+	public double get_deadband_left_x_axis( ){
+		return joystick_deadband( joy.getRawAxis( left_x_axis ) );
+	}
 	/**
 	 * Gets the value of the y axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
 	 * @return double y axis position
 	 */
 	public double get_left_y_axis( ){
 		return joy.getRawAxis( left_y_axis );
+	}
+	public double get_deadband_left_y_axis( ){
+		return joystick_deadband( joy.getRawAxis( left_y_axis ) );
 	}
 	/**
 	 * Gets the value of the x axis of the right stick. ( -1.0 to 1.0, 0.0 is centered )
@@ -141,6 +149,9 @@ public class Controller {
 	public double get_right_x_axis( ){
 		return joy.getRawAxis( right_x_axis );
 	}
+	public double get_deadband_right_x_axis( ){
+		return joystick_deadband( joy.getRawAxis( right_x_axis ) );
+	}
 	/**
 	 * Gets the value of the y axis of the right stick. ( -1.0 to 1.0, 0.0 is centered )
 	 * @return double y axis position
@@ -148,6 +159,21 @@ public class Controller {
 	public double get_right_y_axis( ){
 		return joy.getRawAxis( right_y_axis );
 	}
+	public double get_deadband_right_y_axis( ){
+		return joystick_deadband( joy.getRawAxis( right_y_axis ) );
+	}
+	
+	private double joystick_deadband(double joystick_input){
+		if((joystick_input < ctrl_deadband) && (joystick_input > -ctrl_deadband))
+		{
+			return (double)(0.0);
+		}
+		else
+		{
+			return joystick_input;
+		}
+	}
+	
 	/**
 	 *	Used just in case we need the raw joystick.
 	 *
@@ -156,4 +182,6 @@ public class Controller {
 	public Joystick get_joystick( ){
 		return joy;
 	}
+	
+	
 }
