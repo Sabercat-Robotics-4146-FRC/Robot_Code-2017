@@ -182,5 +182,4 @@ public class Controller {
 	public Joystick get_joystick() {
 		return joy;
 	}
-	
 }

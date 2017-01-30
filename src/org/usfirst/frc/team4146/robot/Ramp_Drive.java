@@ -8,15 +8,15 @@ public class Ramp_Drive {
 	private static final double accelerate_rate = 0.65;
 	private static final double decelerate_rate = 1.0;
 	private static final double mech_deadband = 0.3;
-	private static final double mSlope = ((1.0 - mech_deadband) / (1.0 - Controller.ctrl_deadband));
-	private static final double bIntercept = ((-Controller.ctrl_deadband * mSlope) + mech_deadband);
+	private static final double mSlope = ( (1.0 - mech_deadband) / (1.0 - Controller.ctrl_deadband) );
+	private static final double bIntercept = ( (-Controller.ctrl_deadband * mSlope) + mech_deadband );
 	// Variables
-	public double speed = 0.0;
 	private long this_time = 0;
 	private long last_time = System.nanoTime();
+	private double speed = 0.0;
 	private double dt;
 	private double targetSpeed;
-	
+	// Objects
 	private Controller drive_controller;
 	private RobotDrive drive;
 	
@@ -27,39 +27,44 @@ public class Ramp_Drive {
 	
 	public void ramp_drive() {
 		this_time = System.nanoTime();
-		dt = ( this_time - last_time ) * 1e-9;
+		//dt = ( this_time - last_time ) * 1e-9;
 		last_time = this_time;
-		double left_y = -drive_controller.get_deadband_left_y_axis();
+		double left_y = -drive_controller.get_deadband_left_y_axis(); // Inverted because controller is inverted by default
 		
-		left_y = check_speed(left_y);
-		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );
+		if ( speed < left_y ) {
+			speed += accelerate_rate * dt;
+		}
+		if ( speed > left_y ) {
+			speed -= accelerate_rate * dt;
+		}
+		//check_speed( left_y );
+		drive.arcadeDrive( speed, -drive_controller.get_deadband_right_x_axis() ); // Inverted because controller is inverted by default
 		System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );
+		dt = (System.nanoTime() - last_time) * 1e-9; 
 		Timer.delay( 0.005 );
 	}
 	
-	public double check_speed(double left_y ) {
-		mechanical_deadband( left_y );
+	private void check_speed( double left_y ) {
+		mechanical_deadband_escape( left_y );
 		targetSpeed = find_target_speed( left_y );
-		if( /*(targetSpeed == 0.0) &&*/((speed > -mech_deadband) && (speed < mech_deadband)) ) {
+		if( (targetSpeed == 0.0) && (speed > -mech_deadband) && (speed < mech_deadband) ) {
 			speed = 0.0;
 		}
-		else if( (targetSpeed > speed) && (targetSpeed > 0) ) {//Traveling forward but speed is not fast enough
+		else if( (targetSpeed > speed) && (targetSpeed > 0) ) { //Traveling forward but speed is not fast enough
 			speed +=  accelerate_rate * dt;
 		}
-		else if( (targetSpeed < speed) && (targetSpeed < 0) ) {//Traveling backwards but speed is not fast enough
+		else if( (targetSpeed < speed) && (targetSpeed < 0) ) { //Traveling backwards but speed is not fast enough
 			speed -= accelerate_rate * dt;
 		}
-		else if( (targetSpeed < speed) && (targetSpeed >= 0) ) {//Traveling forwards but speed is too fast
+		else if( (targetSpeed < speed) && (targetSpeed >= 0) ) { //Traveling forwards but speed is too fast
 			speed -= decelerate_rate * dt;
 		}
-		else if( (targetSpeed > speed) && (targetSpeed <= 0) ) {//Traveling backwards but speed is too fast
+		else if( (targetSpeed > speed) && (targetSpeed <= 0) ) { //Traveling backwards but speed is too fast
 			speed +=  decelerate_rate * dt;
 		}
-		
-		return left_y;
 	}
 
-	private void mechanical_deadband(double left_y) {
+	private void mechanical_deadband_escape( double left_y ) { // I want to change the name of this 
 		if( (left_y > 0) && (speed == 0.0) ) {
 			speed = mech_deadband;
 		}

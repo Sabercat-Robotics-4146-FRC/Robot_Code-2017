@@ -28,10 +28,10 @@ public class Robot extends SampleRobot {
 		front_right = new Talon( 7 );
 		rear_right  = new Talon( 0 );
 		
-		front_left.setSafetyEnabled(false);
-		rear_left.setSafetyEnabled(false);
-		front_right.setSafetyEnabled(false);
-		rear_right.setSafetyEnabled(false);
+		front_left.setSafetyEnabled( false );
+		rear_left.setSafetyEnabled( false );
+		front_right.setSafetyEnabled( false );
+		rear_right.setSafetyEnabled( false );
 				
 		gyro = new AHRS( SPI.Port.kMXP );
 		gyro.reset();
