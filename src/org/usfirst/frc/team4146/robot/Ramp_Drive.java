@@ -20,46 +20,46 @@ public class Ramp_Drive {
 	private Controller drive_controller;
 	private RobotDrive drive;
 	
-	Ramp_Drive(Controller dc, RobotDrive d) {
+	Ramp_Drive(Controller dc, RobotDrive d) {												//Constructor brings drive controller to get joystick values and drive object to use arcade drive
 		drive_controller = dc;
 		drive = d;
 	}
 	
 	public void ramp_drive() {
-		this_time = System.nanoTime();
-		dt = ( this_time - last_time ) * 1e-9;
-		last_time = this_time;
-		double left_y = -drive_controller.get_deadband_left_y_axis();
+		this_time = System.nanoTime();														//Get Current System Time
+		dt = ( this_time - last_time ) * 1e-9;												//Determine change in time from last loop to this one
+		last_time = this_time;																//Sets last time equal to current time for next loop
+		double left_y = -drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. The value is negative to make it so positive is forward for ease.
 		
-		left_y = check_speed(left_y);
-		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );
-		System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );
-		Timer.delay( 0.005 );
+		left_y = check_speed(left_y);														//Main function which does ramping and preliminary checks
+		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
+	  //System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );	//Print Values for testing
+		Timer.delay( 0.005 );																//Possibly Useless
 	}
 	
 	public double check_speed(double left_y ) {
-		mechanical_deadband( left_y );
+		mechanical_deadband( left_y );														//Method sets speed to outside mechanical deadband speed if it is within deadband and joystick is out of deadband
 		targetSpeed = find_target_speed( left_y );
-		if( /*(targetSpeed == 0.0) &&*/((speed > -mech_deadband) && (speed < mech_deadband)) ) {
+		if((speed > -mech_deadband) && (speed < mech_deadband)) {							//If speed is within the deadband, just set it to zero
 			speed = 0.0;
 		}
-		else if( (targetSpeed > speed) && (targetSpeed > 0) ) {//Traveling forward but speed is not fast enough
+		else if( (targetSpeed > speed) && (targetSpeed > 0) ) {								//Traveling forward but speed is not fast enough
 			speed +=  accelerate_rate * dt;
 		}
-		else if( (targetSpeed < speed) && (targetSpeed < 0) ) {//Traveling backwards but speed is not fast enough
+		else if( (targetSpeed < speed) && (targetSpeed < 0) ) {								//Traveling backwards but speed is not fast enough
 			speed -= accelerate_rate * dt;
 		}
-		else if( (targetSpeed < speed) && (targetSpeed >= 0) ) {//Traveling forwards but speed is too fast
+		else if( (targetSpeed < speed) && (targetSpeed >= 0) ) {							//Traveling forwards but speed is too fast
 			speed -= decelerate_rate * dt;
 		}
-		else if( (targetSpeed > speed) && (targetSpeed <= 0) ) {//Traveling backwards but speed is too fast
+		else if( (targetSpeed > speed) && (targetSpeed <= 0) ) {							//Traveling backwards but speed is too fast
 			speed +=  decelerate_rate * dt;
 		}
 		
-		return left_y;
+		return left_y;																		//Return value just for printf statement
 	}
 
-	private void mechanical_deadband(double left_y) {
+	private void mechanical_deadband(double left_y) {										//Does mechanical deadband
 		if( (left_y > 0) && (speed == 0.0) ) {
 			speed = mech_deadband;
 		}
@@ -67,7 +67,7 @@ public class Ramp_Drive {
 			speed = -mech_deadband;
 		}
 	}
-	private double find_target_speed( double left_y ) {
+	private double find_target_speed( double left_y ) {										//Does deadband scaling
 		if( left_y == 0.0 ) {
 			return 0.0;
 		}
