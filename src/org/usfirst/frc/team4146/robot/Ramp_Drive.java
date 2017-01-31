@@ -29,7 +29,7 @@ public class Ramp_Drive {
 		this_time = System.nanoTime();														//Get Current System Time
 		dt = ( this_time - last_time ) * 1e-9;												//Determine change in time from last loop to this one
 		last_time = this_time;																//Sets last time equal to current time for next loop
-		double left_y = -drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. The value is negative to make it so positive is forward for ease.
+		double left_y = drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. The value is negative to make it so positive is forward for ease.
 		
 		left_y = check_speed(left_y);														//Main function which does ramping and preliminary checks
 		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
