@@ -23,6 +23,17 @@ class Autonomous {
     // TODO: tweak heading pid constants
     heading_pid.set_pid( 0.5, 0, 0 );
   }
+  private double convert_wrapped_angle( double a ) {
+    a = Math.abs( a );
+    while ( a >= 360 ) {
+      a -= 360;
+    }
+    double b = Math.abs(a) % 360;
+    if ( a > 180 ) {
+      a = -1 * ( 180 - ( a - 180 ) );
+    }
+    return a;
+  }
   public void drive_forward( double feet ) {
     // a while loop that breaks out with PID steady state error threshold, used pid update. 
   }
