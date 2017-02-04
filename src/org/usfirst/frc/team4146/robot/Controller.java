@@ -2,7 +2,7 @@ package org.usfirst.frc.team4146.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
- * The Controller class is a wrapper for the WPI Joystick class for the use of Xbox Controllers (was Logitech Controllers)
+ * The Controller class is a wrapper for the WPI Joystick class for the use of Xbox 360 Controllers (was Logitech Controllers)
  * 
  * @author GowanR
  * @version 8/20/2016
