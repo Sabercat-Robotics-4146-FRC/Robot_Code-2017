@@ -25,9 +25,6 @@ public class Robot extends SampleRobot {
 	
 	AHRS gyro;
 	
-	Heading robotHeading;
-	Move_Distance robotMove;
-	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
@@ -45,12 +42,8 @@ public class Robot extends SampleRobot {
     		
     		gyro = new AHRS( SPI.Port.kMXP );
     		
-        	robotHeading = new Heading( gyro );
-        	
-        	robotMove = new Move_Distance( right_drive_encoder, left_drive_encoder );
-
     	} catch (RuntimeException ex ) {
-    		DriverStation.reportError("Error instantiating: " + ex.getMessage(), true);
+    		DriverStation.reportWarning("Error instantiating: " + ex.getMessage(), true);
     	}
     }
     
@@ -63,9 +56,9 @@ public class Robot extends SampleRobot {
     	
 		gyro.reset();
 		
-		robotHeading.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
+		//robotHeading.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
 		
-		robotMove.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
+		//robotMove.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
     }
 	
     public void autonomous() {
@@ -74,12 +67,23 @@ public class Robot extends SampleRobot {
     
     public void operatorControl() {
     	
-    	//Ramp_Drive dTrain = new Ramp_Drive( drive_controller, drive );
+    	//Ramp_Drive dTrain = new Ramp_Drive( drive_controller, drive );    	
+    	Heading robotHeading;
+    	//Move_Distance robotMove;
+    	
+
+    	
+    	robotHeading = new Heading( gyro );
+    	
+    	//robotMove = new Move_Distance( right_drive_encoder, left_drive_encoder );
+
+    	
     	Preferences prefs = Preferences.getInstance();
     	double p_pref = 0.0;
     	double i_pref = 0.0;
     	double d_pref = 0.0;
     	double turn_angle = 30.0;
+    	double turnism = 0.0;
     	
     	boolean aLast = true;
     	boolean bLast = true;
@@ -117,16 +121,20 @@ public class Robot extends SampleRobot {
     			SmartDashboard.putNumber("I", i_pref);
     			SmartDashboard.putNumber("D", d_pref);
     			SmartDashboard.putNumber("turnAngle", turn_angle);
-    			
-    			
+    			robotHeading.set_heading();
     			yLast = false;
     		}
     		else if( !drive_controller.get_y_button() ) {
     			yLast = true;
     		}
-
     		
-    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), robotHeading.heading()  );
+    		turnism = robotHeading.heading();
+
+			SmartDashboard.putNumber("gyroFusedHeading", gyro.getFusedHeading());
+			SmartDashboard.putNumber("HeadingOutput", turnism);
+
+			
+    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), -turnism  );
     		Timer.delay( 0.005 );// possibly Useless
 
     		
