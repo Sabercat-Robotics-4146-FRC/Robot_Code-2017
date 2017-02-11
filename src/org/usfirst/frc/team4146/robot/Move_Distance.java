@@ -11,10 +11,6 @@ public class Move_Distance {
 	private double rightStart;
 	private double leftStart;
 	private double startPoint;
-
-	private long thisTime = 0;
-	private long lastTime = System.nanoTime();
-	private double dt = 0.0;
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
@@ -29,18 +25,14 @@ public class Move_Distance {
 		
 		move_pid = new PID( new signal() {
 			public double getValue() {
-				return encoder_error();
+				return convert_to_feet(encoder_error());
 			}
 		});
 	}
 	
-	public double move_distance() {
-		thisTime = System.nanoTime();					//Get Current System Time
-		dt = ( thisTime - lastTime ) * 1e-9;			//Determine change in time from last loop to this one
-		lastTime = thisTime;	
+	public double move_distance(double dt) {		//Pass dt to function, which should be from Iterative_Timer	
 		
 		move_pid.update(dt);
-		
 		return move_pid.get();
 	}
 	
@@ -59,6 +51,10 @@ public class Move_Distance {
 		setPoint = startPoint + d * ENCODER_CONVERSION;
 	}
 	
+	private double convert_to_feet(double f) {
+		return (f * ENCODER_CONVERSION);
+	}
+	
 	private double encoder_error() {
 		return encoder_distance() - setPoint;
 	}
@@ -67,4 +63,7 @@ public class Move_Distance {
 		return ( (right_drive_encoder.getRaw() - rightStart) + (left_drive_encoder.getRaw() - leftStart) / 2 );
 	}
 	
+	public double get_error_stack() {
+		return move_pid.steady_state_error();
+	}
 }

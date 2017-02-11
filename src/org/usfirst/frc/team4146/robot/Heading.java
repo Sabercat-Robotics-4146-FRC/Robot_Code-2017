@@ -10,9 +10,7 @@ public class Heading {
 
 	private double tempSetPoint;
 	private double setPoint;
-	private long thisTime = 0;
-	private long lastTime = System.nanoTime();
-	private double dt = 0.0;
+	
 	
 	Heading( AHRS g ) {
 		gyro = g;		
@@ -25,13 +23,9 @@ public class Heading {
 		
 	}
 	
-	public double heading() {
-		thisTime = System.nanoTime();					//Get Current System Time
-		dt = ( thisTime - lastTime ) * 1e-9;			//Determine change in time from last loop to this one
-		lastTime = thisTime;	
-		
+	public double heading(double dt) {		//Pass dt to function, which should be from Iterative_Timer
+			
 		heading_pid.update(dt);
-		
 		return heading_pid.get();
 	}
 	
@@ -46,6 +40,14 @@ public class Heading {
 	
 	public void rel_angle_turn(double change) {
 		setPoint = ( setPoint + change );
+		if(setPoint > 360)
+		{
+			setPoint -= 360;
+		}
+		else if(setPoint < 0)
+		{
+			setPoint += 360;
+		}
 	}
 	
 	private double get_ang_diff(double position, double setpoint) {
@@ -60,4 +62,7 @@ public class Heading {
 	    return tempSetPoint;
     }
 	
+	public double get_error_stack() {
+		return heading_pid.steady_state_error();
+	}
 }

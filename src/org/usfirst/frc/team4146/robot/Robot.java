@@ -25,8 +25,12 @@ public class Robot extends SampleRobot {
 	
 	AHRS gyro;
 	
+	Heading robotHeading;
+	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
+
+	Move_Distance robotMove;
 	
     public Robot() {
     	try {
@@ -42,8 +46,12 @@ public class Robot extends SampleRobot {
     		
     		gyro = new AHRS( SPI.Port.kMXP );
     		
+    		robotHeading = new Heading( gyro );
+    		
+    		robotMove = new Move_Distance( right_drive_encoder, left_drive_encoder );
+    		
     	} catch (RuntimeException ex ) {
-    		DriverStation.reportWarning("Error instantiating: " + ex.getMessage(), true);
+    		DriverStation.reportWarning("Problem instantiating: " + ex.getMessage(), true);
     	}
     }
     
@@ -56,92 +64,43 @@ public class Robot extends SampleRobot {
     	
 		gyro.reset();
 		
-		//robotHeading.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
+
 		
-		//robotMove.set_vars(0.5, 0.0, 0.0, 0.0);// p, i, d, setPoint
+		//robotHeading.set_vars(0.005, 0.0, 0.0, 0.0);// p, i, d, setPoint
+		
+		//robotMove.set_vars(0.005, 0.0, 0.0, 0.0);// p, i, d, setPoint
     }
 	
     public void autonomous() {
     	
+    	Autonomous auto = new Autonomous(robotHeading, robotMove, drive);
+    	auto.autoRun();
     }
     
     public void operatorControl() {
     	
-    	//Ramp_Drive dTrain = new Ramp_Drive( drive_controller, drive );    	
-    	Heading robotHeading;
-    	//Move_Distance robotMove;
+    	Ramp_Drive dTrain = new Ramp_Drive( drive_controller, drive );    	
+    	Iterative_Timer opControlDt = new Iterative_Timer();
     	
-
-    	
-    	robotHeading = new Heading( gyro );
-    	
-    	//robotMove = new Move_Distance( right_drive_encoder, left_drive_encoder );
-
-    	
-    	Preferences prefs = Preferences.getInstance();
-    	double p_pref = 0.0;
-    	double i_pref = 0.0;
-    	double d_pref = 0.0;
-    	double turn_angle = 30.0;
-    	double turnism = 0.0;
-    	
-    	boolean aLast = true;
-    	boolean bLast = true;
-    	boolean yLast = true;
     	while ( isOperatorControl() && isEnabled() ) {
-    		
-    		//dTrain.ramp_drive();
-    		
-    		if(drive_controller.get_a_button() && aLast) {
-    			robotHeading.set_heading();
-    			aLast = false;
-    		}
-    		else if( !drive_controller.get_a_button() ) {
-    			aLast = true;
-    		}
-    		
-    		if(drive_controller.get_b_button() && bLast) {
-//    			robotHeading.rel_angle_turn(-drive_controller.get_deadband_right_x_axis() * 180);
-    			robotHeading.rel_angle_turn(turn_angle);
+    		opControlDt.update();
+    		dTrain.ramp_drive(opControlDt.getDt());
+    		Timer.delay( 0.005 );// possibly Useless
+    	}
+    }	
+    //End of operatorControl
 
-    			bLast = false;
-    		}
-    		else if( !drive_controller.get_b_button() ) {
-    			bLast = true;
-    		}
+    public void test() {
+    	PID_Tuning pidTune = new PID_Tuning(robotHeading, drive_controller, gyro);
+    	
+    	while ( isTest() && isEnabled() ) {
     		
-
-    		if(drive_controller.get_y_button() && yLast) {
-    			p_pref = prefs.getDouble("PValue", 0.0);
-    			i_pref = prefs.getDouble("IValue", 0.0);
-    			d_pref = prefs.getDouble("DValue", 0.0);
-    			turn_angle = prefs.getDouble("TurnAngle", 0.0);
-    			robotHeading.set_vars(p_pref, i_pref, d_pref, 0.0);
-    			SmartDashboard.putNumber("P", p_pref);
-    			SmartDashboard.putNumber("I", i_pref);
-    			SmartDashboard.putNumber("D", d_pref);
-    			SmartDashboard.putNumber("turnAngle", turn_angle);
-    			robotHeading.set_heading();
-    			yLast = false;
-    		}
-    		else if( !drive_controller.get_y_button() ) {
-    			yLast = true;
-    		}
-    		
-    		turnism = robotHeading.heading();
-
-			SmartDashboard.putNumber("gyroFusedHeading", gyro.getFusedHeading());
-			SmartDashboard.putNumber("HeadingOutput", turnism);
-
-			
-    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), -turnism  );
+    		pidTune.checkButtons();
+    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), -pidTune.getTurnism()  );
     		Timer.delay( 0.005 );// possibly Useless
 
     		
     	}
-    }// end operatorControl
-
-    public void test() {
-    	
     }
+    //End of test
 }

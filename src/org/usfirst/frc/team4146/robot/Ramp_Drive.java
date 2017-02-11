@@ -12,9 +12,6 @@ public class Ramp_Drive {
 	private static final double bIntercept = ((-Controller.ctrl_deadband * mSlope) + mech_deadband);
 	// Variables
 	public double speed = 0.0;
-	private long this_time = 0;
-	private long last_time = System.nanoTime();
-	private double dt;
 	private double targetSpeed;
 	
 	private Controller drive_controller;
@@ -25,19 +22,16 @@ public class Ramp_Drive {
 		drive = d;
 	}
 	
-	public void ramp_drive() {
-		this_time = System.nanoTime();														//Get Current System Time
-		dt = ( this_time - last_time ) * 1e-9;												//Determine change in time from last loop to this one
-		last_time = this_time;																//Sets last time equal to current time for next loop
+	public void ramp_drive(double dt) { //Given dt, which should come from Iterative_Timer
 		double left_y = drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. 
 		
-		left_y = check_speed(left_y);														//Main function which does ramping and preliminary checks
+		left_y = check_speed(left_y, dt);														//Main function which does ramping and preliminary checks
 		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
 	  //System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );	//Print Values for testing
 		Timer.delay( 0.005 );																//Possibly Useless
 	}
 	
-	public double check_speed(double left_y ) {
+	public double check_speed(double left_y, double dt ) {
 		mechanical_deadband( left_y );														//Method sets speed to outside mechanical deadband speed if it is within deadband and joystick is out of deadband
 		targetSpeed = find_target_speed( left_y );
 		if((speed > -mech_deadband) && (speed < mech_deadband)) {							//If speed is within the deadband, just set it to zero
