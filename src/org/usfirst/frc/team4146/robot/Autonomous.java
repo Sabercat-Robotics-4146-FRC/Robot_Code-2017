@@ -34,7 +34,7 @@ public class Autonomous {
 		roboMove.set_distance(dis);
 		autoDT.reset();
 		
-		while((Math.abs(roboMove.get_error_stack()) > acceptable_distance_error) && (autoDT.timeSinceStart() < timeOut)) {
+		while((Math.abs(roboMove.getSteadyStateError()) > acceptable_distance_error) && (autoDT.timeSinceStart() < timeOut)) {
 			autoDT.update();
 			roboDrive.arcadeDrive(roboMove.move_distance(autoDT.getDt()), roboHeading.heading(autoDT.getDt()));
 		}
@@ -43,7 +43,7 @@ public class Autonomous {
 	private void turn_Angle(double ang, double acceptable_error) {
 		roboHeading.rel_angle_turn(ang);
 		autoDT.reset();
-		while((Math.abs(roboHeading.get_error_stack()) > acceptable_angle_error) && (autoDT.timeSinceStart() < timeOut))
+		while((Math.abs(roboHeading.getSteadyStateError()) > acceptable_angle_error) && (autoDT.timeSinceStart() < timeOut))
 		{
 			autoDT.update();
 			roboDrive.arcadeDrive(0.0, roboHeading.heading(autoDT.getDt()));
