@@ -63,7 +63,7 @@ public class Move_Distance {
 		return ( (right_drive_encoder.getRaw() - rightStart) + (left_drive_encoder.getRaw() - leftStart) / 2 );
 	}
 	
-	public double get_error_stack() {
+	public double getSteadyStateError() {
 		return move_pid.steady_state_error();
 	}
 }
