@@ -62,7 +62,7 @@ public class Heading {
 	    return tempSetPoint;
     }
 	
-	public double get_error_stack() {
+	public double getSteadyStateError() {
 		return heading_pid.steady_state_error();
 	}
 }
