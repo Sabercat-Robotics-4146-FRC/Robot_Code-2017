@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4146.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 public class Iterative_Timer {
 	private long startTime = 0;
 	private long thisTime = 0;
@@ -28,7 +30,13 @@ public class Iterative_Timer {
 	
 	
 	public double convertNanoToSec(long nano) {		//Don't use this on a full time, only dt, as a long has many more digits than double.
-		return (nano * (1e-9));
+		try{
+			return (nano * (1e-9));
+		} catch( RuntimeException ex ) {
+			DriverStation.reportWarning("YOU FUCKED UP: " + ex.getMessage(), true);
+		}
+		return 0;
+		
 	}
 	
 	

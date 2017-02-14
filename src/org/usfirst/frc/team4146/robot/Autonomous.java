@@ -23,8 +23,8 @@ public class Autonomous {
 	}
 	
 	public void autoRun() {
-		heading_Distance(5.0);
-		turn_Angle(30.0, 5.0);
+		heading_Distance(3.0);
+		//turn_Angle(30.0, 5.0);
 		
 	}
 	

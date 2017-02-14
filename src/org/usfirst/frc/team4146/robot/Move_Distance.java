@@ -4,8 +4,9 @@ import edu.wpi.first.wpilibj.Timer;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Move_Distance {
-
-	private static final double ENCODER_CONVERSION = 666;// yay.
+	private final double ENCODER_TICKS_PER_REVOLUTION = 360.0;
+	private final double WHEEL_DIAMETER = 7.625;
+	private final double ENCODER_CONVERSION = ENCODER_TICKS_PER_REVOLUTION / (WHEEL_DIAMETER * Math.PI);// YAY.
 	
 	private double setPoint;
 	private double rightStart;

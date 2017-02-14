@@ -28,7 +28,7 @@ public class Ramp_Drive {
 		left_y = check_speed(left_y, dt);														//Main function which does ramping and preliminary checks
 		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
 	  //System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );	//Print Values for testing
-		Timer.delay( 0.005 );																//Possibly Useless
+		//Timer.delay( 0.005 );																//Possibly Useless
 	}
 	
 	public double check_speed(double left_y, double dt ) {

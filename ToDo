@@ -2,4 +2,8 @@ Todo:
 Find Encoder Conversion Rate
 Tune PIDs
 Add Vision Code
-Remove Test Code
+Remove Test Code			✓?
+Timing dt Class				✓
+Tune PID Class				✓
+Make DT Passed to classes 	✓
+SmartDashboard classes		✓?
