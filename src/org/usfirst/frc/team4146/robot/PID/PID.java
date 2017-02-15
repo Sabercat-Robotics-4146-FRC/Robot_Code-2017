@@ -83,4 +83,14 @@ public class PID {
 	public double get() {
 		return output;
 	}
+	
+	public static double clamp(double valueToClamp, double clampValue) {
+		if(valueToClamp > clampValue)
+		{
+			return clampValue;
+		} else if(valueToClamp < -(clampValue)) {
+			return -(clampValue);
+		}
+		return valueToClamp;
+	}
 }

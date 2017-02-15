@@ -20,18 +20,23 @@ public class Heading {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
 		});
+		heading_pid.set_setpoint(0.0);
 		
 	}
 	
-	public double heading(double dt) {		//Pass dt to function, which should be from Iterative_Timer
+	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer
 			
 		heading_pid.update(dt);
+	}
+	
+	public double get() {		//Get pid output	
+		
 		return heading_pid.get();
 	}
 	
-	public void set_vars(double p, double i, double d, double s) {
+	public void set_vars(double p, double i, double d) {
 		heading_pid.set_pid(p,i,d);
-		heading_pid.set_setpoint(s);
+		
 	}
 	
 	public void set_heading() {

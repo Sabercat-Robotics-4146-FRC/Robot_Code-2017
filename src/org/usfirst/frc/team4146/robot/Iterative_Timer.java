@@ -21,19 +21,19 @@ public class Iterative_Timer {
 	
 	public void update() {
 		thisTime = System.nanoTime();
-		dt = convertNanoToSec(thisTime - lastTime);
+		dt = convert_nano_to_sec(thisTime - lastTime);
 		lastTime = thisTime;
 	}
-	public double getDt() {
+	public double get_dt() {
 		return dt;
 	}
 	
 	
-	public double convertNanoToSec(long nano) {		//Don't use this on a full time, only dt, as a long has many more digits than double.
+	public double convert_nano_to_sec(long nano) {		//Don't use this on a full time, only dt, as a long has many more digits than double.
 		try{
 			return (nano * (1e-9));
 		} catch( RuntimeException ex ) {
-			DriverStation.reportWarning("YOU FUCKED UP: " + ex.getMessage(), true);
+			DriverStation.reportWarning("Likely an overflow in conversion: " + ex.getMessage(), true);
 		}
 		return 0;
 		
@@ -41,9 +41,9 @@ public class Iterative_Timer {
 	
 	
 	public double timeSinceStart() {
-		return convertNanoToSec(System.nanoTime() - startTime);
+		return convert_nano_to_sec( System.nanoTime() - startTime );
 	}
-	public void resetStart() {
+	public void reset_start() {
 		startTime = System.nanoTime();
 	}
 }

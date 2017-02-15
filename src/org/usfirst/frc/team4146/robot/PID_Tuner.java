@@ -7,7 +7,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class PID_Tuning {
+public class PID_Tuner {
 	
 	private Controller drive_controller;
 	private String name;
@@ -16,7 +16,7 @@ public class PID_Tuning {
 	
 	private Preferences prefs = Preferences.getInstance();
 	
-	PID_Tuning( String name, PID pid, Controller drive_controller, applyPID plant ) {
+	PID_Tuner( String name, PID pid, Controller drive_controller, applyPID plant ) {
 		this.pid = pid;
 		this.drive_controller = drive_controller;
 		this.name = name;
@@ -37,7 +37,6 @@ public class PID_Tuning {
 			pid.set_setpoint( sp );
 		}
 		if ( drive_controller.get_a_button() ) {
-			
 			plant.apply( pid.get() );
 		}
 	}
