@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.networktables.*;
-
+import edu.wpi.first.wpilibj.Servo;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
@@ -25,13 +25,13 @@ public class Robot extends SampleRobot {
 	RobotDrive drive;
 	
 	AHRS gyro;
-	
-	Heading robotHeading;
+	Servo s;
+	Heading robot_heading;
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
-	Ramp_Drive smooth_drive;
-	Move_Distance robotMove;
+	RampDrive smooth_drive;
+	MoveDistance robot_move;
 	
     public Robot() {
     	//try {
@@ -44,10 +44,10 @@ public class Robot extends SampleRobot {
     		
     		// Instantiate robot's drive with Talons
     		drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    		smooth_drive = new Ramp_Drive( drive_controller, drive );
+    		smooth_drive = new RampDrive( drive_controller, drive );
     		gyro = new AHRS( SPI.Port.kMXP );
     		
-    		robotHeading = new Heading( gyro );
+    		robot_heading = new Heading( gyro );
     		
     		left_drive_encoder = new Encoder( 0 , 1 );
     		right_drive_encoder = new Encoder( 2 , 3 );
@@ -55,7 +55,8 @@ public class Robot extends SampleRobot {
     		left_drive_encoder.setReverseDirection(true);
     		right_drive_encoder.setReverseDirection(false);
     		
-    		robotMove = new Move_Distance( right_drive_encoder, left_drive_encoder );
+    		robot_move = new MoveDistance( right_drive_encoder, left_drive_encoder );
+    		s = new Servo( 9 );
     }
     
     public void robotInit() {
@@ -70,13 +71,13 @@ public class Robot extends SampleRobot {
     }
 	
     public void autonomous() {
-    	Autonomous auto = new Autonomous(robotHeading, robotMove, drive);
+    	Autonomous auto = new Autonomous(robot_heading, robot_move, drive);
 //    	auto.turn_to_angle( 90.0, 10.0 );
     }
     
     public void operatorControl() {
     	double dt;
-    	Iterative_Timer timer = new Iterative_Timer();
+    	IterativeTimer timer = new IterativeTimer();
     	timer.reset();
     	Heading heading = new Heading( gyro );
     	heading.set_vars( 0.08, 0.0, 0.0 );
@@ -88,32 +89,32 @@ public class Robot extends SampleRobot {
     	prefs.putDouble( name + "_p", 0.0 );
 		prefs.putDouble( name + "_i", 0.0 );
 		prefs.putDouble( name + "_d", 0.0 );
-		
-    	
+		boolean pressed = true;
+    	boolean shooter_button = false;
+    	boolean shoot_toggle = false;
        	while ( isOperatorControl() && isEnabled() ) {
     		timer.update();
     		dt = timer.get_dt();
-    		
-    		
-    		if ( drive_controller.get_b_button() ) {
-    			double p = prefs.getDouble( name + "_p", 0.0 );
-    			double i = prefs.getDouble( name + "_i", 0.0 );
-    			double d = prefs.getDouble( name + "_d", 0.0 );
-    			
-    			heading.set_vars( p, i, d );
-    			
-    		}
-    		
-    		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
-    		SmartDashboard.putNumber("Right Encoder", right_drive_encoder.get());
-    		SmartDashboard.putNumber("Angle", gyro.getFusedHeading() );
-    		if( drive_controller.get_a_button() ) {
-    			heading.update( dt );
-    			SmartDashboard.putNumber("Angle", heading.get());
-    			drive.arcadeDrive( 0.0, PID.clamp(heading.get(), 0.5));
+    		//smooth_drive.ramp_drive(dt);
+    		if ( drive_controller.get_a_button() && pressed ) {
+    			double d = drive_controller.get_right_y_axis();
+    			s.set( d );
+    			System.out.println( d );
+    			pressed = false;
     		} else {
-    			smooth_drive.ramp_drive( dt );
+    			pressed = true;
     		}
+    		if ( drive_controller.get_b_button() && (!(shooter_button)) ) {
+    			shooter_button = true;
+    			shoot_toggle = !shoot_toggle;
+    		} else if(!(drive_controller.get_b_button())) {
+    			shooter_button = false;
+    		}
+    		
+    		if(shoot_toggle) {
+    			//shooter code
+    		}
+    		
     	}
     }	
     //End of operatorControl

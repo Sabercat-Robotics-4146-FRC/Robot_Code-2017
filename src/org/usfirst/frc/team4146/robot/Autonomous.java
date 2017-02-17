@@ -3,16 +3,16 @@ import edu.wpi.first.wpilibj.RobotDrive;
 
 public class Autonomous {
 	Heading heading;
-	Move_Distance distance;
+	MoveDistance distance;
 	RobotDrive drive;
 	
-	Iterative_Timer timer = new Iterative_Timer();
+	IterativeTimer timer = new IterativeTimer();
 	
 	private final double acceptable_distance_error = 0.5;
 	private final double acceptable_angle_error = 10.0;
 	private final double timeOut = 5.0; //Timeout time for each command. If time elapsed since the start of the command passes this value, it should stop.
 	
-	Autonomous(Heading h, Move_Distance md, RobotDrive rD) {
+	Autonomous(Heading h, MoveDistance md, RobotDrive rD) {
 		heading = h;
 		distance = md;
 		drive = rD;

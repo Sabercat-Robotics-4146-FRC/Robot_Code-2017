@@ -19,7 +19,7 @@ public class Heading {
 			public double getValue() {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
-		});
+		}, false);
 		heading_pid.set_setpoint(0.0);
 		
 	}

@@ -28,8 +28,12 @@ public class PID {
 	
 	private boolean sp_ramp_enabled;
 	PID sp_ramp_pid;
+	
+	private boolean integral_stack_enabled;
+	private double integral_sum;
 
-	public PID ( signal functions ){
+	public PID ( signal functions, boolean doesIntegralHaveMaxSize ){
+		integral_stack_enabled = doesIntegralHaveMaxSize;
 		sp_ramp_enabled = false;
 		this.functions = functions;
 		//integral = 0;
@@ -69,16 +73,26 @@ public class PID {
 		}
 		error = setpoint - functions.getValue();
 		error_stack.push( error );
-		integral_stack.push( ( Ki * error * dt ) );
-
+		if( integral_stack_enabled ) {
+			integral_stack.push( ( Ki * error * dt ) );
+		} else {
+			integral_sum += ( Ki * error * dt);
+		}
 		derivative = ( error - prevError ) / dt;// inconsistent with the github version, swapped vars.
 		derivative_stack.push( derivative );
 		prevError = error;
-		output = ( Kp * error ) + ( integral_stack.sum() ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
-		SmartDashboard.putNumber("P out", Kp * error);
-		SmartDashboard.putNumber("I out", integral_stack.sum());
-		SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
+		if( integral_stack_enabled ) {
+			output = ( Kp * error ) + ( integral_stack.sum() ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
+			SmartDashboard.putNumber("P out", Kp * error);
+			SmartDashboard.putNumber("I out", integral_stack.sum());
+			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
+		} else {
+			output = ( Kp * error ) + ( integral_sum ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
+			SmartDashboard.putNumber("P out", Kp * error);
+			SmartDashboard.putNumber("I out", integral_sum);
+			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
 
+		}
 	}
 	public double get() {
 		return output;

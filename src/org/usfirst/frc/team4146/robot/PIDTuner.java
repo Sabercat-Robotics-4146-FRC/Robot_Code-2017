@@ -7,16 +7,16 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class PID_Tuner {
+public class PIDTuner {
 	
 	private Controller drive_controller;
 	private String name;
-	private applyPID plant;
+	private ApplyPID plant;
 	private PID pid;
 	
 	private Preferences prefs = Preferences.getInstance();
 	
-	PID_Tuner( String name, PID pid, Controller drive_controller, applyPID plant ) {
+	PIDTuner( String name, PID pid, Controller drive_controller, ApplyPID plant ) {
 		this.pid = pid;
 		this.drive_controller = drive_controller;
 		this.name = name;

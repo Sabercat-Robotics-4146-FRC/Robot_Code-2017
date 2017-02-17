@@ -3,7 +3,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import org.usfirst.frc.team4146.robot.PID.*;
 
-public class Move_Distance {
+public class MoveDistance {
 	private final double ENCODER_TICKS_PER_REVOLUTION = 360.0;
 	private final double WHEEL_DIAMETER = 7.625;
 	private final double ENCODER_CONVERSION = ENCODER_TICKS_PER_REVOLUTION / (WHEEL_DIAMETER * Math.PI);// YAY.
@@ -14,7 +14,7 @@ public class Move_Distance {
 	
 	private PID move_pid;
 	
-	Move_Distance( Encoder r, Encoder l ) {
+	MoveDistance( Encoder r, Encoder l ) {
 		right_drive_encoder = r;
 		left_drive_encoder = l;
 		
@@ -24,7 +24,7 @@ public class Move_Distance {
 			public double getValue() {
 				return convert_to_feet( encoder_distance() );
 			}
-		});
+		}, false);
 	}
 	
 	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer	

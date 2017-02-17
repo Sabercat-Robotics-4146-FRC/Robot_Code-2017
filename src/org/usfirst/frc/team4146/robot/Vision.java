@@ -22,7 +22,7 @@ public class Vision {
     			}
     			return x - 160.0;
 			}
-		});
+		}, false);
 		this.center_pid.set_pid( 0.008, 0, 0 );
 	}
 	public double get_distance() {

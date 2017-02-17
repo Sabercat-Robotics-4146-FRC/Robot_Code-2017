@@ -2,12 +2,13 @@ package org.usfirst.frc.team4146.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class Iterative_Timer {
+public class IterativeTimer {
 	private long startTime = 0;
 	private long thisTime = 0;
 	private long lastTime = 0;
 	private double dt = 0;
-	Iterative_Timer() {
+	
+	public IterativeTimer() {
 		startTime = System.nanoTime();
 		thisTime = startTime;
 		lastTime = startTime;

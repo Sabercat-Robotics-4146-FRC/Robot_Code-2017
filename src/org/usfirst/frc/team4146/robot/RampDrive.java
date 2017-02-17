@@ -2,7 +2,7 @@ package org.usfirst.frc.team4146.robot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 
-public class Ramp_Drive {
+public class RampDrive {
 	
 	// Constants
 	private static final double accelerate_rate = 0.65;
@@ -17,7 +17,7 @@ public class Ramp_Drive {
 	private Controller drive_controller;
 	private RobotDrive drive;
 	
-	Ramp_Drive(Controller dc, RobotDrive d) {												//Constructor brings drive controller to get joystick values and drive object to use arcade drive
+	RampDrive(Controller dc, RobotDrive d) {												//Constructor brings drive controller to get joystick values and drive object to use arcade drive
 		drive_controller = dc;
 		drive = d;
 	}
