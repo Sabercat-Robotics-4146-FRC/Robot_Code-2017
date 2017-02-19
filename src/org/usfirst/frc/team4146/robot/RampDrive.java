@@ -15,20 +15,23 @@ public class RampDrive {
 	private double targetSpeed;
 	
 	private Controller drive_controller;
-	private RobotDrive drive;
 	
-	RampDrive(Controller dc, RobotDrive d) {												//Constructor brings drive controller to get joystick values and drive object to use arcade drive
+	
+	RampDrive(Controller dc) {												//Constructor brings drive controller to get joystick values and drive object to use arcade drive
 		drive_controller = dc;
-		drive = d;
+		
 	}
 	
-	public void ramp_drive(double dt) { //Given dt, which should come from Iterative_Timer
+	public void update(double dt) { //Given dt, which should come from Iterative_Timer
 		double left_y = drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. 
 		
-		left_y = check_speed(left_y, dt);														//Main function which does ramping and preliminary checks
-		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
+		left_y = check_speed(left_y, dt);													//Main function which does ramping and preliminary checks 
 	  //System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );	//Print Values for testing
 		//Timer.delay( 0.005 );																//Possibly Useless
+	}
+	
+	public double getSpeed() {
+		return speed;
 	}
 	
 	public double check_speed(double left_y, double dt ) {

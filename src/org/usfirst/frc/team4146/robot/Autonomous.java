@@ -1,5 +1,8 @@
 package org.usfirst.frc.team4146.robot;
+import org.usfirst.frc.team4146.robot.PID.PID;
+
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Autonomous {
 	Heading heading;
@@ -23,18 +26,22 @@ public class Autonomous {
 		distance.reset();
 		distance.set_distance(dis);
 		timer.reset();
-		
-		distance.set_distance( dis );
-		
+		double dt = timer.get_dt();
+		//heading.update( dt );
+		distance.update( dt );
+		System.out.println("POINT 1");
 		while((Math.abs(distance.get_steady_state_error()) > acceptable_distance_error) && (timer.timeSinceStart() < timeOut)) {
+			System.out.println("Point 2");
+			System.out.printf("TimePassed: %f \n", timer.timeSinceStart());
+			
 			timer.update();
-			double dt = timer.get_dt();
+			dt = timer.get_dt();
 			
 			// Update subsystem PIDs
-			distance.update( dt );
 //			heading.update( dt );
-			
-//			drive.arcadeDrive( distance.get(), heading.get() );
+			distance.update( dt );
+			SmartDashboard.putNumber("Distance Pid", PID.clamp(distance.get(), 0.6));
+			drive.arcadeDrive( PID.clamp(distance.get(), 0.6), 0.0);
 		}
 	}
 	

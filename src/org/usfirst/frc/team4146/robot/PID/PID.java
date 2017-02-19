@@ -32,6 +32,17 @@ public class PID {
 	private boolean integral_stack_enabled;
 	private double integral_sum;
 
+	public PID ( signal functions){
+		integral_stack_enabled = false;
+		sp_ramp_enabled = false;
+		this.functions = functions;
+		//integral = 0;
+		setpoint = 0;
+		integral_stack = new SizedStack( 10 );
+		derivative_stack = new SizedStack( 3 );
+		error_stack = new SizedStack( 5 );
+	}
+	
 	public PID ( signal functions, boolean doesIntegralHaveMaxSize ){
 		integral_stack_enabled = doesIntegralHaveMaxSize;
 		sp_ramp_enabled = false;

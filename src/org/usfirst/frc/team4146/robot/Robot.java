@@ -14,7 +14,10 @@ import edu.wpi.first.wpilibj.Servo;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
-	
+	enum servo_state {
+		extending,
+		retracting
+	}
 	Controller drive_controller;
 	
 	Talon front_left;
@@ -44,7 +47,7 @@ public class Robot extends SampleRobot {
     		
     		// Instantiate robot's drive with Talons
     		drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    		smooth_drive = new RampDrive( drive_controller, drive );
+    		smooth_drive = new RampDrive( drive_controller);
     		gyro = new AHRS( SPI.Port.kMXP );
     		
     		robot_heading = new Heading( gyro );
@@ -64,7 +67,7 @@ public class Robot extends SampleRobot {
 		rear_left.setSafetyEnabled(false);
 		front_right.setSafetyEnabled(false);
 		rear_right.setSafetyEnabled(false);
-    	
+    	robot_move.set_pid(0.1, 0.0, 0.0);
 		
 		
 		gyro.reset();
@@ -72,16 +75,87 @@ public class Robot extends SampleRobot {
 	
     public void autonomous() {
     	Autonomous auto = new Autonomous(robot_heading, robot_move, drive);
-//    	auto.turn_to_angle( 90.0, 10.0 );
+    	auto.move_forward(10.0);
     }
     
     public void operatorControl() {
     	double dt;
-    	IterativeTimer timer = new IterativeTimer();
-    	timer.reset();
+    	double driveTrainTurn;
+    	double driveTrainMove;
+    	int servoState = 0;
+    	boolean aButtonLastPress = false;
+    	boolean flyWheelOn = false;
+    	boolean isServoForward = false;
+    	boolean isOscillationOn = false;
+    	boolean bFlag = true;
+    	boolean xFlag = true;
+    	boolean yFlag = true;
+    	long lastTime = System.nanoTime();
+    	long thisTime = System.nanoTime();
+    	IterativeTimer timerMain = new IterativeTimer();
     	Heading heading = new Heading( gyro );
-    	heading.set_vars( 0.08, 0.0, 0.0 );
-    	heading.rel_angle_turn( 90 );
+    	
+    	double time_accumulator = 0;
+    	servo_state linear_servo_state = servo_state.extending;
+    	
+    	while ( isOperatorControl() && isEnabled() ) {
+    		timerMain.update();
+    		dt = timerMain.get_dt();
+    		 
+    		smooth_drive.update(dt);
+    		
+    		driveTrainTurn = drive_controller.get_deadband_right_x_axis(); //Use Heading
+    		driveTrainMove = smooth_drive.getSpeed();
+    		
+    		drive.arcadeDrive( driveTrainMove, driveTrainTurn);
+    		
+    		flyWheelOn = (( drive_controller.get_a_button() ) && (!(aButtonLastPress))) ? (!flyWheelOn) : (flyWheelOn);
+    		aButtonLastPress = drive_controller.get_a_button();
+    		
+    		if(drive_controller.get_b_button() && bFlag) {
+    			bFlag = false;
+    			isOscillationOn = false;
+    		} else if(!drive_controller.get_b_button()) {
+    			bFlag = true;
+    		}
+    		
+    		if(drive_controller.get_x_button() && xFlag) {
+    			xFlag = false;
+    			isOscillationOn = true;
+    		} else if(!drive_controller.get_x_button()) {
+    			xFlag = true;
+    		}
+    		if(drive_controller.get_y_button() && yFlag) {
+    			yFlag = false;
+    			System.out.println(time_accumulator);
+    		} else if(!drive_controller.get_y_button()) {
+    			yFlag = true;
+    		}
+    		time_accumulator += dt;
+
+    		if( true ) {
+    			if( time_accumulator > 5.5 ) {
+    				switch ( linear_servo_state ) {
+    					case extending:
+    						s.set( 0.2 );
+    						time_accumulator = 0.0;
+    						linear_servo_state = servo_state.retracting;
+    						break;
+    					case retracting:
+    						s.set( 0.8 );
+    						time_accumulator = 0.0;
+    						linear_servo_state = servo_state.extending;
+    						break;
+    					default:
+    						System.out.println( "Defaulted!" );
+    						break;
+    				}
+    			}
+    		}
+    		
+    	}
+    	/*
+    	
     	
     	
     	Preferences prefs = Preferences.getInstance();
@@ -115,7 +189,7 @@ public class Robot extends SampleRobot {
     			//shooter code
     		}
     		
-    	}
+    	}*/
     }	
     //End of operatorControl
 
