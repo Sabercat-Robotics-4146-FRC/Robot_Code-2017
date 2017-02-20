@@ -23,15 +23,17 @@ public class Vision {
     			return x - 160.0;
 			}
 		});
-		this.center_pid.set_pid( 0.008, 0, 0 );
+		this.center_pid.set_pid( 0.008, 0, 0.1 );
 	}
 	public double get_distance() {
 		return ( width * focal_length ) / table.getNumber( network_name + "_w", 0.0 );
 	}
+	// Updates PID
 	public void update( double dt ) {
 		center_pid.update( dt );
 	}
-	public double get_center_out() {
+	// Gets PID controller value output
+	public double get() {
 		return center_pid.get();
 	}
 }

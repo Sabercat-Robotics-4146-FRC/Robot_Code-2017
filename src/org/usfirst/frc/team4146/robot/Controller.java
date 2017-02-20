@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4146.robot;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.;
 
 /**
  * The Controller class is a wrapper for the WPI Joystick class for the use of Xbox 360 Controllers (was Logitech Controllers)
@@ -203,6 +205,16 @@ public class Controller {
 			return joystick_input;
 		}
 	}
+	
+	/**
+	 *	Rumble Code!!!
+	 *@return Joystick used for the contorller
+	 */
+	
+//	public void rumble( float l, float r ){
+//		setRumble( RumbleType.kLeftRumble, l );
+//		setRumble( RumbleType.kRightRumble, r );
+//	}
 	
 	/**
 	 *	Used just in case we need the raw joystick.

@@ -22,17 +22,16 @@ public class Ramp_Drive {
 		drive = d;
 	}
 	
-	public void ramp_drive(double dt) { //Given dt, which should come from Iterative_Timer
+	public double ramp_drive(double dt) {//Given dt, which should come from Iterative_Timer
 		double left_y = drive_controller.get_deadband_left_y_axis();						//creates variable left_y which stores the value of the left y axis joystick. 
 		
 		left_y = check_speed(left_y, dt);														//Main function which does ramping and preliminary checks
-		drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
-	  //System.out.printf( "% 5.2f -- % 5.2f -- % 5.2f \n", left_y, targetSpeed, speed );	//Print Values for testing
-		//Timer.delay( 0.005 );																//Possibly Useless
+		//drive.arcadeDrive( speed, -1 * drive_controller.get_deadband_right_x_axis() );		//Sends value 
+		return speed;
 	}
 	
 	public double check_speed(double left_y, double dt ) {
-		mechanical_deadband( left_y );														//Method sets speed to outside mechanical deadband speed if it is within deadband and joystick is out of deadband
+		mechanical_deadband_escape( left_y );														//Method sets speed to outside mechanical deadband speed if it is within deadband and joystick is out of deadband
 		targetSpeed = find_target_speed( left_y );
 		if((speed > -mech_deadband) && (speed < mech_deadband)) {							//If speed is within the deadband, just set it to zero
 			speed = 0.0;
@@ -53,7 +52,7 @@ public class Ramp_Drive {
 		return left_y;																		//Return value just for printf statement
 	}
 
-	private void mechanical_deadband(double left_y) {										//Does mechanical deadband
+	private void mechanical_deadband_escape(double left_y) {										//Does mechanical deadband
 		if( (left_y > 0) && (speed == 0.0) ) {
 			speed = mech_deadband;
 		}

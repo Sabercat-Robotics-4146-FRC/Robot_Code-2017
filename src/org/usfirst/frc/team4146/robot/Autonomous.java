@@ -20,22 +20,22 @@ public class Autonomous {
 	}
 	
 	public void move_forward( double dis ) {
+		double dt;
 		distance.reset();
 		distance.set_distance(dis);
 		timer.reset();
 		
-		distance.set_distance( dis );
-		
-		while((Math.abs(distance.get_steady_state_error()) > acceptable_distance_error) && (timer.timeSinceStart() < timeOut)) {
+		do {
 			timer.update();
-			double dt = timer.get_dt();
+			dt = timer.get_dt();
 			
 			// Update subsystem PIDs
 			distance.update( dt );
 //			heading.update( dt );
 			
-//			drive.arcadeDrive( distance.get(), heading.get() );
-		}
+			drive.arcadeDrive( distance.get(), heading.get() );
+		} while((Math.abs(distance.get_steady_state_error()) > acceptable_distance_error) && (timer.timeSinceStart() < timeOut));
+		
 	}
 	
 //	public void turn_to_angle(double angle, double acceptable_error) {

@@ -28,17 +28,9 @@ public class Iterative_Timer {
 		return dt;
 	}
 	
-	
-	public double convert_nano_to_sec(long nano) {		//Don't use this on a full time, only dt, as a long has many more digits than double.
-		try{
+	public double convert_nano_to_sec(long nano) {		
 			return (nano * (1e-9));
-		} catch( RuntimeException ex ) {
-			DriverStation.reportWarning("Likely an overflow in conversion: " + ex.getMessage(), true);
-		}
-		return 0;
-		
 	}
-	
 	
 	public double timeSinceStart() {
 		return convert_nano_to_sec( System.nanoTime() - startTime );

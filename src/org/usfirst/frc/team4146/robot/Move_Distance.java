@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj.Timer;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Move_Distance {
-	private final double ENCODER_TICKS_PER_REVOLUTION = 360.0;
-	private final double WHEEL_DIAMETER = 7.625;
-	private final double ENCODER_CONVERSION = ENCODER_TICKS_PER_REVOLUTION / (WHEEL_DIAMETER * Math.PI);// YAY.
+	private final double ENCODER_TICKS_PER_REVOLUTION = 360.0; //79% sure / rocky trust
+	private final double WHEEL_DIAMETER = 7.625; // Inches
+	private final double ENCODER_CONVERSION = (  ENCODER_TICKS_PER_REVOLUTION / ( WHEEL_DIAMETER * Math.PI ) ) * 12;// YAY.
 
 	
 	Encoder right_drive_encoder;
@@ -25,16 +25,19 @@ public class Move_Distance {
 				return convert_to_feet( encoder_distance() );
 			}
 		});
+		move_pid.set_pid( 0.2, 0, 0 );
 	}
 	
 	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer	
-		move_pid.update(dt);
+		move_pid.update( dt );
 	}
 	
+	// Returns distance in feet
 	public double get() {
 		return move_pid.get();
 	}
 	
+	// Resets Encoders
 	public void reset() {
 		left_drive_encoder.reset();
 		right_drive_encoder.reset();
@@ -45,17 +48,17 @@ public class Move_Distance {
 	}
 	
 	public void set_setpoint( double s ) {
-		set_distance( s );
+		move_pid.set_setpoint( s );
 	}
 	
 	public void set_distance(double d) {
-		move_pid.set_setpoint( convert_to_feet( d ) );
+		move_pid.set_setpoint( d );
 	}
-	
-	private double convert_to_feet(double f) {
-		return (f * ENCODER_CONVERSION);
+	// Converts encoder ticks to feet
+	private double convert_to_feet( double e ) {
+		return ( e / ENCODER_CONVERSION );
 	}
-	
+	// Returns average encoder ticks
 	private double encoder_distance() {
 		return ( ( right_drive_encoder.getRaw() + left_drive_encoder.getRaw() ) / 2 );
 	}
