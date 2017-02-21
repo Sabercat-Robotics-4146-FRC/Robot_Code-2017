@@ -40,9 +40,9 @@ public class Robot extends SampleRobot {
 	}
 	
 	// Shooter RPM parameters
-	static double shooter_rpm_tolerance = 5;
+	static double shooter_rpm_tolerance = 10;
 	static double shooter_rpm_setpoint  = -2200.0;
-	static double shooter_intake_speed  = -0.2;
+	static double shooter_intake_speed  = -1.0;
 	Controller drive_controller;
 	
 	
@@ -56,13 +56,14 @@ public class Robot extends SampleRobot {
 	Talon ball_intake;
 	Talon shooter_intake;
 	Talon vibrator;
+	Talon lifter;
 	
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
 	RobotDrive drive;
 	
-	//AHRS gyro;
+	AHRS gyro;
 	
 	//Heading robotHeading;
 	
@@ -73,13 +74,15 @@ public class Robot extends SampleRobot {
 	
 	Servo linear_servo;
 	Servo gear_servo;
-	
+	Servo left_lifter_servo;
+	Servo right_lifter_servo;
 	
 	NetworkTable network_table;
 	
 	Vision gear_vision;
 	
     public Robot() {
+    	gyro = new AHRS( SPI.Port.kMXP );
     	//Initialize network tables
     	network_table = NetworkTable.getTable( "SmartDashboard" );
     	
@@ -99,7 +102,9 @@ public class Robot extends SampleRobot {
     	shooter_intake 	= new Talon( 5 );
     	
     	vibrator		= new Talon( 6 );
-    		
+    	
+    	lifter			= new Talon( 7 );
+    	
     	//Talon SRX Initialization 
     	master_shooter 	= new CANTalon( 0 );
     	slave_shooter 	= new CANTalon( 1 );
@@ -111,10 +116,10 @@ public class Robot extends SampleRobot {
     	master_shooter.configPeakOutputVoltage(+12.0f, -12.0f);
     	
     	master_shooter.setProfile( 0 );
-    	master_shooter.setF( 0.0 ); // was 0.1097
-        master_shooter.setP( 0.0 ); // was 0.22
-        master_shooter.setI( 0.0002 ); // was 0
-        master_shooter.setD( 0.01 );
+//    	master_shooter.setF( 0.0 ); // was 0.1097
+//        master_shooter.setP( 0.0 ); // was 0.22
+//        master_shooter.setI( 0.0002 ); // was 0
+//        master_shooter.setD( 0.01 );
     		
     	//Setting slave_talon 
     	slave_shooter.changeControlMode( CANTalon.TalonControlMode.Follower );
@@ -124,8 +129,10 @@ public class Robot extends SampleRobot {
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
     		
-    	linear_servo = new Servo( 9 );
+    	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
+    	left_lifter_servo = new Servo( 11 );
+    	right_lifter_servo = new Servo( 12 );
     }
     
     public void robotInit() {
@@ -184,7 +191,7 @@ public class Robot extends SampleRobot {
     	
     	double forward_torque;
     	double spin_torque;
-    	gear_servo.set( 0.2 );
+    	//gear_servo.set( 0.2 );
     	// out = 0.45
     	//  in = 0.2
     	while ( isOperatorControl() && isEnabled() ) {
@@ -212,17 +219,23 @@ public class Robot extends SampleRobot {
     			state = robot_state.idle;
     		}
     		
+    		if ( drive_controller.get_y_button() ) {
+    			lifter.set( -1.0 );
+    		}
+    		if ( !drive_controller.get_y_button() ) {
+    			lifter.set( 0.0 );
+    		}
     		// handle gear servo
     		if ( drive_controller.get_x_button() && x_button_toggle ) {
     			x_button_toggle = false;
     			switch ( gear ) {
     				case in:
     					System.out.println( "Moving Out!" );
-    					gear_servo.set( 0.45 );
+    					gear_servo.set( 0.3 );
     					break;
     				case out:
     					System.out.println( "Moving In!" );
-    					gear_servo.set( 0.2 );
+    					gear_servo.set( 0.5 );
     					break;
     				default:
     					break;
@@ -244,17 +257,20 @@ public class Robot extends SampleRobot {
     				master_shooter.set( shooter_rpm_setpoint );
     				
     				// Network Table debugging
+    				network_table.putNumber( "Shooter_RPM",  master_shooter.getSpeed() );
     				network_table.putNumber( "Shooter Error", master_shooter.getSpeed() - master_shooter.getSetpoint() );
     				network_table.putNumber( "Get value", master_shooter.get() );
     				network_table.putNumber( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
     				
     				
-        			ball_intake.set( -0.6 );
+        			ball_intake.set( -0.35 );
         			vibrator.set( 0.7 );
         			oscillate_servo();
         			// Only feed balls to shooter if RPM is within a tolerance.
         			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
         				shooter_intake.set( shooter_intake_speed );
+        			} else {
+        				shooter_intake.set( 0.0 );
         			}
     				break;
     			case sicem:
@@ -271,7 +287,7 @@ public class Robot extends SampleRobot {
         			}
     				break;
     			case intaking:
-    				ball_intake.set( -0.6 );
+    				ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
     				master_shooter.set( -1.0 );
@@ -294,6 +310,7 @@ public class Robot extends SampleRobot {
     		
     		drive.arcadeDrive( forward_torque, spin_torque );
     		
+    		//System.out.println( master_shooter.getSpeed() );
     	}
 }	
     //End of operatorControl
