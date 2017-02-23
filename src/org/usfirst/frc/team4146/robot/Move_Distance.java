@@ -12,7 +12,7 @@ public class Move_Distance {
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
-	private PID move_pid;
+	public PID move_pid;
 	
 	Move_Distance( Encoder r, Encoder l ) {
 		right_drive_encoder = r;
