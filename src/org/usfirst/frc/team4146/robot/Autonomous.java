@@ -25,6 +25,8 @@ public class Autonomous {
 		distance.set_distance(dis);
 		timer.reset();
 		
+		distance.move_pid.fill_error( 1 );
+		
 		do {
 			timer.update();
 			dt = timer.get_dt();
@@ -33,7 +35,9 @@ public class Autonomous {
 			distance.update( dt );
 //			heading.update( dt );
 			
-			drive.arcadeDrive( distance.get(), heading.get() );
+			drive.arcadeDrive( distance.get(), /*heading.get()*/ 0.0 );
+			
+			
 		} while((Math.abs(distance.get_steady_state_error()) > acceptable_distance_error) && (timer.timeSinceStart() < timeOut));
 		
 	}
