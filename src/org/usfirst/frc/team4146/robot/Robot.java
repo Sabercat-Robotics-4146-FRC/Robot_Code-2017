@@ -42,8 +42,9 @@ public class Robot extends SampleRobot {
 	// Shooter RPM parameters
 	static double shooter_rpm_tolerance = 10;
 	static double shooter_rpm_setpoint  = -2200.0;
-	static double shooter_intake_speed  = -1.0;
+	static double shooter_intake_speed  = -0.4;
 	Controller drive_controller;
+	Controller lifting_controller;
 	
 	
 	// Motor Controller init
@@ -56,8 +57,7 @@ public class Robot extends SampleRobot {
 	Talon ball_intake;
 	Talon shooter_intake;
 	Talon vibrator;
-	Talon lifter;
-	
+		
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
@@ -74,12 +74,12 @@ public class Robot extends SampleRobot {
 	
 	Servo linear_servo;
 	Servo gear_servo;
-	Servo left_lifter_servo;
-	Servo right_lifter_servo;
 	
 	NetworkTable network_table;
 	
 	Vision gear_vision;
+	
+	Lifting lifting;
 	
     public Robot() {
     	gyro = new AHRS( SPI.Port.kMXP );
@@ -90,7 +90,12 @@ public class Robot extends SampleRobot {
     	gear_vision = new Vision( "gear", network_table );
     	
     	//Controller Initialization 
-    	drive_controller = new Controller( 0 );	
+    	drive_controller = new Controller( 0 );
+    	lifting_controller = new Controller( 1 );
+    	
+    	//Initializing Lifter Process.
+    	lifting = new Lifting( lifting_controller );
+    	
     	//Talon SR Initialization 
     	front_left  	= new Talon( 0 );
     	rear_left   	= new Talon( 1 );
@@ -103,7 +108,7 @@ public class Robot extends SampleRobot {
     	
     	vibrator		= new Talon( 6 );
     	
-    	lifter			= new Talon( 7 );
+    	
     	
     	//Talon SRX Initialization 
     	master_shooter 	= new CANTalon( 0 );
@@ -131,8 +136,7 @@ public class Robot extends SampleRobot {
     		
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
-    	left_lifter_servo = new Servo( 11 );
-    	right_lifter_servo = new Servo( 12 );
+    	
     }
     
     public void robotInit() {
@@ -162,7 +166,7 @@ public class Robot extends SampleRobot {
 					linear_servo_state = servo_state.retracting;
 					break;
 				case retracting:
-					linear_servo.set( 0.8 );
+					linear_servo.set( 0.7 );
 					time_accumulator = 0.0;
 					linear_servo_state = servo_state.extending;
 					break;
@@ -199,6 +203,7 @@ public class Robot extends SampleRobot {
     		timer.update();
     		dt = timer.get_dt();
     		gear_vision.update( dt );
+    		lifting.update();
     		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
@@ -207,11 +212,11 @@ public class Robot extends SampleRobot {
     		// Check button inputs and change state 
     		if ( drive_controller.get_right_trigger() ) { // Shoot with right trigger,
     			state = robot_state.shooting;
-    		} else if ( drive_controller.get_a_button() ) { // Intake with A button
+    		} else if ( drive_controller.get_left_trigger() ) { // Ball intake with left trigger.
     			state = robot_state.intaking;
     		} else if ( drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
     			state = robot_state.testing_shooter;
-    		} else if ( drive_controller.get_left_trigger() ) {
+    		} else if ( drive_controller.get_left_bumper() ) {
     			state = robot_state.gear_tracking;
     		} else if ( drive_controller.get_right_bumper() ) {
     			state = robot_state.sicem;
@@ -219,12 +224,6 @@ public class Robot extends SampleRobot {
     			state = robot_state.idle;
     		}
     		
-    		if ( drive_controller.get_y_button() ) {
-    			lifter.set( -1.0 );
-    		}
-    		if ( !drive_controller.get_y_button() ) {
-    			lifter.set( 0.0 );
-    		}
     		// handle gear servo
     		if ( drive_controller.get_x_button() && x_button_toggle ) {
     			x_button_toggle = false;
@@ -263,8 +262,8 @@ public class Robot extends SampleRobot {
     				network_table.putNumber( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
     				
     				
-        			ball_intake.set( -0.35 );
-        			vibrator.set( 0.7 );
+        			//ball_intake.set( -0.35 );
+        			//vibrator.set( 0.7 );
         			oscillate_servo();
         			// Only feed balls to shooter if RPM is within a tolerance.
         			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
@@ -287,6 +286,7 @@ public class Robot extends SampleRobot {
         			}
     				break;
     			case intaking:
+    				//ball_intake.set( -1.0 );
     				ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
@@ -316,10 +316,44 @@ public class Robot extends SampleRobot {
     //End of operatorControl
 
     public void test() {
+    	StringBuilder sb = new StringBuilder();
+    	int _loops = 0;
     	while ( isTest() && isEnabled() ) {
-    //		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
+    		double leftYstick = -drive_controller.get_left_y_axis();
+    		double motorOutput = master_shooter.getOutputVoltage() / master_shooter.getBusVoltage();
+    		
+    			sb.append("\tout:");
+    			sb.append(motorOutput);
+    			sb.append("\tspd:");
+    			sb.append(master_shooter.getSpeed());
+    			if(drive_controller.get_a_button())
+    			{
+    				double targetSpeed = leftYstick * 1500.0;
+    				master_shooter.changeControlMode(TalonControlMode.Speed);
+    				master_shooter.set(targetSpeed); /* 1500 RPM in either direction */
+
+    	        	/* append more signals to print when in speed mode. */
+    	            sb.append("\terr:");
+    	            sb.append(master_shooter.getClosedLoopError());
+    	            sb.append("\ttrg:");
+    	            sb.append(targetSpeed);
+    	        } else {
+    	        	/* Percent voltage mode */
+    	        	master_shooter.changeControlMode(TalonControlMode.PercentVbus);
+    	        	master_shooter.set(leftYstick);
+    	        }
+
+    	        if(++_loops >= 10) {
+    	        	_loops = 0;
+    	        	System.out.println(sb.toString());
+    	        }
+    	        sb.setLength(0);
+    			
+    		
+    		
+    		//		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
     //		SmartDashboard.putNumber("Right Encoder", right_drive_encoder.get());
-    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), drive_controller.get_deadband_right_x_axis());
+    		//drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), drive_controller.get_deadband_right_x_axis());
     	}
     }
     //End of test
