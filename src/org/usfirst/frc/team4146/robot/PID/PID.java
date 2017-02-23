@@ -25,6 +25,7 @@ public class PID {
 	private SizedStack derivative_stack;
 	/* Make error tolerance stack, used for steady state error breakouts */
 	private SizedStack error_stack;
+	private int error_stack_size;
 	
 	private boolean sp_ramp_enabled;
 	PID sp_ramp_pid;
@@ -36,7 +37,9 @@ public class PID {
 		setpoint = 0;
 		integral_stack = new SizedStack( 10 );
 		derivative_stack = new SizedStack( 3 );
-		error_stack = new SizedStack( 5 );
+		
+		error_stack_size = 20;
+		error_stack = new SizedStack( error_stack_size );
 	}
 	public void set_integral_range( int n ) {
 		integral_stack.resize( n );
@@ -58,6 +61,11 @@ public class PID {
 	public void set_sp_ramp( PID sp_pid ) {
 		sp_ramp_enabled = true;
 		sp_ramp_pid = sp_pid;
+	}
+	public void fill_error( double e ) {
+		for ( int i = 0; i < error_stack_size; i++ ) {
+			error_stack.push( e );
+		}
 	}
 	public double steady_state_error() {
 		return error_stack.mean();
