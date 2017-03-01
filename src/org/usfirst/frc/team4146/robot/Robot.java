@@ -79,7 +79,7 @@ public class Robot extends SampleRobot {
 	
 	Vision gear_vision;
 	
-	Lifting lifting;
+	Lifter lifting;
 	
     public Robot() {
     	gyro = new AHRS( SPI.Port.kMXP );
@@ -94,7 +94,7 @@ public class Robot extends SampleRobot {
     	lifting_controller = new Controller( 1 );
     	
     	//Initializing Lifter Process.
-    	lifting = new Lifting( lifting_controller );
+    	lifting = new Lifter( lifting_controller );
     	
     	//Talon SR Initialization 
     	front_left  	= new Talon( 0 );
