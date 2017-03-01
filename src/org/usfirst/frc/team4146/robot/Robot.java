@@ -19,6 +19,8 @@ import com.ctre.CANTalon.*;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
+		
+	/* State Machines initialization */
 	
 	// Servo state machine
 	enum servo_state {
@@ -39,15 +41,25 @@ public class Robot extends SampleRobot {
 		idle
 	}
 	
+	
+	/* Global Variable initialization */
+	
 	// Shooter RPM parameters
 	static double shooter_rpm_tolerance = 10;
 	static double shooter_rpm_setpoint  = -2200.0;
 	static double shooter_intake_speed  = -0.4;
+	
+	
+	/* Controller initialization */
+	
+	// Driver's Remote Controller initialization
 	Controller drive_controller;
 	Controller lifting_controller;
 	
 	
-	// Motor Controller init
+	/* Motor initialization */
+	
+	// Talon SR Motor Controller initialization
 	Talon front_left;
 	Talon rear_left;
 	
@@ -57,46 +69,66 @@ public class Robot extends SampleRobot {
 	Talon ball_intake;
 	Talon shooter_intake;
 	Talon vibrator;
-		
+	Talon lifter;
+	
+	// CANTalon SRX Motor Controller initialization
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
-	RobotDrive drive;
+	// Servo Motor initialization
+	Servo gear_servo;
+	Servo locking_servo;
+	Servo linear_servo;
+	Servo left_lifter_finger_servo;
+	Servo right_lifter_finger_servo;
 	
+
+	/* Sensor and Network Tables initialization */
+	
+	//Nav-x Gyro initialization
 	AHRS gyro;
-	
-	//Heading robotHeading;
 	
 	//Encoder right_drive_encoder;
 	//Encoder left_drive_encoder;
-	Ramp_Drive smooth_drive;
-	Move_Distance robotMove;
 	
-	Servo linear_servo;
-	Servo gear_servo;
-	
+	//Network Tables initialization
 	NetworkTable network_table;
 	
+	
+	/* Subclass initialization */
+	
+	//RobotDrive initialization
+	RobotDrive drive;
+	
+	//Ramp_Drive initialization
+	Ramp_Drive smooth_drive;
+	
+	//Vision initialization
 	Vision gear_vision;
 	
+	//Lifting initialization
 	Lifting lifting;
 	
+	//Shooting initialization
+	Shooting shooter;
+	
+	//Heading robotHeading;
+	
+	//Move_Distance initialization
+	Move_Distance robotMove;
+		
     public Robot() {
-    	gyro = new AHRS( SPI.Port.kMXP );
-    	//Initialize network tables
-    	network_table = NetworkTable.getTable( "SmartDashboard" );
     	
-    	//Initialize Vision Processing
-    	gear_vision = new Vision( "gear", network_table );
-    	
-    	//Controller Initialization 
+    	/* Controller initialization */
+
+    	// Driver's Remote Controller initialization
     	drive_controller = new Controller( 0 );
     	lifting_controller = new Controller( 1 );
     	
-    	//Initializing Lifter Process.
-    	lifting = new Lifting( lifting_controller );
     	
-    	//Talon SR Initialization 
+    	/* Motor initialization */
+    	
+    	//Talon SR Motor Controller initialization
     	front_left  	= new Talon( 0 );
     	rear_left   	= new Talon( 1 );
     	
@@ -105,14 +137,52 @@ public class Robot extends SampleRobot {
     	
     	ball_intake	 	= new Talon( 4 );
     	shooter_intake 	= new Talon( 5 );
-    	
     	vibrator		= new Talon( 6 );
+    	lifter 			= new Talon( 7 );
     	
-    	
-    	
-    	//Talon SRX Initialization 
+    	//CANTalon SRX Motor Controller Initialization 
     	master_shooter 	= new CANTalon( 0 );
     	slave_shooter 	= new CANTalon( 1 );
+    	
+    	// Servo Motor initialization
+    	gear_servo = new Servo( 8 );
+    	locking_servo = new Servo( 9 );
+    	linear_servo = new Servo( 10 );
+    	left_lifter_finger_servo = new Servo( 11 );
+    	right_lifter_finger_servo = new Servo( 12 );
+    	
+    	
+    	/* Sensor and Network Tables initialization */
+    	
+    	//Nav-x Gyro initialization
+    	gyro = new AHRS( SPI.Port.kMXP );
+    	
+    	//Network Tables initialization
+    	network_table = NetworkTable.getTable( "SmartDashboard" );
+    	
+    	
+    	/* Subclass initialization */
+    	
+    	//RobotDrive initialization
+    	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );	//Robotdrive takes driving talons
+    	
+    	//Ramp_Drive initialization
+    	smooth_drive = new Ramp_Drive( drive_controller, drive );					//Ramp_drive takes a controller and RobotDrive
+    	
+    	//Vision initialization
+    	gear_vision = new Vision( "gear", network_table );
+    	
+    	//Lifting initialization
+    	lifting = new Lifting( lifting_controller, lifter, locking_servo, left_lifter_finger_servo, right_lifter_finger_servo );
+    	
+    	//Shooting initialization
+    	shooter = new Shooting( master_shooter, slave_shooter, shooter_intake, vibrator, linear_servo);
+    	
+    	//Move_Distance initialization 
+    	
+    	
+    	
+   //Move to shooter?
     		
     	master_shooter.setFeedbackDevice( FeedbackDevice.CtreMagEncoder_Relative );
     	master_shooter.reverseSensor(false);
@@ -130,12 +200,11 @@ public class Robot extends SampleRobot {
     	slave_shooter.changeControlMode( CANTalon.TalonControlMode.Follower );
     	slave_shooter.set( master_shooter.getDeviceID() );
     	
-    	// Instantiate robot's drive with Talons
-    	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    	smooth_drive = new Ramp_Drive( drive_controller, drive );
+    	
+    	
+    	
     		
-    	linear_servo = new Servo( 10 );
-    	gear_servo = new Servo( 8 );
+    	
     	
     }
     
