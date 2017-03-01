@@ -203,7 +203,7 @@ public class Robot extends SampleRobot {
     		timer.update();
     		dt = timer.get_dt();
     		gear_vision.update( dt );
-    		lifting.update();
+    		lifting.update( dt );
     		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
