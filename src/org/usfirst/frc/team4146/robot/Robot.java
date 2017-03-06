@@ -44,7 +44,7 @@ public class Robot extends SampleRobot {
 	static double shooter_rpm_setpoint  = -2200.0;
 	static double shooter_intake_speed  = -0.4;
 	Controller drive_controller;
-	Controller lifting_controller;
+	Controller lifter_controller;
 	
 	
 	// Motor Controller init
@@ -67,8 +67,8 @@ public class Robot extends SampleRobot {
 	
 	//Heading robotHeading;
 	
-	//Encoder right_drive_encoder;
-	//Encoder left_drive_encoder;
+	Encoder right_drive_encoder;
+	Encoder left_drive_encoder;
 	Ramp_Drive smooth_drive;
 	Move_Distance robotMove;
 	
@@ -79,7 +79,7 @@ public class Robot extends SampleRobot {
 	
 	Vision gear_vision;
 	
-	Lifter lifting;
+	Lifter big_lifter;
 	
     public Robot() {
     	gyro = new AHRS( SPI.Port.kMXP );
@@ -91,10 +91,10 @@ public class Robot extends SampleRobot {
     	
     	//Controller Initialization 
     	drive_controller = new Controller( 0 );
-    	lifting_controller = new Controller( 1 );
+    	lifter_controller = new Controller( 1 );
     	
     	//Initializing Lifter Process.
-    	lifting = new Lifter( lifting_controller );
+    	big_lifter = new Lifter( lifter_controller );
     	
     	//Talon SR Initialization 
     	front_left  	= new Talon( 0 );
@@ -121,6 +121,7 @@ public class Robot extends SampleRobot {
     	master_shooter.configPeakOutputVoltage(+12.0f, -12.0f);
     	
     	master_shooter.setProfile( 0 );
+    	master_shooter.changeControlMode( TalonControlMode.Speed );
 //    	master_shooter.setF( 0.0 ); // was 0.1097
 //        master_shooter.setP( 0.0 ); // was 0.22
 //        master_shooter.setI( 0.0002 ); // was 0
@@ -137,6 +138,8 @@ public class Robot extends SampleRobot {
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
     	
+    	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
+    	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
     }
     
     public void robotInit() {
@@ -203,19 +206,23 @@ public class Robot extends SampleRobot {
     		timer.update();
     		dt = timer.get_dt();
     		gear_vision.update( dt );
-    		lifting.update( dt );
+    		big_lifter.update( dt );
     		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
     		time_accumulator += dt;
-    		
+//    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
+//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+    		double testing = right_drive_encoder.getRaw();
+//    		System.out.println( testing );
+    		network_table.putNumber( "New_Right_Encoder", testing );
     		// Check button inputs and change state 
     		if ( drive_controller.get_right_trigger() ) { // Shoot with right trigger,
     			state = robot_state.shooting;
     		} else if ( drive_controller.get_left_trigger() ) { // Ball intake with left trigger.
     			state = robot_state.intaking;
     		} else if ( drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
-    			state = robot_state.testing_shooter;
+    			//state = robot_state.testing_shooter;
     		} else if ( drive_controller.get_left_bumper() ) {
     			state = robot_state.gear_tracking;
     		} else if ( drive_controller.get_right_bumper() ) {
@@ -229,12 +236,12 @@ public class Robot extends SampleRobot {
     			x_button_toggle = false;
     			switch ( gear ) {
     				case in:
-    					System.out.println( "Moving Out!" );
-    					gear_servo.set( 0.3 );
+    					System.out.println( "Moving In!" );
+    					gear_servo.set( 1.0 ); // In number
     					break;
     				case out:
-    					System.out.println( "Moving In!" );
-    					gear_servo.set( 0.5 );
+    					System.out.println( "Moving Out!" );
+    					gear_servo.set( 0.8 ); // Out number
     					break;
     				default:
     					break;
@@ -262,8 +269,8 @@ public class Robot extends SampleRobot {
     				network_table.putNumber( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
     				
     				
-        			//ball_intake.set( -0.35 );
-        			//vibrator.set( 0.7 );
+        			ball_intake.set( -0.35 );
+        			vibrator.set( 0.7 );
         			oscillate_servo();
         			// Only feed balls to shooter if RPM is within a tolerance.
         			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
@@ -277,9 +284,10 @@ public class Robot extends SampleRobot {
         			vibrator.set( 1.0 );
         			oscillate_servo();
         			
+        			master_shooter.changeControlMode(TalonControlMode.Speed);
+        			master_shooter.set( -3000 );
         			master_shooter.enableControl();
-    				master_shooter.changeControlMode(TalonControlMode.Speed);
-    				master_shooter.set( -3000 );
+    				
         			
         			if ( Math.abs( master_shooter.getSpeed() ) >= 2100 ) {
         				shooter_intake.set( -1.0 );
@@ -290,7 +298,11 @@ public class Robot extends SampleRobot {
     				ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
-    				master_shooter.set( -1.0 );
+    				master_shooter.changeControlMode( TalonControlMode.Speed );
+    				master_shooter.set( -2200 );
+    				master_shooter.enableControl();
+    				System.out.println( master_shooter.getError() );
+    				//shooter_intake.set( -0.3 );
     				break;
     			case idle:
     				master_shooter.disableControl();
@@ -308,7 +320,9 @@ public class Robot extends SampleRobot {
     		
     		} // End of state switch
     		
+    		//drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     		drive.arcadeDrive( forward_torque, spin_torque );
+    		//drive.arcadeDrive( forward_torque, -1 * drive_controller.get_deadband_right_x_axis() );
     		
     		//System.out.println( master_shooter.getSpeed() );
     	}

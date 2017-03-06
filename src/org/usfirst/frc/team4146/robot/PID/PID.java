@@ -83,9 +83,6 @@ public class PID {
 		derivative_stack.push( derivative );
 		prevError = error;
 		output = ( Kp * error ) + ( integral_stack.sum() ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
-		SmartDashboard.putNumber("P out", Kp * error);
-		SmartDashboard.putNumber("I out", integral_stack.sum());
-		SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
 
 	}
 	public double get() {

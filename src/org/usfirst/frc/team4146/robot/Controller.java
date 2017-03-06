@@ -75,7 +75,7 @@ public class Controller {
 	 * @return boolean whether left bumper is pressed
 	 */
 	public boolean get_left_bumper() {
-		return joy.getRawAxis( left_bumper ) > 0;
+		return joy.getRawButton( left_bumper ) ;
 	}
 	/**
 	 * Gets whether the right bumper is being pushed on the controller.

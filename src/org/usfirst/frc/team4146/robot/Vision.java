@@ -23,7 +23,7 @@ public class Vision {
     			return x - 160.0;
 			}
 		});
-		this.center_pid.set_pid( 0.008, 0, 0.1 );
+		this.center_pid.set_pid( 0.008, 0, 0.4 );
 	}
 	public double get_distance() {
 		return ( width * focal_length ) / table.getNumber( network_name + "_w", 0.0 );
@@ -34,6 +34,9 @@ public class Vision {
 	}
 	// Gets PID controller value output
 	public double get() {
+//		if ( center_pid.get() > 0.7 ) {
+//			return 0;
+//		}
 		return center_pid.get();
 	}
 }
