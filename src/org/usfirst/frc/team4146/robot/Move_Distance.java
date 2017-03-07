@@ -7,7 +7,8 @@ public class Move_Distance {
 	private final double ENCODER_TICKS_PER_REVOLUTION = 360.0; //79% sure / rocky trust
 	private final double WHEEL_DIAMETER = 7.625; // Inches
 	private final double ENCODER_CONVERSION = (  ENCODER_TICKS_PER_REVOLUTION / ( WHEEL_DIAMETER * Math.PI ) ) * 12;// YAY.
-
+	//Tested ticks per foot is 1300
+	private final double ENCODER_RAW_CONVERSION = 1300; //ticks per foot
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
@@ -60,7 +61,8 @@ public class Move_Distance {
 	}
 	// Returns average encoder ticks
 	private double encoder_distance() {
-		return ( ( right_drive_encoder.getRaw() + left_drive_encoder.getRaw() ) / 2 );
+//		return ( ( right_drive_encoder.getRaw() + left_drive_encoder.getRaw() ) / 2 ); // Practice bot has broken left encoder
+		return right_drive_encoder.getRaw();
 	}
 	
 	public double get_steady_state_error() {

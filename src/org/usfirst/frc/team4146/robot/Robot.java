@@ -147,6 +147,8 @@ public class Robot extends SampleRobot {
 		rear_left.setSafetyEnabled(false);
 		front_right.setSafetyEnabled(false);
 		rear_right.setSafetyEnabled(false);
+		right_drive_encoder.reset();
+		left_drive_encoder.reset();
     }
 	
     public void autonomous() {
@@ -211,8 +213,9 @@ public class Robot extends SampleRobot {
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
     		time_accumulator += dt;
-//    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
-//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
+    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+    		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading());
     		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
     		network_table.putNumber( "New_Right_Encoder", testing );
@@ -237,11 +240,11 @@ public class Robot extends SampleRobot {
     			switch ( gear ) {
     				case in:
     					System.out.println( "Moving In!" );
-    					gear_servo.set( 1.0 ); // In number
+    					gear_servo.set( 0.4 ); // In number
     					break;
     				case out:
     					System.out.println( "Moving Out!" );
-    					gear_servo.set( 0.8 ); // Out number
+    					gear_servo.set( 0.6 ); // Out number
     					break;
     				default:
     					break;
@@ -287,11 +290,11 @@ public class Robot extends SampleRobot {
         			master_shooter.changeControlMode(TalonControlMode.Speed);
         			master_shooter.set( -3000 );
         			master_shooter.enableControl();
-    				
+        			shooter_intake.set( -1.0 );
         			
-        			if ( Math.abs( master_shooter.getSpeed() ) >= 2100 ) {
-        				shooter_intake.set( -1.0 );
-        			}
+//        			if ( Math.abs( master_shooter.getSpeed() ) >= 2100 ) {
+//        				shooter_intake.set( -1.0 );
+//        			}
     				break;
     			case intaking:
     				//ball_intake.set( -1.0 );
@@ -330,45 +333,72 @@ public class Robot extends SampleRobot {
     //End of operatorControl
 
     public void test() {
-    	StringBuilder sb = new StringBuilder();
-    	int _loops = 0;
+    	
+    	
     	while ( isTest() && isEnabled() ) {
-    		double leftYstick = -drive_controller.get_left_y_axis();
-    		double motorOutput = master_shooter.getOutputVoltage() / master_shooter.getBusVoltage();
+//    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
+//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+//    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     		
-    			sb.append("\tout:");
-    			sb.append(motorOutput);
-    			sb.append("\tspd:");
-    			sb.append(master_shooter.getSpeed());
-    			if(drive_controller.get_a_button())
-    			{
-    				double targetSpeed = leftYstick * 1500.0;
-    				master_shooter.changeControlMode(TalonControlMode.Speed);
-    				master_shooter.set(targetSpeed); /* 1500 RPM in either direction */
-
-    	        	/* append more signals to print when in speed mode. */
-    	            sb.append("\terr:");
-    	            sb.append(master_shooter.getClosedLoopError());
-    	            sb.append("\ttrg:");
-    	            sb.append(targetSpeed);
-    	        } else {
-    	        	/* Percent voltage mode */
-    	        	master_shooter.changeControlMode(TalonControlMode.PercentVbus);
-    	        	master_shooter.set(leftYstick);
-    	        }
-
-    	        if(++_loops >= 10) {
-    	        	_loops = 0;
-    	        	System.out.println(sb.toString());
-    	        }
-    	        sb.setLength(0);
-    			
+    		if ( drive_controller.get_b_button() ){
+    			master_shooter.changeControlMode( TalonControlMode.PercentVbus );
+        		master_shooter.set( -1.0 );
+        		master_shooter.enableControl();
+        	} else {
+        		master_shooter.set( 0.0 );
+        	}
     		
+    		if ( drive_controller.get_y_button() ){
+    			shooter_intake.set( -0.6);
+    		} else {
+    			shooter_intake.set( 0.0 );
+    		}
     		
-    		//		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
-    //		SmartDashboard.putNumber("Right Encoder", right_drive_encoder.get());
-    		//drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), drive_controller.get_deadband_right_x_axis());
+    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     	}
+    	
+    	
+    	
+    	
+//    	StringBuilder sb = new StringBuilder();
+//    	int _loops = 0;
+//    	while ( isTest() && isEnabled() ) {
+//    		double leftYstick = -drive_controller.get_left_y_axis();
+//    		double motorOutput = master_shooter.getOutputVoltage() / master_shooter.getBusVoltage();
+//    		
+//    			sb.append("\tout:");
+//    			sb.append(motorOutput);
+//    			sb.append("\tspd:");
+//    			sb.append(master_shooter.getSpeed());
+//    			if(drive_controller.get_a_button())
+//    			{
+//    				double targetSpeed = leftYstick * 1500.0;
+//    				master_shooter.changeControlMode(TalonControlMode.Speed);
+//    				master_shooter.set(targetSpeed); /* 1500 RPM in either direction */
+//
+//    	        	/* append more signals to print when in speed mode. */
+//    	            sb.append("\terr:");
+//    	            sb.append(master_shooter.getClosedLoopError());
+//    	            sb.append("\ttrg:");
+//    	            sb.append(targetSpeed);
+//    	        } else {
+//    	        	/* Percent voltage mode */
+//    	        	master_shooter.changeControlMode(TalonControlMode.PercentVbus);
+//    	        	master_shooter.set(leftYstick);
+//    	        }
+//
+//    	        if(++_loops >= 10) {
+//    	        	_loops = 0;
+//    	        	System.out.println(sb.toString());
+//    	        }
+//    	        sb.setLength(0);
+//    			
+//    		
+//    		
+//    		//		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
+//    //		SmartDashboard.putNumber("Right Encoder", right_drive_encoder.get());
+//  		//drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), drive_controller.get_deadband_right_x_axis());
+//    	}
     }
     //End of test
 }
