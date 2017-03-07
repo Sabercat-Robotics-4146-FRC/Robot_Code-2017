@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4146.robot;
+import org.usfirst.frc.team4146.robot.PID.*;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Autonomous {
 	Heading heading;
@@ -10,43 +12,47 @@ public class Autonomous {
 	
 	private final double acceptable_distance_error = 0.5;
 	private final double acceptable_angle_error = 10.0;
-	private final double timeOut = 5.0; //Timeout time for each command. If time elapsed since the start of the command passes this value, it should stop.
+	private final double defaultTimeOut = 5.0; //Timeout time for each command. If time elapsed since the start of the command passes this value, it should stop.
 	
-	Autonomous(Heading h, Move_Distance md, RobotDrive rD) {
-		heading = h;
+	Autonomous(/*Heading h,*/ Move_Distance md, RobotDrive rD) {
+//		heading = h;
 		distance = md;
 		drive = rD;
 //		heading.set_pid( 0.05, 0, 0);
 	}
 	
-	public void move_forward( double dis ) {
+	public void move_forward( double dis, double timeOut ) {// uses given timeout value
 		double dt;
 		distance.reset();
 		distance.set_distance(dis);
 		timer.reset();
 		
-		distance.move_pid.fill_error( 1 );
-		
+		distance.move_pid.fill_error( 10 );
+		double clamp = 0.0;
 		do {
 			timer.update();
 			dt = timer.get_dt();
-			
+			clamp += (1 * dt); 
 			// Update subsystem PIDs
 			distance.update( dt );
 //			heading.update( dt );
 			
-			drive.arcadeDrive( distance.get(), /*heading.get()*/ 0.0 );
+			drive.arcadeDrive( PID.clamp(distance.get(), clamp), /*heading.get()*/ 0.0 );
+			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
 			
-			
-		} while((Math.abs(distance.get_steady_state_error()) > acceptable_distance_error) && (timer.timeSinceStart() < timeOut));
+		} while((distance.get_steady_state_error() > acceptable_distance_error) && (timer.timeSinceStart() < timeOut));
 		
 	}
 	
-//	public void turn_to_angle(double angle, double acceptable_error) {
+	public void move_forward( double dis ) {// uses default timeout value
+		move_forward( dis, defaultTimeOut);
+	}
+	
+//	public void turn_to_angle(double angle, double timeOut) {// uses given timeout value
 //		timer.reset();
-//		heading.turn( angle );
+//		heading.rel_angle_turn( angle );
 //		
-//		while( /*( Math.abs( heading.get_steady_state_error() ) > acceptable_angle_error ) &&*/ ( timer.timeSinceStart() < timeOut ) )
+//		while((heading.get_steady_state_error() > acceptable_angle_error ) && ( timer.timeSinceStart() < timeOut ) )
 //		{
 //			timer.update();
 //			double dt = timer.get_dt();
@@ -54,5 +60,8 @@ public class Autonomous {
 //			System.out.println( heading.get() );
 //			drive.arcadeDrive(0.0, heading.get() );
 //		}
+//	}
+//	public void turn_to_angle( double angle ) {// uses default timeout value
+//		turn_to_angle(angle, defaultTimeOut);
 //	}
 }
