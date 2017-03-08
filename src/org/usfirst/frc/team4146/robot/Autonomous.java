@@ -14,12 +14,10 @@ public class Autonomous {
 	private final double acceptable_angle_error = 10.0;
 	private final double defaultTimeOut = 5.0;// Default timeout value in seconds
 	
-	Autonomous(/*Heading h,*/ Move_Distance md, RobotDrive rd) {
-//		heading = h;
+	Autonomous(Heading h, Move_Distance md, RobotDrive rd) {
+		heading = h;
 		distance = md;
 		drive = rd;
-//		heading.set_pid( 0.05, 0, 0);
-		distance.set_pid(0.2, 0.0, 0.01);
 	}
 	
 	public void move_forward( double dis, double timeOut ) {// uses given timeout value
@@ -34,12 +32,12 @@ public class Autonomous {
 		do {
 			timer.update();
 			dt = timer.get_dt();
-			clamp += (1 * dt); 
+			clamp += (1 * dt); // really REALLY getto pid ramp
 			// Update subsystem PIDs
 			distance.update( dt );
-//			heading.update( dt );
+			heading.update( dt );
 			
-			drive.arcadeDrive( PID.clamp(distance.get(), clamp), /*heading.get()*/ 0.0 );
+			drive.arcadeDrive( PID.clamp(distance.get(), clamp), heading.get());
 			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
 			
 		} while((distance.get_steady_state_error() > acceptable_distance_error) && (timer.timeSinceStart() < timeOut));
@@ -50,20 +48,21 @@ public class Autonomous {
 		move_forward( dis, defaultTimeOut);
 	}
 	
-	public void turn_to_angle(double angle, double timeOut) {// uses given timeout value
+	public void turn(double angle, double timeOut) {// uses given timeout value
+		double dt;
 		timer.reset();
 		heading.rel_angle_turn( angle );
 		
 		while((heading.get_steady_state_error() > acceptable_angle_error ) && ( timer.timeSinceStart() < timeOut ) )
 		{
 			timer.update();
-			double dt = timer.get_dt();
+			dt = timer.get_dt();
 			heading.update( dt );
 			System.out.println( heading.get() );
 			drive.arcadeDrive(0.0, heading.get() );
 		}
 	}
-	public void turn_to_angle( double angle ) {// uses default timeout value
-		turn_to_angle(angle, defaultTimeOut);
+	public void turn( double angle ) {// uses default timeout value
+		turn(angle, defaultTimeOut);
 	}
 }

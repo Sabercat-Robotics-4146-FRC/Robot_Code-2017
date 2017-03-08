@@ -65,11 +65,12 @@ public class Robot extends SampleRobot {
 	
 	AHRS gyro;
 	
-//	Heading heading;
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	Ramp_Drive smooth_drive;
+	
+	Heading heading;
 	Move_Distance distance;
 	
 	Servo linear_servo;
@@ -80,6 +81,8 @@ public class Robot extends SampleRobot {
 	Vision gear_vision;
 	
 	Lifter big_lifter;
+	
+	Autonomous auto;
 	
     public Robot() {
     	gyro = new AHRS( SPI.Port.kMXP );
@@ -134,7 +137,6 @@ public class Robot extends SampleRobot {
     	// Instantiate robot's drive with Talons
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
-//    	heading = new Heading(gyro);
     	
     		
     	linear_servo = new Servo( 10 );
@@ -142,8 +144,12 @@ public class Robot extends SampleRobot {
     	
     	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
-    	
+
+    	heading = new Heading(gyro);
     	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);
+
+    	auto = new Autonomous(heading, distance, drive);
+    	
     }
     
     public void robotInit() {
@@ -153,16 +159,35 @@ public class Robot extends SampleRobot {
 		rear_right.setSafetyEnabled(false);
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
-		SmartDashboard.putNumber("Move PID out", 0.0);
+
+		heading.set_pid( 0.05, 0, 0);
+		distance.set_pid(0.2, 0.0, 0.01);
+		
+		SmartDashboard.putNumber("Move PID out", 0.0); // for testing the output of the move_distance PID
     }
+    
+    /* 
+     * !!!auto.turn() DOES NOT reset angle before turning
+     * use heading.set_heading() before auto.turn() if
+     * you want to turn from current location!!!
+     * 
+     * Commands you can use:
+     * 
+     * auto.move_forward(double distanceInFeet, double timeOutInSeconds);
+     * auto.turn(double angleInDegrees, double timeOutInSeconds);
+     * distance.reset();// resets encoders and integralSum
+     * heading.set_heading();// sets current heading as zero
+     */
 	
     public void autonomous() {
-		right_drive_encoder.reset();
-		left_drive_encoder.reset();
-    	SmartDashboard.putBoolean("Auto Status", true);
-
-    	Autonomous auto = new Autonomous(/*heading,*/ distance, drive);
-    	auto.move_forward( 10.0, 10.0 );
+    	distance.reset();
+		heading.set_heading();
+		SmartDashboard.putBoolean("Auto Status", true);
+		
+		// Begin auto
+//    	auto.move_forward( 10.0, 10.0 );
+    	auto.turn(-30.0, 5);
+    	// End auto
     	
     	SmartDashboard.putBoolean("Auto Status", false);
     }
