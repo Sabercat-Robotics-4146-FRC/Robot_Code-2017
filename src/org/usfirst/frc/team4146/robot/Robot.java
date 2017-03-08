@@ -160,10 +160,12 @@ public class Robot extends SampleRobot {
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.05, 0, 0);
+		heading.set_pid( 0.1, 0, 0);
 		distance.set_pid(0.2, 0.0, 0.01);
 		
 		SmartDashboard.putNumber("Move PID out", 0.0); // for testing the output of the move_distance PID
+//    	SmartDashboard.putBoolean("Auto Status", false);
+
     }
     
     /* 
@@ -182,14 +184,13 @@ public class Robot extends SampleRobot {
     public void autonomous() {
     	distance.reset();
 		heading.set_heading();
-		SmartDashboard.putBoolean("Auto Status", true);
+//		SmartDashboard.putBoolean("Auto Status", true);
 		
 		// Begin auto
-//    	auto.move_forward( 10.0, 10.0 );
-    	auto.turn(-30.0, 5);
+    	auto.move_forward( 10.0, 5.0 );
+//    	auto.turn(-30.0, 5);
     	// End auto
-    	
-    	SmartDashboard.putBoolean("Auto Status", false);
+    	System.out.println("running 3");
     }
     
     
@@ -278,7 +279,7 @@ public class Robot extends SampleRobot {
     			switch ( gear ) {
     				case in:
     					System.out.println( "Moving In!" );
-    					gear_servo.set( 0.4 ); // In number
+    					gear_servo.set( 0.37 ); // In number
     					break;
     				case out:
     					System.out.println( "Moving Out!" );

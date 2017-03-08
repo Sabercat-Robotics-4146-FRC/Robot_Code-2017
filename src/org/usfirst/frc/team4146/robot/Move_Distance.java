@@ -41,7 +41,7 @@ public class Move_Distance {
 	public void reset() {
 		left_drive_encoder.reset();
 		right_drive_encoder.reset();
-		reset_integral_sum();
+		reset_pid();
 	}
 	
 	public void set_pid( double p, double i, double d ) {
@@ -50,10 +50,11 @@ public class Move_Distance {
 	
 	public void set_setpoint( double s ) {
 		move_pid.set_setpoint( s );
+		reset_pid();
 	}
 	// ^v THESE TWO DO THE SAME THING??????????????????????
 	public void set_distance(double d) {
-		move_pid.set_setpoint( d );
+		set_setpoint( d );
 	}
 	// Converts encoder ticks to feet
 	private double convert_to_feet( double e ) {
@@ -67,7 +68,8 @@ public class Move_Distance {
 	public double get_steady_state_error() {
 		return move_pid.steady_state_error();
 	}
-	public void reset_integral_sum() {
+	public void reset_pid() {
 		move_pid.set_integral_sum(0.0);
+		move_pid.take_prev_error_value();
 	}
 }

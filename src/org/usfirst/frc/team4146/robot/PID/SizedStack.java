@@ -35,23 +35,6 @@ class SizedStack {
     return this.data;
   }
   /**
-  * Returns summation of the absolute values of every number in a SizedStack.
-  */
-  public double absolute_sum() {
-    this.trim();
-    double sum = 0;
-    for ( int i = 0; i < data.size(); i ++ ) {
-      sum += Math.abs(data.get(i));
-    }
-    return sum;
-  }
-  /**
-  * Returns the mean of the absolute values of every number in a SizedStack.
-  */
-  public double absolute_mean() {
-    return this.sum()/data.size();
-  }
-  /**
   * Returns summation of a SizedStack.
   */
   public double sum() {
@@ -68,6 +51,23 @@ class SizedStack {
   public double mean() {
     return this.sum()/data.size();
   }
+  /**
+   * Returns summation of the absolute values of every number in a SizedStack.
+   */
+   public double absolute_sum() {
+     this.trim();
+     double sum = 0;
+     for ( int i = 0; i < data.size(); i ++ ) {
+       sum += Math.abs(data.get(i));
+     }
+     return sum;
+   }
+   /**
+   * Returns the mean of the absolute values of every number in a SizedStack.
+   */
+   public double absolute_mean() {
+     return this.sum()/data.size();
+   }
   /**
   * Removes the oldest entered data point and returns it.
   */

@@ -5,7 +5,7 @@ import org.usfirst.frc.team4146.robot.PID.*;
 public class Heading {
 	
 	private AHRS gyro;
-	private PID heading_pid;
+	public PID heading_pid;
 
 
 	private double tempSetPoint;
@@ -40,7 +40,7 @@ public class Heading {
 	
 	public void set_heading() {
 		setPoint = gyro.getFusedHeading();
-		reset_integral_sum();
+		reset_pid();
 	}
 	
 	public void rel_angle_turn(double change) {
@@ -53,12 +53,12 @@ public class Heading {
 		{
 			setPoint += 360;
 		}
-		reset_integral_sum();
+		reset_pid();
 	}
 	
 	private double get_ang_diff(double position, double setpoint) {
 		
-	    tempSetPoint = position - setpoint;
+	    tempSetPoint = setpoint - position;
 	    
 	    if( tempSetPoint > 180 ) { 
 	      tempSetPoint -= 360;
@@ -71,7 +71,8 @@ public class Heading {
 	public double get_steady_state_error() {
 		return heading_pid.steady_state_error();
 	}
-	public void reset_integral_sum() {
+	public void reset_pid() {
 		heading_pid.set_integral_sum(0.0);
+		heading_pid.take_prev_error_value();
 	}
 }

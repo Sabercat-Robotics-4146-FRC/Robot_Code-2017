@@ -88,7 +88,6 @@ public class PID {
 		for ( int i = 0; i < error_stack_size; i++ ) {
 			error_stack.push( e );
 		}
-		prevError = e;
 	}
 	public double steady_state_error() {
 		return error_stack.absolute_mean();
@@ -109,18 +108,18 @@ public class PID {
 			
 			integral_stack.push( ( Ki * error * dt ) );
 			output = ( Kp * error ) + ( integral_stack.sum() ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
-			SmartDashboard.putNumber("P out", Kp * error);
-			SmartDashboard.putNumber("I out", integral_stack.sum());
-			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
+//			SmartDashboard.putNumber("P out", Kp * error);
+//			SmartDashboard.putNumber("I out", integral_stack.sum());
+//			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
 			
 		}
 		else {
 			integralSum += Ki * error * dt;
 			output = ( Kp * error ) + ( integralSum ) + ( Kd * /*derivative_stack.mean()*/ derivative ); // Note: Should we use mean derivative filter?
 			
-			SmartDashboard.putNumber("P out", Kp * error);
-			SmartDashboard.putNumber("I out", integralSum);
-			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
+//			SmartDashboard.putNumber("P out", Kp * error);
+//			SmartDashboard.putNumber("I out", integralSum);
+//			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
 			
 		}
 
@@ -138,5 +137,8 @@ public class PID {
 			return -(clampValue);
 		}
 		return valueToClamp;
+	}
+	public void take_prev_error_value() {
+		prevError = setpoint - functions.getValue();
 	}
 }
