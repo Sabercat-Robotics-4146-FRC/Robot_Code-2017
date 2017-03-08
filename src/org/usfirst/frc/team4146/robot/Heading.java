@@ -19,9 +19,8 @@ public class Heading {
 			public double getValue() {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
-		});
-		heading_pid.set_setpoint(0.0);
-		
+		}, false);
+		heading_pid.set_setpoint(0.0); // this pid always tries to go to zero
 	}
 	
 	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer
@@ -34,13 +33,14 @@ public class Heading {
 		return heading_pid.get();
 	}
 	
-	public void set_vars(double p, double i, double d) {
+	public void set_pid(double p, double i, double d) {
 		heading_pid.set_pid(p,i,d);
 		
 	}
 	
 	public void set_heading() {
 		setPoint = gyro.getFusedHeading();
+		reset_integral_sum();
 	}
 	
 	public void rel_angle_turn(double change) {
@@ -53,6 +53,7 @@ public class Heading {
 		{
 			setPoint += 360;
 		}
+		reset_integral_sum();
 	}
 	
 	private double get_ang_diff(double position, double setpoint) {
@@ -67,7 +68,10 @@ public class Heading {
 	    return tempSetPoint;
     }
 	
-	public double getSteadyStateError() {
+	public double get_steady_state_error() {
 		return heading_pid.steady_state_error();
+	}
+	public void reset_integral_sum() {
+		heading_pid.set_integral_sum(0.0);
 	}
 }

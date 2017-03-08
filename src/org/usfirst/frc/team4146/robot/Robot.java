@@ -65,12 +65,12 @@ public class Robot extends SampleRobot {
 	
 	AHRS gyro;
 	
-	//Heading robotHeading;
+//	Heading heading;
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	Ramp_Drive smooth_drive;
-	Move_Distance robotMove;
+	Move_Distance distance;
 	
 	Servo linear_servo;
 	Servo gear_servo;
@@ -134,12 +134,16 @@ public class Robot extends SampleRobot {
     	// Instantiate robot's drive with Talons
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
+//    	heading = new Heading(gyro);
+    	
     		
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
     	
     	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
+    	
+    	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);
     }
     
     public void robotInit() {
@@ -149,12 +153,18 @@ public class Robot extends SampleRobot {
 		rear_right.setSafetyEnabled(false);
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
+		SmartDashboard.putNumber("Move PID out", 0.0);
     }
 	
     public void autonomous() {
-    	//Autonomous auto = new Autonomous(robotHeading, robotMove, drive);
-//    	auto.turn_to_angle( 90.0, 10.0 );
+		right_drive_encoder.reset();
+		left_drive_encoder.reset();
+    	SmartDashboard.putBoolean("Auto Status", true);
+
+    	Autonomous auto = new Autonomous(/*heading,*/ distance, drive);
+    	auto.move_forward( 10.0, 10.0 );
     	
+    	SmartDashboard.putBoolean("Auto Status", false);
     }
     
     
@@ -217,7 +227,7 @@ public class Robot extends SampleRobot {
     		
     		time_accumulator += dt;
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
-    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
     		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading());
     		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
