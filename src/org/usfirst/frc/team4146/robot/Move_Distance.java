@@ -24,7 +24,6 @@ public class Move_Distance {
 				return convert_to_feet( encoder_distance() );
 			}
 		}, false);
-		move_pid.set_pid( 0.2, 0.0, 0.01 ); // default pid values
 		
 		reset();
 	}
@@ -51,12 +50,10 @@ public class Move_Distance {
 	
 	public void set_setpoint( double s ) {
 		move_pid.set_setpoint( s );
-		reset_integral_sum();
 	}
 	// ^v THESE TWO DO THE SAME THING??????????????????????
 	public void set_distance(double d) {
 		move_pid.set_setpoint( d );
-		reset_integral_sum();
 	}
 	// Converts encoder ticks to feet
 	private double convert_to_feet( double e ) {

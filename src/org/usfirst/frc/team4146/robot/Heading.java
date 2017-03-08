@@ -21,7 +21,6 @@ public class Heading {
 			}
 		}, false);
 		heading_pid.set_setpoint(0.0); // this pid always tries to go to zero
-		heading_pid.set_pid( 0.2, 0, 0 ); // default pid values
 	}
 	
 	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer

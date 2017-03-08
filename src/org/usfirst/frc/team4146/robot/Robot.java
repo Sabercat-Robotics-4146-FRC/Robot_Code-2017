@@ -65,12 +65,12 @@ public class Robot extends SampleRobot {
 	
 	AHRS gyro;
 	
-//	Heading robotHeading;
+//	Heading heading;
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	Ramp_Drive smooth_drive;
-	Move_Distance robotMove;
+	Move_Distance distance;
 	
 	Servo linear_servo;
 	Servo gear_servo;
@@ -134,7 +134,7 @@ public class Robot extends SampleRobot {
     	// Instantiate robot's drive with Talons
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
-//    	robotHeading = new Heading(gyro);
+//    	heading = new Heading(gyro);
     	
     		
     	linear_servo = new Servo( 10 );
@@ -143,7 +143,7 @@ public class Robot extends SampleRobot {
     	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
     	
-    	robotMove = new Move_Distance(right_drive_encoder, right_drive_encoder);
+    	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);
     }
     
     public void robotInit() {
@@ -161,7 +161,7 @@ public class Robot extends SampleRobot {
 		left_drive_encoder.reset();
     	SmartDashboard.putBoolean("Auto Status", true);
 
-    	Autonomous auto = new Autonomous(/*robotHeading,*/ robotMove, drive);
+    	Autonomous auto = new Autonomous(/*heading,*/ distance, drive);
     	auto.move_forward( 10.0, 10.0 );
     	
     	SmartDashboard.putBoolean("Auto Status", false);
