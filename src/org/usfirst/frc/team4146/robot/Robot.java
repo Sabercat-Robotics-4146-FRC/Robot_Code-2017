@@ -81,9 +81,7 @@ public class Robot extends SampleRobot {
 	Vision gear_vision;
 	
 	Lifter big_lifter;
-	
-	Autonomous auto;
-	
+		
     public Robot() {
     	gyro = new AHRS( SPI.Port.kMXP );
     	//Initialize network tables
@@ -146,10 +144,7 @@ public class Robot extends SampleRobot {
     	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
 
     	heading = new Heading(gyro);
-    	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);
-
-    	auto = new Autonomous(heading, distance, drive);
-    	
+    	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);    	
     }
     
     public void robotInit() {
@@ -160,8 +155,8 @@ public class Robot extends SampleRobot {
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.1, 0, 0);
-		distance.set_pid(0.2, 0.0, 0.01);
+		heading.set_pid( 0.1, .0, 0);
+		distance.set_pid(0.6, 0.0, 0.0);
 		
 		SmartDashboard.putNumber("Move PID out", 0.0); // for testing the output of the move_distance PID
 //    	SmartDashboard.putBoolean("Auto Status", false);
@@ -182,15 +177,19 @@ public class Robot extends SampleRobot {
      */
 	
     public void autonomous() {
+    	Autonomous auto = new Autonomous(heading, distance, drive);
+
+
     	distance.reset();
 		heading.set_heading();
-//		SmartDashboard.putBoolean("Auto Status", true);
+		SmartDashboard.putBoolean("Auto Status", true);
 		
 		// Begin auto
-    	auto.move_forward( 10.0, 5.0 );
-//    	auto.turn(-30.0, 5);
+    	auto.move_forward( 10.0, 10.0 );
+//    	auto.turn(30.0, 5.0);
+    	
     	// End auto
-    	System.out.println("running 3");
+		SmartDashboard.putBoolean("Auto Status", false);
     }
     
     

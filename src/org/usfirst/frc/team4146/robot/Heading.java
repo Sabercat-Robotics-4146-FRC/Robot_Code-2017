@@ -75,4 +75,7 @@ public class Heading {
 		heading_pid.set_integral_sum(0.0);
 		heading_pid.take_prev_error_value();
 	}
+	public double get_fused_heading() {
+		return gyro.getFusedHeading();
+	}
 }

@@ -7,7 +7,6 @@ public class Autonomous {
 	Heading heading;
 	Move_Distance distance;
 	RobotDrive drive;
-	
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.5;
@@ -29,8 +28,10 @@ public class Autonomous {
 		distance.set_distance(dis);
 //		heading.set_heading(); // <-- Do we want this? will we ever want to go and turn at the same time? or just go forward?
 		timer.reset();
-		distance.move_pid.fill_error( dis );
+		distance.move_pid.fill_error( 100 );
 		do {
+    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+
 			timer.update();
 			dt = timer.get_dt();
 			clamp += (1 * dt); // really REALLY getto pid ramp
@@ -60,7 +61,8 @@ public class Autonomous {
 
 		do {
 //			System.out.println("running 2");
-		
+    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+
 			timer.update();
 			dt = timer.get_dt();
 			clamp += (1.5 * dt); // really REALLY getto pid ramp
