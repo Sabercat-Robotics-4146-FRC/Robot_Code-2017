@@ -10,7 +10,7 @@ public class Lifter {
 	private final double left_lifter_finger_servo_close = 0.8;	//Fill These with correct values
 	private final double left_lifter_finger_servo_open = 0.0;		//Fill These with correct values
 	
-	private final double right_lifter_finger_servo_close = 0.1;	//Fill These with correct values
+	private final double right_lifter_finger_servo_close = 0.2;	//Fill These with correct values
 	private final double right_lifter_finger_servo_open = 0.99;	//Fill These with correct values
 	private final double locking_servo_open = 0.8;				//Fill These with correct values
 	private final double locking_servo_close = 0.2;			//Fill These with correct values
@@ -95,7 +95,7 @@ public class Lifter {
 				if( this.lifting_controller.get_b_button() ) {
 					lifter.set( -1.0 );
 				} else if ( this.lifting_controller.get_x_button() ) {
-					lifter.set( 1.0 );
+					lifter.set( -0.25 );
 				} else {
 					lifter.set( 0.0 );
 				}
@@ -112,7 +112,7 @@ public class Lifter {
 				if( this.lifting_controller.get_a_button() ) {
 					state = lifter_state.close;
 				}
-				if ( this.lifting_controller.get_x_button() ) {
+				if ( this.lifting_controller.get_x_button() ) { // unwind
 					lifter.set( 0.25 );
 				} else if ( this.lifting_controller.get_b_button() ) {
 					lifter.set( -0.25 );

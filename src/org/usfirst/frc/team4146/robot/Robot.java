@@ -40,9 +40,9 @@ public class Robot extends SampleRobot {
 	}
 	
 	// Shooter RPM parameters
-	static double shooter_rpm_tolerance = 10;
-	static double shooter_rpm_setpoint  = -2200.0;
-	static double shooter_intake_speed  = -0.4;
+	static double shooter_rpm_tolerance = 50;
+	static double shooter_rpm_setpoint  = -2700.0;
+	static double shooter_intake_speed  = -0.6;
 	Controller drive_controller;
 	Controller lifter_controller;
 	
@@ -212,6 +212,9 @@ public class Robot extends SampleRobot {
     		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
+    		network_table.putNumber( "Forward_Torque", forward_torque );
+    		network_table.putNumber( "Spin_Torque", spin_torque );
+    		
     		time_accumulator += dt;
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
     		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
@@ -244,7 +247,7 @@ public class Robot extends SampleRobot {
     					break;
     				case out:
     					System.out.println( "Moving Out!" );
-    					gear_servo.set( 0.6 ); // Out number
+    					gear_servo.set( 0.57 ); // Out number
     					break;
     				default:
     					break;
@@ -290,14 +293,12 @@ public class Robot extends SampleRobot {
         			master_shooter.changeControlMode(TalonControlMode.Speed);
         			master_shooter.set( -3000 );
         			master_shooter.enableControl();
-        			shooter_intake.set( -1.0 );
         			
-//        			if ( Math.abs( master_shooter.getSpeed() ) >= 2100 ) {
-//        				shooter_intake.set( -1.0 );
-//        			}
+        			if ( Math.abs( master_shooter.getSpeed() ) >= 2900 ) {
+        				shooter_intake.set( -1.0 );
+        			}
     				break;
     			case intaking:
-    				//ball_intake.set( -1.0 );
     				ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
@@ -326,6 +327,7 @@ public class Robot extends SampleRobot {
     		//drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     		drive.arcadeDrive( forward_torque, spin_torque );
     		//drive.arcadeDrive( forward_torque, -1 * drive_controller.get_deadband_right_x_axis() );
+    		//drive.arcadeDrive(  drive_controller.get_deadband_left_y_axis(), -1 * drive_controller.get_deadband_right_x_axis() );
     		
     		//System.out.println( master_shooter.getSpeed() );
     	}
@@ -349,7 +351,7 @@ public class Robot extends SampleRobot {
         	}
     		
     		if ( drive_controller.get_y_button() ){
-    			shooter_intake.set( -0.6);
+    			shooter_intake.set( -0.4 );
     		} else {
     			shooter_intake.set( 0.0 );
     		}
