@@ -39,4 +39,9 @@ public class Vision {
 //		}
 		return center_pid.get();
 	}
+	
+	public double get_steady_state_error() {
+		return center_pid.steady_state_error();
+	}
+	
 }

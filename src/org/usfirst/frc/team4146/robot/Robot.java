@@ -20,15 +20,20 @@ import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
 	
-	// Servo state machine
+	/* Robot State Machine Lists */
+	
+	// Linear Servo State Machine
 	enum servo_state {
 		extending,
 		retracting
 	}
+	
+	// Gear Servo State Machine
 	enum gear_state {
 		out,
 		in
 	}
+	
 	// Robot State Machine
 	enum robot_state {
 		shooting,
@@ -39,15 +44,24 @@ public class Robot extends SampleRobot {
 		idle
 	}
 	
+	
+	/* Global Constants */
+	
 	// Shooter RPM parameters
 	static double shooter_rpm_tolerance = 50;
 	static double shooter_rpm_setpoint  = -2700.0;
 	static double shooter_intake_speed  = -0.6;
+	
+	
+	/* Joystick Controllers */ 
+	
 	Controller drive_controller;
 	Controller lifter_controller;
 	
 	
-	// Motor Controller init
+	/* Motor Controller initialization */
+	
+	// Talon SR Motor Controller init
 	Talon front_left;
 	Talon rear_left;
 	
@@ -58,46 +72,61 @@ public class Robot extends SampleRobot {
 	Talon shooter_intake;
 	Talon vibrator;
 		
+	//CANTalon SRX Motor Controller init
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
-	RobotDrive drive;
-	
-	AHRS gyro;
-	
-	
-	Encoder right_drive_encoder;
-	Encoder left_drive_encoder;
-	Ramp_Drive smooth_drive;
-	
-	Heading heading;
-	Move_Distance distance;
-	
+	//Servo Motor Controller init
 	Servo linear_servo;
 	Servo gear_servo;
 	
+	
+	/* Sensor and NetworkTable initialization */
+	
+	//Navx Gyro init
+	AHRS gyro;
+	
+	//Encoder init
+	Encoder right_drive_encoder;
+	Encoder left_drive_encoder;
+	
+	//NetworkTable init
 	NetworkTable network_table;
 	
+	
+	/* Subclass initialization */
+	
+	//RobotDrive init
+	RobotDrive drive;
+	
+	//Ramp_Drive init 
+	Ramp_Drive smooth_drive;
+	
+	//Vision init
 	Vision gear_vision;
 	
+	//Lifter init
 	Lifter big_lifter;
-		
+	
+	//Heading init
+	Heading heading;
+	
+	//Move_Distance init
+	Move_Distance distance;
+	
+	
     public Robot() {
-    	gyro = new AHRS( SPI.Port.kMXP );
-    	//Initialize network tables
-    	network_table = NetworkTable.getTable( "SmartDashboard" );
-    	
-    	//Initialize Vision Processing
-    	gear_vision = new Vision( "gear", network_table );
+    
+    	/* Joystick Controllers */ 
     	
     	//Controller Initialization 
     	drive_controller = new Controller( 0 );
     	lifter_controller = new Controller( 1 );
     	
-    	//Initializing Lifter Process.
-    	big_lifter = new Lifter( lifter_controller );
+
+    	/* Motor Controller initialization */
     	
-    	//Talon SR Initialization 
+    	// Talon SR Motor Controller init
     	front_left  	= new Talon( 0 );
     	rear_left   	= new Talon( 1 );
     	
@@ -108,88 +137,106 @@ public class Robot extends SampleRobot {
     	shooter_intake 	= new Talon( 5 );
     	
     	vibrator		= new Talon( 6 );
-    	
-    	
-    	
-    	//Talon SRX Initialization 
+    
+    	//CANTalon SRX Motor Controller init
     	master_shooter 	= new CANTalon( 0 );
     	slave_shooter 	= new CANTalon( 1 );
     		
     	master_shooter.setFeedbackDevice( FeedbackDevice.CtreMagEncoder_Relative );
-    	master_shooter.reverseSensor(false);
+    	master_shooter.reverseSensor( false );
     		
-    	master_shooter.configNominalOutputVoltage(+0.0f, -0.0f);
-    	master_shooter.configPeakOutputVoltage(+12.0f, -12.0f);
+    	master_shooter.configNominalOutputVoltage( +0.0f, -0.0f );
+    	master_shooter.configPeakOutputVoltage( +12.0f, -12.0f );
     	
     	master_shooter.setProfile( 0 );
     	master_shooter.changeControlMode( TalonControlMode.Speed );
-//    	master_shooter.setF( 0.0 ); // was 0.1097
-//        master_shooter.setP( 0.0 ); // was 0.22
-//        master_shooter.setI( 0.0002 ); // was 0
-//        master_shooter.setD( 0.01 );
+//    	master_shooter.setF( 0.0 ); 	// was 0.1097
+//      master_shooter.setP( 0.0 ); 	// was 0.22
+//      master_shooter.setI( 0.0002 ); 	// was 0
+//      master_shooter.setD( 0.01 );
     		
     	//Setting slave_talon 
     	slave_shooter.changeControlMode( CANTalon.TalonControlMode.Follower );
     	slave_shooter.set( master_shooter.getDeviceID() );
     	
-    	// Instantiate robot's drive with Talons
-    	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    	smooth_drive = new Ramp_Drive( drive_controller, drive );
-    	
-    		
+    	//Servo Motor Controller init
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
     	
+
+    	/* Sensor and NetworkTable initialization */
+    	
+    	//Navx Gyro init
+    	gyro = new AHRS( SPI.Port.kMXP );
+    	
+    	//Encoder init
     	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
-
-    	heading = new Heading(gyro);
-    	distance = new Move_Distance(right_drive_encoder, right_drive_encoder);    	
+    
+    	//NetworkTable init
+    	network_table = NetworkTable.getTable( "SmartDashboard" );
+    	
+    	
+    	/* Subclass initialization */
+    	
+    	// Instantiate robot's drive with Talons
+    	//RobotDrive init
+    	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
+    
+    	//Ramp_Drive init 
+    	smooth_drive = new Ramp_Drive( drive_controller, drive );
+    	
+    	//Vision init
+    	gear_vision = new Vision( "gear", network_table );
+    	
+    	//Lifter init
+    	big_lifter = new Lifter( lifter_controller );
+    		
+    	//Heading init
+    	heading = new Heading( gyro );
+    	
+    	//Move_Distance init
+    	distance = new Move_Distance( right_drive_encoder, right_drive_encoder );
+    	
     }
     
     public void robotInit() {
-    	front_left.setSafetyEnabled(false);
-		rear_left.setSafetyEnabled(false);
-		front_right.setSafetyEnabled(false);
-		rear_right.setSafetyEnabled(false);
+    	front_left.setSafetyEnabled( false );
+		rear_left.setSafetyEnabled( false );
+		front_right.setSafetyEnabled( false );
+		rear_right.setSafetyEnabled( false );
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.1, .0, 0);
-		distance.set_pid(0.6, 0.0, 0.0);
-		
-		SmartDashboard.putNumber("Move PID out", 0.0); // for testing the output of the move_distance PID
-//    	SmartDashboard.putBoolean("Auto Status", false);
-
+		heading.set_pid( 0.1, 0.0, 0.0 );
+		distance.set_pid( 0.6, 0.0, 0.0 );
     }
     
     /* 
      * !!!auto.turn() DOES NOT reset angle before turning
-     * use heading.set_heading() before auto.turn() if
-     * you want to turn from current location!!!
+     * you must use heading.set_heading()!!!
      * 
      * Commands you can use:
      * 
-     * auto.move_forward(double distanceInFeet, double timeOutInSeconds);
-     * auto.turn(double angleInDegrees, double timeOutInSeconds);
-     * distance.reset();// resets encoders and integralSum
+     * 
+     * auto.move_forward(double distanceInFeet, double timeOutInSeconds);  //Does not reset heading or use heading at all
+     * auto.move_heading_lock(double distanceInFeet, double timeOutInSeconds);
+     * auto.turn(double angleInDegrees, double timeOutInSeconds);		   //Turns to relative angle from current setpoint
      * heading.set_heading();// sets current heading as zero
      */
 	
     public void autonomous() {
-    	Autonomous auto = new Autonomous(heading, distance, drive);
-
-
+    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision );
     	distance.reset();
 		heading.set_heading();
-		SmartDashboard.putBoolean("Auto Status", true);
+		SmartDashboard.putBoolean( "isAutoComplete", false );
 		
-		// Begin auto
+		/* Begin auto */
     	auto.move_forward( 10.0, 10.0 );
-//    	auto.turn(30.0, 5.0);
+//    	auto.turn( 30.0, 5.0 );
     	
-    	// End auto
-		SmartDashboard.putBoolean("Auto Status", false);
+    	/* End auto */
+		SmartDashboard.putBoolean( "isAutoComplete", true );
     }
     
     
@@ -253,7 +300,7 @@ public class Robot extends SampleRobot {
     		time_accumulator += dt;
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
 //    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
-    		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading());
+    		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading() );
     		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
     		network_table.putNumber( "New_Right_Encoder", testing );
@@ -325,7 +372,7 @@ public class Robot extends SampleRobot {
         			vibrator.set( 1.0 );
         			oscillate_servo();
         			
-        			master_shooter.changeControlMode(TalonControlMode.Speed);
+        			master_shooter.changeControlMode( TalonControlMode.Speed );
         			master_shooter.set( -3000 );
         			master_shooter.enableControl();
         			
@@ -403,15 +450,15 @@ public class Robot extends SampleRobot {
 //    		double leftYstick = -drive_controller.get_left_y_axis();
 //    		double motorOutput = master_shooter.getOutputVoltage() / master_shooter.getBusVoltage();
 //    		
-//    			sb.append("\tout:");
-//    			sb.append(motorOutput);
-//    			sb.append("\tspd:");
-//    			sb.append(master_shooter.getSpeed());
-//    			if(drive_controller.get_a_button())
+//    			sb.append( "\tout:" );
+//    			sb.append( motorOutput );
+//    			sb.append( "\tspd:" );
+//    			sb.append( master_shooter.getSpeed() );
+//    			if( drive_controller.get_a_button() )
 //    			{
 //    				double targetSpeed = leftYstick * 1500.0;
-//    				master_shooter.changeControlMode(TalonControlMode.Speed);
-//    				master_shooter.set(targetSpeed); /* 1500 RPM in either direction */
+//    				master_shooter.changeControlMode( TalonControlMode.Speed );
+//    				master_shooter.set( targetSpeed ); /* 1500 RPM in either direction */
 //
 //    	        	/* append more signals to print when in speed mode. */
 //    	            sb.append("\terr:");

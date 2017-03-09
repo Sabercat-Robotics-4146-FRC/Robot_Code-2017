@@ -7,6 +7,7 @@ public class Autonomous {
 	Heading heading;
 	Move_Distance distance;
 	RobotDrive drive;
+	Vision autoVision;
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.5;
@@ -15,10 +16,11 @@ public class Autonomous {
 	private final double MAX_MOVE_SPEED = 0.8;
 	private final double MAX_TURN_SPEED = 0.6;
 	
-	Autonomous(Heading h, Move_Distance md, RobotDrive rd) {
+	Autonomous(Heading h, Move_Distance md, RobotDrive rd, Vision v) {
 		heading = h;
 		distance = md;
 		drive = rd;
+		autoVision = v;
 	}
 	
 	public void move_forward( double dis, double timeOut ) {// uses given timeout value
@@ -26,20 +28,16 @@ public class Autonomous {
 		double clamp = 0.0;
 		distance.reset();
 		distance.set_distance(dis);
-//		heading.set_heading(); // <-- Do we want this? will we ever want to go and turn at the same time? or just go forward?
 		timer.reset();
 		distance.move_pid.fill_error( 100 );
 		do {
-    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
-
 			timer.update();
 			dt = timer.get_dt();
 			clamp += (1 * dt); // really REALLY getto pid ramp
 			// Update subsystem PIDs
 			distance.update( dt );
-			heading.update( dt );
 			
-			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
+			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), 0.0 );
 			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
 			
 		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
@@ -72,7 +70,51 @@ public class Autonomous {
 
 		} while((heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR ) && ( timer.timeSinceStart() < timeOut ) );
 	}
+	
 	public void turn( double angle ) {// uses default timeout value
 		turn(angle, DEFAULT_TIME_OUT);
 	}
+	
+	public void move_heading_lock( double dis, double timeOut) {
+		double dt;
+		double clamp = 0.0;
+		distance.reset();
+		distance.set_distance(dis);
+		timer.reset();
+		distance.move_pid.fill_error( 100 );
+		do {
+    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+
+			timer.update();
+			dt = timer.get_dt();
+			clamp += (1 * dt); // really REALLY getto pid ramp
+			// Update subsystem PIDs
+			distance.update( dt );
+			heading.update( dt );
+			
+			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
+			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
+			
+		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+
+	}
+	
+	public void turnToGear(double timeOut) {
+		double dt;
+		timer.reset();
+		//Fill Error?
+		do {
+			timer.update();
+			dt = timer.get_dt();
+			autoVision.update(dt);
+			drive.arcadeDrive( 0.0, autoVision.get()); //autovision get might have to be negative
+			
+		}while((autoVision.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR) && (timer.timeSinceStart() < timeOut));
+		
+	}
+	
+	public void moveToGear( double timeOut ) {
+		double dis = autoVision.get_distance(); //subtract .5 or something?
+		move_heading_lock(dis, timeOut); //Dis Might have to be negative	
+		}
 }

@@ -45,8 +45,8 @@ public class Lifter {
 		
 		lifter = new Talon( 7 );
 		
-		left_lifter_finger_servo = new Servo( 11 );
-    	right_lifter_finger_servo = new Servo( 12 );
+		left_lifter_finger_servo = new Servo( 12 );
+    	right_lifter_finger_servo = new Servo( 11 );
     	locking_servo = new Servo( 9 );
     	
     	left_lifter_finger_servo.set( left_lifter_finger_servo_open );
