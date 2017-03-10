@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4146.robot;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Move_Distance {
@@ -8,22 +10,23 @@ public class Move_Distance {
 	private final double WHEEL_DIAMETER = 7.625; // Inches
 	private final double ENCODER_CONVERSION = (  ENCODER_TICKS_PER_REVOLUTION / ( WHEEL_DIAMETER * Math.PI ) ) * 12;// YAY.
 	//Tested ticks per foot is 1300
-	private final double ENCODER_RAW_CONVERSION = 1300; //ticks per foot
+	private final double ENCODER_RAW_CONVERSION = 1317; //ticks per foot
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
+	
 	public PID move_pid;
 	
-	Move_Distance( Encoder r, Encoder l ) {
+	Move_Distance( Encoder r, Encoder l, NetworkTable table) {
 		right_drive_encoder = r;
 		left_drive_encoder = l;
-				
+		
 		move_pid = new PID( new signal() {
 			public double getValue() {
 				return convert_to_feet( encoder_distance() );
 			}
-		}, false);
+		}, false, "Move Distance", table);
 		
 		reset();
 	}

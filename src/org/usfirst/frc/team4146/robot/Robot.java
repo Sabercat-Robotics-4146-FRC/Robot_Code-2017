@@ -47,11 +47,14 @@ public class Robot extends SampleRobot {
 	
 	/* Global Constants */
 	
-	// Shooter RPM parameters
-	static double shooter_rpm_tolerance = 50;
-	static double shooter_rpm_setpoint  = -2700.0;
-	static double shooter_intake_speed  = -0.6;
+	private final double GEAR_IN = 0.37;
+	private final double GEAR_OUT = 0.57;
 	
+	// Shooter RPM parameters
+	static double shooter_rpm_tolerance = 10; //was 50
+	static double shooter_rpm_setpoint  = -2700.0;
+	static double shooter_intake_speed  = -0.8;
+	static double vibrator_speed = 0.8;
 	
 	/* Joystick Controllers */ 
 	
@@ -170,8 +173,8 @@ public class Robot extends SampleRobot {
     	gyro = new AHRS( SPI.Port.kMXP );
     	
     	//Encoder init
-    	right_drive_encoder = new Encoder( 0, 1, false, Encoder.EncodingType.k4X );
-    	left_drive_encoder = new Encoder( 2, 3, true, Encoder.EncodingType.k4X );
+    	right_drive_encoder = new Encoder( 8, 9, true, Encoder.EncodingType.k4X );
+    	left_drive_encoder = new Encoder( 6, 7, false, Encoder.EncodingType.k4X );
     
     	//NetworkTable init
     	network_table = NetworkTable.getTable( "SmartDashboard" );
@@ -193,10 +196,10 @@ public class Robot extends SampleRobot {
     	big_lifter = new Lifter( lifter_controller );
     		
     	//Heading init
-    	heading = new Heading( gyro );
+    	heading = new Heading( gyro, network_table );
     	
     	//Move_Distance init
-    	distance = new Move_Distance( right_drive_encoder, right_drive_encoder );
+    	distance = new Move_Distance( right_drive_encoder, right_drive_encoder, network_table );
     	
     }
     
@@ -208,8 +211,11 @@ public class Robot extends SampleRobot {
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.1, 0.0, 0.0 );
-		distance.set_pid( 0.6, 0.0, 0.0 );
+		heading.set_pid( 0.1, 0.0, 0.5 );
+		distance.set_pid( 0.4, 0.0, 0.0);
+		
+		gear_servo.set( GEAR_IN );
+		
     }
     
     /* 
@@ -226,17 +232,18 @@ public class Robot extends SampleRobot {
      */
 	
     public void autonomous() {
-    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision );
+    	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
+    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
     	distance.reset();
 		heading.set_heading();
-		SmartDashboard.putBoolean( "isAutoComplete", false );
+		network_table.putBoolean( "isAutoComplete", false );
 		
 		/* Begin auto */
-    	auto.move_forward( 10.0, 10.0 );
-//    	auto.turn( 30.0, 5.0 );
-    	
+//    	auto.move_heading_lock( 2.0, 5.0 );
+    	//auto.turn( 120.0, 5.0 );
+    	auto.move_forward( 5, 10 );
     	/* End auto */
-		SmartDashboard.putBoolean( "isAutoComplete", true );
+		network_table.putBoolean( "isAutoComplete", true );
     }
     
     
@@ -271,7 +278,7 @@ public class Robot extends SampleRobot {
     	timer.reset();
     	
     	robot_state state = robot_state.idle;
-    	gear_state gear = gear_state.in;
+    	gear_state gear = gear_state.out; //Should be first state to run since gear servo starts closed
     	
     	// Resets the servo in the beginning of Operator Control
     	if ( linear_servo.get() >= 0.5 ) {
@@ -299,7 +306,7 @@ public class Robot extends SampleRobot {
     		
     		time_accumulator += dt;
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
-//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
+    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
     		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading() );
     		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
@@ -310,7 +317,7 @@ public class Robot extends SampleRobot {
     		} else if ( drive_controller.get_left_trigger() ) { // Ball intake with left trigger.
     			state = robot_state.intaking;
     		} else if ( drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
-    			//state = robot_state.testing_shooter;
+    			state = robot_state.testing_shooter;
     		} else if ( drive_controller.get_left_bumper() ) {
     			state = robot_state.gear_tracking;
     		} else if ( drive_controller.get_right_bumper() ) {
@@ -324,12 +331,12 @@ public class Robot extends SampleRobot {
     			x_button_toggle = false;
     			switch ( gear ) {
     				case in:
-    					System.out.println( "Moving In!" );
-    					gear_servo.set( 0.37 ); // In number
+    					System.out.println( "Moving In! / Closing" );
+    					gear_servo.set( GEAR_IN ); // In number
     					break;
     				case out:
-    					System.out.println( "Moving Out!" );
-    					gear_servo.set( 0.57 ); // Out number
+    					System.out.println( "Moving Out! / Opening" );
+    					gear_servo.set( GEAR_OUT ); // Out number
     					break;
     				default:
     					break;
@@ -355,10 +362,10 @@ public class Robot extends SampleRobot {
     				network_table.putNumber( "Shooter Error", master_shooter.getSpeed() - master_shooter.getSetpoint() );
     				network_table.putNumber( "Get value", master_shooter.get() );
     				network_table.putNumber( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
+    				network_table.putNumber( "Closed_Loop_Error", master_shooter.getClosedLoopError() );
     				
-    				
-        			ball_intake.set( -0.35 );
-        			vibrator.set( 0.7 );
+        			ball_intake.set( -0.3 );
+        			vibrator.set( vibrator_speed );
         			oscillate_servo();
         			// Only feed balls to shooter if RPM is within a tolerance.
         			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
@@ -369,7 +376,7 @@ public class Robot extends SampleRobot {
     				break;
     			case sicem:
     				ball_intake.set( -1.0 );
-        			vibrator.set( 1.0 );
+        			vibrator.set( 0.9 );
         			oscillate_servo();
         			
         			master_shooter.changeControlMode( TalonControlMode.Speed );
@@ -384,11 +391,14 @@ public class Robot extends SampleRobot {
     				ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
-    				master_shooter.changeControlMode( TalonControlMode.Speed );
-    				master_shooter.set( -2200 );
-    				master_shooter.enableControl();
-    				System.out.println( master_shooter.getError() );
+//    				master_shooter.changeControlMode( TalonControlMode.Speed );
+//    				master_shooter.set( -2200 );
+//    				master_shooter.enableControl();
+//    				System.out.println( master_shooter.getError() );
     				//shooter_intake.set( -0.3 );
+    				//shooter_intake.set( -0.6 );
+    				vibrator.set( 0.6 );
+    				shooter_intake.set(-1.0);
     				break;
     			case idle:
     				master_shooter.disableControl();
@@ -417,28 +427,28 @@ public class Robot extends SampleRobot {
     //End of operatorControl
 
     public void test() {
-    	
-    	
+    	Iterative_Timer timer = new Iterative_Timer();
+    	timer.reset();
+    	double dt;
+    	heading.set_heading();
+		heading.rel_angle_turn( 45 );
+		heading.set_pid( 0.25, 0, 0 );
+    	double forward = 0;
+    	double spin = 0;
     	while ( isTest() && isEnabled() ) {
+    		timer.update();
+    		dt = timer.get_dt();
 //    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
 //    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
 //    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     		
+    		heading.update( dt );
     		if ( drive_controller.get_b_button() ){
-    			master_shooter.changeControlMode( TalonControlMode.PercentVbus );
-        		master_shooter.set( -1.0 );
-        		master_shooter.enableControl();
+    			spin = heading.get();
         	} else {
-        		master_shooter.set( 0.0 );
+        		spin = 0;
         	}
-    		
-    		if ( drive_controller.get_y_button() ){
-    			shooter_intake.set( -0.4 );
-    		} else {
-    			shooter_intake.set( 0.0 );
-    		}
-    		
-    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
+    		drive.arcadeDrive( forward, spin );
     	}
     	
     	

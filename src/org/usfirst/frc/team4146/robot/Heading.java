@@ -1,5 +1,8 @@
 package org.usfirst.frc.team4146.robot;
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Heading {
@@ -7,19 +10,19 @@ public class Heading {
 	private AHRS gyro;
 	public PID heading_pid;
 
-
+	
 	private double tempSetPoint;
 	private double setPoint;
 	
 	
-	Heading( AHRS g ) {
+	Heading( AHRS g, NetworkTable table) {
 		gyro = g;		
 		
 		heading_pid = new PID( new signal() {
 			public double getValue() {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
-		}, false);
+		}, false, "Heading", table);
 		heading_pid.set_setpoint(0.0); // this pid always tries to go to zero
 	}
 	

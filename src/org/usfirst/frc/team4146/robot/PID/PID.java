@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4146.robot.PID;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.usfirst.frc.team4146.robot.SmartDashboard_Wrapper;
+
+import edu.wpi.first.wpilibj.networktables.*;
 
 /**
  * General purpose PID loop.
@@ -18,7 +20,7 @@ public class PID {
 	private double derivative;
 	private signal functions;
 	private double output;
-
+	
 	/* Prevent Integral windup with a SizedStack */
 	private SizedStack integral_stack;
 	/* Make derivative filter with SizedStack */
@@ -26,7 +28,7 @@ public class PID {
 	/* Make error tolerance stack, used for steady state error breakouts */
 	private SizedStack error_stack;
 	private int error_stack_size = 10;
-	
+	private String instName;
 	private boolean integralStackFlag;
 	private double integralSum = 0.0;
 	
@@ -42,9 +44,11 @@ public class PID {
 		integral_stack = new SizedStack( 10 );
 		derivative_stack = new SizedStack( 3 );
 		error_stack = new SizedStack( error_stack_size );
+		instName = "default";
 	}
-	
-	public PID ( signal functions, boolean integralStackFlag ){
+	NetworkTable table;
+	public PID ( signal functions, boolean integralStackFlag, String name, NetworkTable table ){
+		this.table = table;
 		this.integralStackFlag = integralStackFlag;
 		sp_ramp_enabled = false;
 		this.functions = functions;
@@ -53,6 +57,7 @@ public class PID {
 		integral_stack = new SizedStack( 10 );
 		derivative_stack = new SizedStack( 3 );
 		error_stack = new SizedStack( error_stack_size );
+		instName = name;
 	}
 	
 	public void set_integral_range( int n ) {
@@ -90,45 +95,42 @@ public class PID {
 		}
 	}
 	public double steady_state_error() {
-		return error_stack.absolute_mean();
+		return error_stack.mean();
 	}
+	int i = 0;
 	public void update( double dt ){
-		if ( sp_ramp_enabled ) {
-			sp_ramp_pid.update( dt );
-			setpoint = sp_ramp_pid.get();
-		}
 		error = setpoint - functions.getValue();
 		error_stack.push( error );
 		
-		derivative = ( error - prevError ) / dt;// inconsistent with the github version, swapped vars.
+		derivative = ( error - prevError ) / dt;
 		derivative_stack.push( derivative );
-		prevError = error;
 		
-		if(integralStackFlag) {
-			
-			integral_stack.push( ( Ki * error * dt ) );
-			output = ( Kp * error ) + ( integral_stack.sum() ) + ( Kd * derivative_stack.mean() ); // Note: Should we use mean derivative filter?
-//			SmartDashboard.putNumber("P out", Kp * error);
-//			SmartDashboard.putNumber("I out", integral_stack.sum());
-//			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
-			
+		if ( i++ == 200 ){
+			prevError = error;
+			//System.out.println( derivative );
+			i = 0;
 		}
-		else {
-			integralSum += Ki * error * dt;
-			output = ( Kp * error ) + ( integralSum ) + ( Kd * /*derivative_stack.mean()*/ derivative ); // Note: Should we use mean derivative filter?
-			
-//			SmartDashboard.putNumber("P out", Kp * error);
-//			SmartDashboard.putNumber("I out", integralSum);
-//			SmartDashboard.putNumber("D out", Kd * derivative_stack.mean() );
-			
-		}
-
-		
+		integralSum += Ki * error * dt;
+		output = ( Kp * error ) + ( integralSum ) + ( Kd * derivative  );
+	}
+//	public double p_out() {
+//		return proportionalOutput;
+//	}
+//	public double i_out() {
+//		return integralOutput;
+//	}
+//	public double d_out() {
+//		return derivativeOutput;
+//	}
+	public void print_pid() {
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " P Out", Kp * error);
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " I Out", integralSum);
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " D Out", derivative );
 	}
 	public double get() {
 		return output;
 	}
-	
+		
 	public static double clamp(double valueToClamp, double clampValue) {
 		if(valueToClamp > clampValue)
 		{
@@ -139,6 +141,7 @@ public class PID {
 		return valueToClamp;
 	}
 	public void take_prev_error_value() {
-		prevError = setpoint - functions.getValue();
+		
+		//prevError = setpoint - functions.getValue();
 	}
 }

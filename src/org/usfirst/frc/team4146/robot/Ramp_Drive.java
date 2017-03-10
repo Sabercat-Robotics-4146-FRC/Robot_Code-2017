@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class Ramp_Drive {
 	
 	// Constants
-	private static final double accelerate_rate = 0.70; //0.65 
+	private static final double accelerate_rate = 1.5; //was 0.7 but chris wanted it to be more subtle
 	private static final double decelerate_rate = 1.2;  //1.0 
 	private static final double mech_deadband = 0.3;
 	private static final double mSlope = ((1.0 - mech_deadband) / (1.0 - Controller.ctrl_deadband));
