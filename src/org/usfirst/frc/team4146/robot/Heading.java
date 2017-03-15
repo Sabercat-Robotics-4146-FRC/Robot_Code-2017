@@ -7,7 +7,7 @@ import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Heading {
 	
-	private AHRS gyro;
+	public AHRS gyro;
 	public PID heading_pid;
 
 	

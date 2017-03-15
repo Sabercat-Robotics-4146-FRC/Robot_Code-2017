@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.networktables.*;
@@ -47,8 +48,8 @@ public class Robot extends SampleRobot {
 	
 	/* Global Constants */
 	
-	private final double GEAR_IN = 0.37;
-	private final double GEAR_OUT = 0.57;
+	private final double GEAR_IN = 0.35;
+	private final double GEAR_OUT = 0.64;
 	
 	// Shooter RPM parameters
 	static double shooter_rpm_tolerance = 10; //was 50
@@ -117,6 +118,7 @@ public class Robot extends SampleRobot {
 	//Move_Distance init
 	Move_Distance distance;
 	
+	SendableChooser chooser;
 	
     public Robot() {
     
@@ -185,7 +187,7 @@ public class Robot extends SampleRobot {
     	// Instantiate robot's drive with Talons
     	//RobotDrive init
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    
+    	drive.setSafetyEnabled(false);
     	//Ramp_Drive init 
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
     	
@@ -201,6 +203,13 @@ public class Robot extends SampleRobot {
     	//Move_Distance init
     	distance = new Move_Distance( right_drive_encoder, right_drive_encoder, network_table );
     	
+    	chooser = new SendableChooser();
+    	chooser.addDefault("Do Nothing", "Do Nothing");
+    	chooser.addObject("Gear from Center", "Gear from Center");
+    	chooser.addObject("Cross Baseline", "Cross Baseline");
+    	chooser.addObject("Side Gear on Left", "Side Gear on Left");
+    	chooser.addObject("Side Gear on Right", "Side Gear on Right");
+    	SmartDashboard.putData("Auto mode", chooser);
     }
     
     public void robotInit() {
@@ -211,7 +220,7 @@ public class Robot extends SampleRobot {
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.1, 0.0, 0.5 );
+		heading.set_pid( 0.07, 0.01, 0.0 );
 		distance.set_pid( 0.4, 0.0, 0.0);
 		
 		gear_servo.set( GEAR_IN );
@@ -232,16 +241,52 @@ public class Robot extends SampleRobot {
      */
 	
     public void autonomous() {
+    	
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
     	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
     	distance.reset();
 		heading.set_heading();
 		network_table.putBoolean( "isAutoComplete", false );
 		
+		String autoSelected = (String) chooser.getSelected();
+		switch(autoSelected)
+		{
+		case "Do Nothing":
+			default:
+			break;
+		case "Gear from Center":
+			auto.move_heading_lock( -6.8, 5.0 );
+			Timer.delay(0.3);
+
+	    	gear_servo.set( GEAR_OUT );
+	    	Timer.delay(0.3);
+	    	auto.move_heading_lock(2.0, 2.0);
+	    	gear_servo.set( GEAR_IN );
+	    	break;
+		case "Cross Baseline":
+			auto.move_heading_lock( 6, 5 );
+			break;
+		case "Side Gear on Left":
+			auto.move_heading_lock(-7.88, 5);	//-10.88
+			auto.turn(60, 5);					//60
+			auto.move_heading_lock(-1.75, 3);	//-1.75
+			break;
+		case "Side Gear on Right":
+
+			//auto.move_heading_lock()
+			//auto.turn()
+			//auto.move_heading_lock(dis, timeOut);
+			
+			break;
+		}
 		/* Begin auto */
-//    	auto.move_heading_lock( 2.0, 5.0 );
-    	//auto.turn( 120.0, 5.0 );
-    	auto.move_forward( 5, 10 );
+    
+    	//auto.turn( 90.0, 5.0 );
+    	
+    	
+//    	Timer.delay(4.0);
+    	//auto.move_heading_lock(12, 10.0);
+
     	/* End auto */
 		network_table.putBoolean( "isAutoComplete", true );
     }
@@ -280,6 +325,7 @@ public class Robot extends SampleRobot {
     	robot_state state = robot_state.idle;
     	gear_state gear = gear_state.out; //Should be first state to run since gear servo starts closed
     	
+    	
     	// Resets the servo in the beginning of Operator Control
     	if ( linear_servo.get() >= 0.5 ) {
     		linear_servo.set( 0.2 );
@@ -287,7 +333,7 @@ public class Robot extends SampleRobot {
     		linear_servo.set( 0.9 );
     	}
     	
-    	double forward_torque;
+//    	double forward_torque;
     	double spin_torque;
     	//gear_servo.set( 0.2 );
     	// out = 0.45
@@ -298,19 +344,19 @@ public class Robot extends SampleRobot {
     		dt = timer.get_dt();
     		gear_vision.update( dt );
     		big_lifter.update( dt );
-    		forward_torque = smooth_drive.ramp_drive( dt );
+//    		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		
-    		network_table.putNumber( "Forward_Torque", forward_torque );
+//    		network_table.putNumber( "Forward_Torque", forward_torque );
     		network_table.putNumber( "Spin_Torque", spin_torque );
     		
     		time_accumulator += dt;
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
     		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
     		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading() );
-    		double testing = right_drive_encoder.getRaw();
+//    		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
-    		network_table.putNumber( "New_Right_Encoder", testing );
+//    		network_table.putNumber( "New_Right_Encoder", testing );
     		// Check button inputs and change state 
     		if ( drive_controller.get_right_trigger() ) { // Shoot with right trigger,
     			state = robot_state.shooting;
@@ -417,7 +463,7 @@ public class Robot extends SampleRobot {
     		} // End of state switch
     		
     		//drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
-    		drive.arcadeDrive( forward_torque, spin_torque );
+    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), spin_torque );
     		//drive.arcadeDrive( forward_torque, -1 * drive_controller.get_deadband_right_x_axis() );
     		//drive.arcadeDrive(  drive_controller.get_deadband_left_y_axis(), -1 * drive_controller.get_deadband_right_x_axis() );
     		

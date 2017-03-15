@@ -40,7 +40,8 @@ public class Autonomous {
 			distance.update( dt );
 			
 			drive.arcadeDrive(distance.get(), 0.0 );
-			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
+			distance.move_pid.print_pid();
+			SmartDashboard.putNumber("Gyro", heading.gyro.getFusedHeading());
 			
 		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		
@@ -61,7 +62,8 @@ public class Autonomous {
 
 		do {
 		//System.out.println("running 2");
-    		//SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+    		SmartDashboard.putNumber( "Steady State Error", heading.get_steady_state_error());
 
 			timer.update();
 			dt = timer.get_dt();
@@ -84,9 +86,9 @@ public class Autonomous {
 		distance.reset();
 		distance.set_distance(dis);
 		timer.reset();
-		distance.move_pid.fill_error( 100 );
+		distance.move_pid.fill_error( 1000 );
 		do {
-    		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+    		//SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
 
 			timer.update();
 			dt = timer.get_dt();
@@ -95,16 +97,16 @@ public class Autonomous {
 			distance.update( dt );
 			heading.update( dt );
 			
-			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
-			SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
-			
+	//		drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
+			//SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
+			drive.arcadeDrive(PID.clamp(distance.get(), 0.6), heading.get());
 //			distance.networktable.putNumber("Distance P out", distance.move_pid.p_out());
 //			distance.networktable.putNumber("Distance I out", distance.move_pid.i_out());
 //			distance.networktable.putNumber("Distance D out", distance.move_pid.d_out() );
 //			distance.networktable.putNumber("Heading P out", heading.heading_pid.p_out());
 //			distance.networktable.putNumber("Heading I out", heading.heading_pid.i_out());
 //			distance.networktable.putNumber("Heading D out", heading.heading_pid.d_out() );
-		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 
 	}
 	
