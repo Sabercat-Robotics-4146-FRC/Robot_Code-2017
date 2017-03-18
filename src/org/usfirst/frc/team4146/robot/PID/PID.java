@@ -1,8 +1,9 @@
 package org.usfirst.frc.team4146.robot.PID;
 
+//import org.usfirst.frc.team4146.robot.SD_Wrapper;
 import org.usfirst.frc.team4146.robot.SmartDashboard_Wrapper;
 
-import edu.wpi.first.wpilibj.networktables.*;
+
 
 /**
  * General purpose PID loop.
@@ -34,6 +35,7 @@ public class PID {
 	
 	private boolean sp_ramp_enabled;
 	PID sp_ramp_pid;
+	
 
 	public PID ( signal functions ){
 		this.integralStackFlag = true;
@@ -46,9 +48,8 @@ public class PID {
 		error_stack = new SizedStack( error_stack_size );
 		instName = "default";
 	}
-	NetworkTable table;
-	public PID ( signal functions, boolean integralStackFlag, String name, NetworkTable table ){
-		this.table = table;
+	
+	public PID ( signal functions, boolean integralStackFlag, String name){
 		this.integralStackFlag = integralStackFlag;
 		sp_ramp_enabled = false;
 		this.functions = functions;
@@ -95,21 +96,25 @@ public class PID {
 		}
 	}
 	public double steady_state_error() {
-		return error_stack.mean();
+		return error_stack.absolute_mean();
 	}
 	int i = 0;
+	double derivative_dt = 0;
 	public void update( double dt ){
 		error = setpoint - functions.getValue();
 		error_stack.push( error );
-		
-		derivative = ( error - prevError ) / dt;
-		derivative_stack.push( derivative );
-		
-		if ( i++ == 200 ){
+		print_pid(functions.getValue());
+		derivative_dt += dt;
+		if(error != prevError) {
+			derivative = ( error - prevError ) / derivative_dt;
+			derivative_stack.push( derivative );
 			prevError = error;
-			//System.out.println( derivative );
-			i = 0;
+			derivative_dt = 0;
 		}
+		//if ( i++ == 200 ){
+			//System.out.println( derivative );
+			//i = 0;
+		//}
 		integralSum += Ki * error * dt;
 		output = ( Kp * error ) + ( integralSum ) + ( Kd * derivative  );
 	}
@@ -122,10 +127,13 @@ public class PID {
 //	public double d_out() {
 //		return derivativeOutput;
 //	}
-	public void print_pid() {
-		SmartDashboard_Wrapper.printToSmartDashboard(instName + " P Out", Kp * error);
-		SmartDashboard_Wrapper.printToSmartDashboard(instName + " I Out", integralSum);
-		SmartDashboard_Wrapper.printToSmartDashboard(instName + " D Out", derivative );
+	public void print_pid( double getVal) {
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " P Out", Kp * error);
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " I Out", integralSum);
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " D Out", Kd * derivative );
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " Error", error );
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " PrevError", prevError );
+		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " functions", getVal );
 	}
 	public double get() {
 		return output;
@@ -142,6 +150,6 @@ public class PID {
 	}
 	public void take_prev_error_value() {
 		
-		//prevError = setpoint - functions.getValue();
+		prevError = setpoint - functions.getValue();
 	}
 }

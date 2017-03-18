@@ -66,7 +66,7 @@ class SizedStack {
    * Returns the mean of the absolute values of every number in a SizedStack.
    */
   public double absolute_mean() {
-	  return this.sum()/data.size();
+	  return this.absolute_sum()/data.size();
   }
   /**
   * Removes the oldest entered data point and returns it.

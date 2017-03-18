@@ -21,6 +21,11 @@ import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
 	
+	//Things to change when not working on practice bot
+		//Change to use both encoders
+		//Change password back in build.properties
+		//Unreverse lifter motor
+	
 	/* Robot State Machine Lists */
 	
 	// Linear Servo State Machine
@@ -110,7 +115,7 @@ public class Robot extends SampleRobot {
 	Vision gear_vision;
 	
 	//Lifter init
-	Lifter big_lifter;
+	Lifter lifter;
 	
 	//Heading init
 	Heading heading;
@@ -118,7 +123,8 @@ public class Robot extends SampleRobot {
 	//Move_Distance init
 	Move_Distance distance;
 	
-	SendableChooser chooser;
+	//Sendable Chooser init
+	SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
 	
     public Robot() {
     
@@ -151,7 +157,7 @@ public class Robot extends SampleRobot {
     	master_shooter.reverseSensor( false );
     		
     	master_shooter.configNominalOutputVoltage( +0.0f, -0.0f );
-    	master_shooter.configPeakOutputVoltage( +12.0f, -12.0f );
+    	master_shooter.configPeakOutputVoltage( +12.0f, -12.0f );	//One of these might suppose to be 0
     	
     	master_shooter.setProfile( 0 );
     	master_shooter.changeControlMode( TalonControlMode.Speed );
@@ -187,7 +193,8 @@ public class Robot extends SampleRobot {
     	// Instantiate robot's drive with Talons
     	//RobotDrive init
     	drive = new RobotDrive( front_left, rear_left, front_right, rear_right );
-    	drive.setSafetyEnabled(false);
+    	
+    	
     	//Ramp_Drive init 
     	smooth_drive = new Ramp_Drive( drive_controller, drive );
     	
@@ -195,32 +202,37 @@ public class Robot extends SampleRobot {
     	gear_vision = new Vision( "gear", network_table );
     	
     	//Lifter init
-    	big_lifter = new Lifter( lifter_controller );
+    	lifter = new Lifter( lifter_controller );
     		
     	//Heading init
-    	heading = new Heading( gyro, network_table );
+    	heading = new Heading( gyro);
     	
     	//Move_Distance init
-    	distance = new Move_Distance( right_drive_encoder, right_drive_encoder, network_table );
+    	distance = new Move_Distance( right_drive_encoder, right_drive_encoder);
     	
     	chooser = new SendableChooser();
-    	chooser.addDefault("Do Nothing", "Do Nothing");
-    	chooser.addObject("Gear from Center", "Gear from Center");
-    	chooser.addObject("Cross Baseline", "Cross Baseline");
-    	chooser.addObject("Side Gear on Left", "Side Gear on Left");
+    	chooser.addDefault("Do Nothing", "Do Nothing");						//Autonomous that does nothing. It is the default
+    	chooser.addObject("Gear from Center", "Gear from Center");			//Delivering gear to center from center	
+    	chooser.addObject("Cross Baseline", "Cross Baseline");				//Only drives forward about 6 feet
+    	chooser.addObject("Side Gear on Left", "Side Gear on Left");		
     	chooser.addObject("Side Gear on Right", "Side Gear on Right");
     	SmartDashboard.putData("Auto mode", chooser);
+    	
+    	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
     }
     
     public void robotInit() {
+    	//Set SafetyEnabled to false. Without this the RoboRio complains a lot, which caused a crash in a qualification match.
     	front_left.setSafetyEnabled( false );
 		rear_left.setSafetyEnabled( false );
 		front_right.setSafetyEnabled( false );
 		rear_right.setSafetyEnabled( false );
+		drive.setSafetyEnabled(false);
+		
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.07, 0.01, 0.0 );
+		heading.set_pid( 0.07, 0.1, 0.0 );
 		distance.set_pid( 0.4, 0.0, 0.0);
 		
 		gear_servo.set( GEAR_IN );
@@ -238,11 +250,12 @@ public class Robot extends SampleRobot {
      * auto.move_heading_lock(double distanceInFeet, double timeOutInSeconds);
      * auto.turn(double angleInDegrees, double timeOutInSeconds);		   //Turns to relative angle from current setpoint
      * heading.set_heading();// sets current heading as zero
+     * Timer.delay(double seconds);
      */
 	
     public void autonomous() {
     	
-    	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
+    	
     	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
     	distance.reset();
 		heading.set_heading();
@@ -271,8 +284,8 @@ public class Robot extends SampleRobot {
 			auto.turn(60, 5);					//60
 			auto.move_heading_lock(-1.75, 3);	//-1.75
 			break;
-		case "Side Gear on Right":
-
+		case "Side Gear on Right":			//Currently used for turn testing
+			auto.turn(60, 5);
 			//auto.move_heading_lock()
 			//auto.turn()
 			//auto.move_heading_lock(dis, timeOut);
@@ -343,7 +356,7 @@ public class Robot extends SampleRobot {
     		timer.update();
     		dt = timer.get_dt();
     		gear_vision.update( dt );
-    		big_lifter.update( dt );
+    		lifter.update( dt );
 //    		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
     		

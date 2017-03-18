@@ -15,15 +15,17 @@ public class Heading {
 	private double setPoint;
 	
 	
-	Heading( AHRS g, NetworkTable table) {
+	Heading( AHRS g) {
 		gyro = g;		
 		
 		heading_pid = new PID( new signal() {
 			public double getValue() {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
-		}, false, "Heading", table);
+		}, false, "Heading");
+		
 		heading_pid.set_setpoint(0.0); // this pid always tries to go to zero
+		heading_pid.set_error_range( 16 );
 	}
 	
 	public void update(double dt) {		//Pass dt to function, which should be from Iterative_Timer

@@ -13,7 +13,7 @@ public class Autonomous {
 	
 	
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.5;
-	private final double ACCEPTABLE_ANGLE_ERROR = 10.0;
+	private final double ACCEPTABLE_ANGLE_ERROR = 0.25;
 	private final double DEFAULT_TIME_OUT = 5.0;
 	private final double MAX_MOVE_SPEED = 0.8;
 	private final double MAX_TURN_SPEED = 0.6;
@@ -40,7 +40,7 @@ public class Autonomous {
 			distance.update( dt );
 			
 			drive.arcadeDrive(distance.get(), 0.0 );
-			distance.move_pid.print_pid();
+		//	distance.move_pid.print_pid();
 			SmartDashboard.putNumber("Gyro", heading.gyro.getFusedHeading());
 			
 		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
@@ -70,10 +70,12 @@ public class Autonomous {
 			clamp += (1.5 * dt); // really REALLY getto pid ramp
 			heading.update( dt );
 		//	drive.arcadeDrive(0.0, PID.clamp(PID.clamp(heading.get(), clamp), MAX_TURN_SPEED));
-			drive.arcadeDrive(0.0, heading.get());
+			drive.arcadeDrive(0.0, PID.clamp( heading.get(), 0.7 ) );
 			//SmartDashboard.putNumber("Heading PID out", heading.get());
-			heading.heading_pid.print_pid();
-		} while(/*(heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR ) && */( timer.timeSinceStart() < timeOut ) );
+			//heading.heading_pid.print_pid();
+		} while( (heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR ) && ( timer.timeSinceStart() < timeOut ) );
+		drive.arcadeDrive( 0.0, 0.0 );
+		System.out.println( "Done Turning! " + timer.timeSinceStart() );
 	}
 	
 	public void turn( double angle ) {// uses default timeout value

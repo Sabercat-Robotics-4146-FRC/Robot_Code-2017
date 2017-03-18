@@ -18,7 +18,7 @@ public class Move_Distance {
 	
 	public PID move_pid;
 	
-	Move_Distance( Encoder r, Encoder l, NetworkTable table) {
+	Move_Distance( Encoder r, Encoder l) {
 		right_drive_encoder = r;
 		left_drive_encoder = l;
 		
@@ -26,7 +26,7 @@ public class Move_Distance {
 			public double getValue() {
 				return convert_to_feet( encoder_distance() );
 			}
-		}, false, "Move Distance", table);
+		}, false, "Move Distance");
 		
 		reset();
 	}
