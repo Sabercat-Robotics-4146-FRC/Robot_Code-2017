@@ -28,10 +28,13 @@ public class PID {
 	private SizedStack derivative_stack;
 	/* Make error tolerance stack, used for steady state error breakouts */
 	private SizedStack error_stack;
-	private int error_stack_size = 10;
+	private int error_stack_size = 1000;
+	private double error_stack_dt;
+	
 	private String instName;
 	private boolean integralStackFlag;
 	private double integralSum = 0.0;
+	private double integralActivationRange = 100000000.0;
 	
 	private boolean sp_ramp_enabled;
 	PID sp_ramp_pid;
@@ -59,6 +62,20 @@ public class PID {
 		derivative_stack = new SizedStack( 3 );
 		error_stack = new SizedStack( error_stack_size );
 		instName = name;
+		
+	}
+	
+	public PID ( signal functions, boolean integralStackFlag, String name, double integralRange){
+		this.integralStackFlag = integralStackFlag;
+		sp_ramp_enabled = false;
+		this.functions = functions;
+		//integral = 0;
+		setpoint = 0;
+		integral_stack = new SizedStack( 10 );
+		derivative_stack = new SizedStack( 3 );
+		error_stack = new SizedStack( error_stack_size );
+		instName = name;
+		this.integralActivationRange = integralRange;
 	}
 	
 	public void set_integral_range( int n ) {
@@ -91,7 +108,7 @@ public class PID {
 		sp_ramp_pid = sp_pid;
 	}
 	public void fill_error( double e ) {
-		for ( int i = 0; i < error_stack_size; i++ ) {
+		for ( int i = 0; i <= error_stack_size; i++ ) {
 			error_stack.push( e );
 		}
 	}
@@ -102,7 +119,14 @@ public class PID {
 	double derivative_dt = 0;
 	public void update( double dt ){
 		error = setpoint - functions.getValue();
-		error_stack.push( error );
+		error_stack_dt += dt;
+		
+		if( error_stack_dt > (0.001)) {//The value is 1/1000 which is time in secs that it will push error at. So it will push 100 times per second. 
+			error_stack.push( error );
+			error_stack_dt = 0.0;
+			//System.out.println( error );
+		}
+		
 		print_pid(functions.getValue());
 		derivative_dt += dt;
 		if(error != prevError) {
@@ -111,11 +135,12 @@ public class PID {
 			prevError = error;
 			derivative_dt = 0;
 		}
-		//if ( i++ == 200 ){
-			//System.out.println( derivative );
-			//i = 0;
-		//}
-		integralSum += Ki * error * dt;
+		
+		if(Math.abs(error) < integralActivationRange)
+		{
+			integralSum += Ki * error * dt;	
+		}
+		
 		output = ( Kp * error ) + ( integralSum ) + ( Kd * derivative  );
 	}
 //	public double p_out() {
@@ -128,12 +153,12 @@ public class PID {
 //		return derivativeOutput;
 //	}
 	public void print_pid( double getVal) {
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " P Out", Kp * error);
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " I Out", integralSum);
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " D Out", Kd * derivative );
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " Error", error );
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " PrevError", prevError );
-		SmartDashboard_Wrapper.SD_Wrapper.putDouble(instName + " functions", getVal );
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " P Out", Kp * error);
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " I Out", integralSum);
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " D Out", Kd * derivative );
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " Error", error );
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " PrevError", prevError );
+		SmartDashboard_Wrapper.printToSmartDashboard(instName + " functions", getVal );
 	}
 	public double get() {
 		return output;
@@ -152,4 +177,9 @@ public class PID {
 		
 		prevError = setpoint - functions.getValue();
 	}
+	
+	public double get_error() {
+		return error;
+	}
+	
 }

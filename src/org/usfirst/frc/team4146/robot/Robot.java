@@ -25,7 +25,8 @@ public class Robot extends SampleRobot {
 		//Change to use both encoders
 		//Change password back in build.properties
 		//Unreverse lifter motor
-	
+		//Undeinvert Right Encoder -- So invert it
+		//Make sure autonomous has no test code in it.
 	/* Robot State Machine Lists */
 	
 	// Linear Servo State Machine
@@ -181,7 +182,7 @@ public class Robot extends SampleRobot {
     	gyro = new AHRS( SPI.Port.kMXP );
     	
     	//Encoder init
-    	right_drive_encoder = new Encoder( 8, 9, true, Encoder.EncodingType.k4X );
+    	right_drive_encoder = new Encoder( 8, 9, false, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 6, 7, false, Encoder.EncodingType.k4X );
     
     	//NetworkTable init
@@ -216,6 +217,7 @@ public class Robot extends SampleRobot {
     	chooser.addObject("Cross Baseline", "Cross Baseline");				//Only drives forward about 6 feet
     	chooser.addObject("Side Gear on Left", "Side Gear on Left");		
     	chooser.addObject("Side Gear on Right", "Side Gear on Right");
+    	chooser.addObject("Testing Commands", "Testing Commands");
     	SmartDashboard.putData("Auto mode", chooser);
     	
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
@@ -232,8 +234,15 @@ public class Robot extends SampleRobot {
 		right_drive_encoder.reset();
 		left_drive_encoder.reset();
 
-		heading.set_pid( 0.07, 0.1, 0.0 );
-		distance.set_pid( 0.4, 0.0, 0.0);
+		//heading.set_pid( 0.07, 0.1, 0.0 ); //0.07, 0.1, 0.0 
+		Autonomous.set_heading_turn_pid_values( 0.07, 0.1, 0.0 );
+		Autonomous.set_heading_move_pid_values( 0.2, 0.2, 0.0 );
+		distance.set_pid( 0.4, 0.1, 0.0);  
+		//0.4, 0.0, 0.0  
+		//0.4, 0.1, 0.0 Integral Range of 3, this one crawls a little bit after stopping	
+		//0.4, 0.6, 0.0 Integral Range is 2, Overshoots 
+		// Fix error stack! 
+		// Add the ability to start integral when within a value
 		
 		gear_servo.set( GEAR_IN );
 		
@@ -246,7 +255,7 @@ public class Robot extends SampleRobot {
      * Commands you can use:
      * 
      * 
-     * auto.move_forward(double distanceInFeet, double timeOutInSeconds);  //Does not reset heading or use heading at all
+     * auto.move_forward(double distanceInFeet, double timeOutInSeconds);//Does not reset heading or use heading at all
      * auto.move_heading_lock(double distanceInFeet, double timeOutInSeconds);
      * auto.turn(double angleInDegrees, double timeOutInSeconds);		   //Turns to relative angle from current setpoint
      * heading.set_heading();// sets current heading as zero
@@ -267,6 +276,7 @@ public class Robot extends SampleRobot {
 		case "Do Nothing":
 			default:
 			break;
+			
 		case "Gear from Center":
 			auto.move_heading_lock( -6.8, 5.0 );
 			Timer.delay(0.3);
@@ -276,20 +286,32 @@ public class Robot extends SampleRobot {
 	    	auto.move_heading_lock(2.0, 2.0);
 	    	gear_servo.set( GEAR_IN );
 	    	break;
+	    	
 		case "Cross Baseline":
-			auto.move_heading_lock( 6, 5 );
+			auto.move_heading_lock( -7, 10 );	//Is this suppose to be positive?
 			break;
+			
 		case "Side Gear on Left":
-			auto.move_heading_lock(-7.88, 5);	//-10.88
-			auto.turn(60, 5);					//60
+			auto.move_heading_lock(-7.5, 8);	//-8.04
+			//Timer.delay(0.3);
+			auto.turn(60, 7);					//60
+			//Timer.delay(0.3);
 			auto.move_heading_lock(-1.75, 3);	//-1.75
 			break;
-		case "Side Gear on Right":			//Currently used for turn testing
-			auto.turn(60, 5);
-			//auto.move_heading_lock()
-			//auto.turn()
-			//auto.move_heading_lock(dis, timeOut);
 			
+		case "Side Gear on Right":			
+			
+			auto.move_heading_lock(-7.5, 8);	//-8.04
+			//Timer.delay(0.3);
+			auto.turn(-60, 7);					//60
+			//Timer.delay(0.3);
+			auto.move_heading_lock(-1.75, 3);	//-1.75
+			
+			break;
+			
+		case "Testing Commands":
+			auto.turn(60, 5);
+			//auto.move_heading_lock( 10, 10 );
 			break;
 		}
 		/* Begin auto */

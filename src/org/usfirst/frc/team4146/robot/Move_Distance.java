@@ -26,7 +26,7 @@ public class Move_Distance {
 			public double getValue() {
 				return convert_to_feet( encoder_distance() );
 			}
-		}, false, "Move Distance");
+		}, false, "Move Distance", 3);
 		
 		reset();
 	}
