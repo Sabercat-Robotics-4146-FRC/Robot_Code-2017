@@ -13,12 +13,13 @@ public class Autonomous {
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	//Constants
-	private final double ACCEPTABLE_DISTANCE_ERROR = 0.25;
+	private final double ACCEPTABLE_DISTANCE_ERROR = 0.1;
 	private final double ACCEPTABLE_ANGLE_ERROR = 1.0;
 	private final double DEFAULT_TIME_OUT = 5.0;
 	private final double MAX_MOVE_SPEED = 0.7;
 	private final double MAX_TURN_SPEED = 0.7;
 	
+	private final int WHILE_WAIT_TIME = 1;
 	//Variables
 	private static double headingTurnP;
 	private static double headingTurnI;
@@ -52,7 +53,7 @@ public class Autonomous {
 			drive.arcadeDrive(distance.get(), 0.0 );
 		//	distance.move_pid.print_pid();
 //			SmartDashboard.putNumber("Gyro", heading.gyro.getFusedHeading());
-			
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
 		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		
 	}
@@ -84,22 +85,17 @@ public class Autonomous {
 			drive.arcadeDrive(0.0, PID.clamp( heading.get(), MAX_TURN_SPEED ) );
 			//SmartDashboard.putNumber("Heading PID out", heading.get());
 			//heading.heading_pid.print_pid();
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// MOVE THIS TO ITERATIVE_TIMER
-				System.out.println("Thread.sleep was Interrupted!");
-				e.printStackTrace();
-			}
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
+			
 		} while( ((heading.heading_pid.get_error() > ACCEPTABLE_ANGLE_ERROR) || (heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR)) && (timer.timeSinceStart() < timeOut) );
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Turning! " + timer.timeSinceStart() + ": Dt = " + dt );
-		while(timer.timeSinceStart() < (timeOut * 2 ))
+		/*while(timer.timeSinceStart() < (timeOut * 2 ))
 		{
 			SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
     		SmartDashboard.putNumber( "Steady State Error", heading.get_steady_state_error());
     		heading.update( dt );
-		}
+		}*/
 	}
 	
 	public void turn( double angle ) {// uses default timeout value
@@ -135,6 +131,7 @@ public class Autonomous {
 //			distance.networktable.putNumber("Heading P out", heading.heading_pid.p_out());
 //			distance.networktable.putNumber("Heading I out", heading.heading_pid.i_out());
 //			distance.networktable.putNumber("Heading D out", heading.heading_pid.d_out() );
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
 		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Moving Forward! " + timer.timeSinceStart() + " : dt is " + dt );
@@ -151,7 +148,7 @@ public class Autonomous {
 			dt = timer.get_dt();
 			autoVision.update(dt);
 			drive.arcadeDrive( 0.0, autoVision.get()); //autovision get might have to be negative
-			
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
 		}while((autoVision.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR) && (timer.timeSinceStart() < timeOut));
 		
 	}

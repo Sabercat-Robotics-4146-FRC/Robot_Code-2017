@@ -14,6 +14,8 @@ public class PID_Tuner {
 	private applyPID plant;
 	private PID pid;
 	
+	
+	
 	private Preferences prefs = Preferences.getInstance();
 	
 	PID_Tuner( String name, PID pid, Controller drive_controller, applyPID plant ) {
@@ -26,7 +28,8 @@ public class PID_Tuner {
 		prefs.putDouble( name + "_d", 0.0 );
 		prefs.putDouble( name +"_setpoint", 0.0);
 	}
-	public void update( double dt ) {
+	public double update( double dt ) {		//added toReturn and changed void to double to return turn amount
+		double toReturn = 0.0;
 		pid.update( dt );
 		if ( drive_controller.get_b_button() ) {
 			double p = prefs.getDouble( name + "_p", 0.0 );
@@ -34,10 +37,15 @@ public class PID_Tuner {
 			double d = prefs.getDouble( name + "_d", 0.0 );
 			double sp = prefs.getDouble( name +"_setpoint", 0.0);
 			pid.set_pid( p, i, d );
-			pid.set_setpoint( sp );
+			toReturn = sp;
+			//pid.set_setpoint( sp ); //Commented out to tune heading
 		}
+		
+		
 		if ( drive_controller.get_a_button() ) {
 			plant.apply( pid.get() );
 		}
+		
+		return toReturn;
 	}
 }

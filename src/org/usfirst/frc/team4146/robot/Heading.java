@@ -22,7 +22,7 @@ public class Heading {
 			public double getValue() {
 				return get_ang_diff( gyro.getFusedHeading(), setPoint);
 			}
-		}, false, "Heading", 30); //Doesn't start the integral until within 30 degrees, might be a really bad idea
+		}, false, "Heading", 15); //Doesn't start the integral until within 30 degrees, might be a really bad idea
 		
 		heading_pid.set_setpoint(0.0); // this pid always tries to go to zero
 		//heading_pid.set_error_range( 16 );

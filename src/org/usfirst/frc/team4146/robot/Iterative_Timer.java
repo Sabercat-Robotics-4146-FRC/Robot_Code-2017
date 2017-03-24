@@ -38,4 +38,15 @@ public class Iterative_Timer {
 	public void reset_start() {
 		startTime = System.nanoTime();
 	}
+	
+	public static void waitMilli( int waitTime ) {
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			// MOVE THIS TO ITERATIVE_TIMER
+			//OK
+			System.out.println("Thread.sleep was Interrupted!");
+			e.printStackTrace();
+		}
+	}
 }

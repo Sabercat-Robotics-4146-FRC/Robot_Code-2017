@@ -217,7 +217,10 @@ public class Robot extends SampleRobot {
     	chooser.addObject("Cross Baseline", "Cross Baseline");				//Only drives forward about 6 feet
     	chooser.addObject("Side Gear on Left", "Side Gear on Left");		
     	chooser.addObject("Side Gear on Right", "Side Gear on Right");
-    	chooser.addObject("Testing Commands", "Testing Commands");
+    	chooser.addObject("Testing 1", "Testing 1");
+    	chooser.addObject("Testing 2", "Testing 2");
+    	chooser.addObject("Testing 3", "Testing 3");
+
     	SmartDashboard.putData("Auto mode", chooser);
     	
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
@@ -235,9 +238,9 @@ public class Robot extends SampleRobot {
 		left_drive_encoder.reset();
 
 		//heading.set_pid( 0.07, 0.1, 0.0 ); //0.07, 0.1, 0.0 
-		Autonomous.set_heading_turn_pid_values( 0.07, 0.1, 0.0 );
+		Autonomous.set_heading_turn_pid_values( 0.06, 0.25, 0.0 );
 		Autonomous.set_heading_move_pid_values( 0.2, 0.2, 0.0 );
-		distance.set_pid( 0.4, 0.1, 0.0);  
+		distance.set_pid( 0.4, 0.3, 0.0);  //try i = 0.3
 		//0.4, 0.0, 0.0  
 		//0.4, 0.1, 0.0 Integral Range of 3, this one crawls a little bit after stopping	
 		//0.4, 0.6, 0.0 Integral Range is 2, Overshoots 
@@ -263,7 +266,7 @@ public class Robot extends SampleRobot {
      */
 	
     public void autonomous() {
-    	
+    	Preferences prefs = Preferences.getInstance();
     	
     	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
     	distance.reset();
@@ -305,13 +308,29 @@ public class Robot extends SampleRobot {
 			//Timer.delay(0.3);
 			auto.turn(-60, 7);					//60
 			//Timer.delay(0.3);
-			auto.move_heading_lock(-1.75, 3);	//-1.75
+			auto.move_heading_lock(-1.75, 5);	//-1.75
 			
 			break;
 			
-		case "Testing Commands":
-			auto.turn(60, 5);
+		case "Testing 1":
+			auto.turn(30, 5);
 			//auto.move_heading_lock( 10, 10 );
+			break;
+			
+		case "Testing 2":
+			auto.turn(60, 6);
+
+			break;
+			
+		case "Testing 3":
+			double moveDis = prefs.getDouble( "_setpoint", 0.0);
+			double testP = prefs.getDouble( "testP", 0.0);
+			double testI = prefs.getDouble( "testI", 0.0);
+			double testD = prefs.getDouble( "testD", 0.0);
+			distance.set_pid( testP, testI, testD );
+			System.out.println("move distance: " + moveDis);
+			auto.move_heading_lock(moveDis, 10);
+
 			break;
 		}
 		/* Begin auto */
@@ -508,28 +527,40 @@ public class Robot extends SampleRobot {
     //End of operatorControl
 
     public void test() {
+    
+    
+    
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
     	double dt;
     	heading.set_heading();
-		heading.rel_angle_turn( 45 );
-		heading.set_pid( 0.25, 0, 0 );
+		//heading.rel_angle_turn( 45 );
+		//heading.set_pid( 0.25, 0, 0 );
     	double forward = 0;
     	double spin = 0;
+    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
+    	distance.reset();
+		heading.set_heading();
+		PID_Tuner headingTune = new PID_Tuner("HeadingTune", heading.heading_pid, drive_controller, new applyPID() { public void apply( double output  ) { } });
     	while ( isTest() && isEnabled() ) {
     		timer.update();
     		dt = timer.get_dt();
+    		
+    		if ( drive_controller.get_a_button() && (headingTune.update(dt) != 0.0)) {
+    			auto.turn(headingTune.update(dt), 5);
+    		}
+    		
 //    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
 //    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
 //    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
     		
-    		heading.update( dt );
-    		if ( drive_controller.get_b_button() ){
-    			spin = heading.get();
-        	} else {
-        		spin = 0;
-        	}
-    		drive.arcadeDrive( forward, spin );
+//    		heading.update( dt );
+//    		if ( drive_controller.get_b_button() ){
+//    			spin = heading.get();
+//        	} else {
+//        		spin = 0;
+//        	}
+//    		drive.arcadeDrive( forward, spin );
     	}
     	
     	
