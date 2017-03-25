@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.CANSpeedController;
 
+import edu.wpi.first.wpilibj.Spark;
+
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.*;
 
@@ -239,8 +241,12 @@ public class Robot extends SampleRobot {
 
 		//heading.set_pid( 0.07, 0.1, 0.0 ); //0.07, 0.1, 0.0 
 		Autonomous.set_heading_turn_pid_values( 0.06, 0.25, 0.0 );
-		Autonomous.set_heading_move_pid_values( 0.2, 0.2, 0.0 );
-		distance.set_pid( 0.4, 0.3, 0.0);  //try i = 0.3
+		
+		
+		
+		Autonomous.set_heading_move_pid_values( 0.35, 0.022, 0.0 );
+		Autonomous.set_loose_heading_move_pid_values( 0.0, 0.02, 0.0 );
+		distance.set_pid( 0.7, 2.0, 0.0);
 		//0.4, 0.0, 0.0  
 		//0.4, 0.1, 0.0 Integral Range of 3, this one crawls a little bit after stopping	
 		//0.4, 0.6, 0.0 Integral Range is 2, Overshoots 
@@ -291,7 +297,7 @@ public class Robot extends SampleRobot {
 	    	break;
 	    	
 		case "Cross Baseline":
-			auto.move_heading_lock( -7, 10 );	//Is this suppose to be positive?
+			auto.move_heading_lock( -7, 15 );	//Is this suppose to be positive?
 			break;
 			
 		case "Side Gear on Left":
@@ -327,9 +333,15 @@ public class Robot extends SampleRobot {
 			double testP = prefs.getDouble( "testP", 0.0);
 			double testI = prefs.getDouble( "testI", 0.0);
 			double testD = prefs.getDouble( "testD", 0.0);
-			distance.set_pid( testP, testI, testD );
+			Autonomous.set_heading_move_pid_values( testP, testI, testD );
+			
+			double looseP = prefs.getDouble( "looseP", 0.0);
+			double looseI = prefs.getDouble( "looseI", 0.0);
+			double looseD = prefs.getDouble( "looseD", 0.0);
+			Autonomous.set_loose_heading_move_pid_values( looseP, looseI, looseD );
+			//distance.set_pid( testP, testI, testD );
 			System.out.println("move distance: " + moveDis);
-			auto.move_heading_lock(moveDis, 10);
+			auto.move_heading_lock(moveDis, 15);
 
 			break;
 		}
@@ -527,84 +539,26 @@ public class Robot extends SampleRobot {
     //End of operatorControl
 
     public void test() {
-    
+    	Spark motor = new Spark( 9 );
     
     
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
     	double dt;
     	heading.set_heading();
-		//heading.rel_angle_turn( 45 );
-		//heading.set_pid( 0.25, 0, 0 );
-    	double forward = 0;
-    	double spin = 0;
-    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
-    	distance.reset();
-		heading.set_heading();
-		PID_Tuner headingTune = new PID_Tuner("HeadingTune", heading.heading_pid, drive_controller, new applyPID() { public void apply( double output  ) { } });
     	while ( isTest() && isEnabled() ) {
     		timer.update();
     		dt = timer.get_dt();
     		
-    		if ( drive_controller.get_a_button() && (headingTune.update(dt) != 0.0)) {
-    			auto.turn(headingTune.update(dt), 5);
+    		if ( drive_controller.get_a_button() ) {
+    			motor.set( 0.5 );
+    		} else if ( drive_controller.get_b_button() ) {
+    			motor.set( -0.5 );
+    		} else {
+    			motor.set( 0.0 );
     		}
-    		
-//    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
-//    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
-//    		drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
-    		
-//    		heading.update( dt );
-//    		if ( drive_controller.get_b_button() ){
-//    			spin = heading.get();
-//        	} else {
-//        		spin = 0;
-//        	}
-//    		drive.arcadeDrive( forward, spin );
     	}
-    	
-    	
-    	
-    	
-//    	StringBuilder sb = new StringBuilder();
-//    	int _loops = 0;
-//    	while ( isTest() && isEnabled() ) {
-//    		double leftYstick = -drive_controller.get_left_y_axis();
-//    		double motorOutput = master_shooter.getOutputVoltage() / master_shooter.getBusVoltage();
-//    		
-//    			sb.append( "\tout:" );
-//    			sb.append( motorOutput );
-//    			sb.append( "\tspd:" );
-//    			sb.append( master_shooter.getSpeed() );
-//    			if( drive_controller.get_a_button() )
-//    			{
-//    				double targetSpeed = leftYstick * 1500.0;
-//    				master_shooter.changeControlMode( TalonControlMode.Speed );
-//    				master_shooter.set( targetSpeed ); /* 1500 RPM in either direction */
-//
-//    	        	/* append more signals to print when in speed mode. */
-//    	            sb.append("\terr:");
-//    	            sb.append(master_shooter.getClosedLoopError());
-//    	            sb.append("\ttrg:");
-//    	            sb.append(targetSpeed);
-//    	        } else {
-//    	        	/* Percent voltage mode */
-//    	        	master_shooter.changeControlMode(TalonControlMode.PercentVbus);
-//    	        	master_shooter.set(leftYstick);
-//    	        }
-//
-//    	        if(++_loops >= 10) {
-//    	        	_loops = 0;
-//    	        	System.out.println(sb.toString());
-//    	        }
-//    	        sb.setLength(0);
-//    			
-//    		
-//    		
-//    		//		SmartDashboard.putNumber("Left Encoder", left_drive_encoder.get());
-//    //		SmartDashboard.putNumber("Right Encoder", right_drive_encoder.get());
-//  		//drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), drive_controller.get_deadband_right_x_axis());
-//    	}
+    		
     }
     //End of test
 }

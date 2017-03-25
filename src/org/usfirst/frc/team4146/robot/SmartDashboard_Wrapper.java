@@ -16,4 +16,8 @@ public class SmartDashboard_Wrapper {
 		networktable.putNumber(fieldName, value);
 	}
 	
+	public static void printToSmartDashboard( String fieldName, boolean value ) {
+		networktable.putBoolean(fieldName, value);
+	}
+	
 }

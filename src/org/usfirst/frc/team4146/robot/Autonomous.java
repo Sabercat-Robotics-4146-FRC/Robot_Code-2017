@@ -13,12 +13,14 @@ public class Autonomous {
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	//Constants
-	private final double ACCEPTABLE_DISTANCE_ERROR = 0.1;
+	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083;
 	private final double ACCEPTABLE_ANGLE_ERROR = 1.0;
 	private final double DEFAULT_TIME_OUT = 5.0;
 	private final double MAX_MOVE_SPEED = 0.7;
 	private final double MAX_TURN_SPEED = 0.7;
-	
+	private final double MAX_HEADING_TURN_SPEED = 0.7;
+	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 1;
+	private final double HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD = 0.00625;
 	private final int WHILE_WAIT_TIME = 1;
 	//Variables
 	private static double headingTurnP;
@@ -27,6 +29,10 @@ public class Autonomous {
 	private static double headingMoveP;
 	private static double headingMoveI;
 	private static double headingMoveD;
+	private static double looseHeadingMoveP;
+	private static double looseHeadingMoveI;
+	private static double looseHeadingMoveD;
+	
 	
 	Autonomous(Heading h, Move_Distance md, RobotDrive rd, Vision v) {
 		heading = h;
@@ -75,7 +81,7 @@ public class Autonomous {
 		do {
 		//System.out.println("running 2");
     		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
-    		SmartDashboard.putNumber( "Steady State Error", heading.get_steady_state_error());
+    		SmartDashboard.putNumber( "Heading Steady State Error", heading.get_steady_state_error());
 
 			timer.update();
 			dt = timer.get_dt();
@@ -106,25 +112,36 @@ public class Autonomous {
 		set_heading_to_move();
 		double dt;
 		double clamp = 0.0;
+		double spin;
 		distance.reset();
 		distance.set_distance(dis);
 		timer.reset();
 		distance.move_pid.fill_error( 1000 );
 		do {
-    		//SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+			SmartDashboard_Wrapper.printToSmartDashboard( "Feet Moved", distance.right_drive_encoder.getRaw()/1300 );
 
+    		//SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+			
 			timer.update();
 			dt = timer.get_dt();
 			clamp += (1 * dt); // really REALLY getto pid ramp
 			// Update subsystem PIDs
 			distance.update( dt );
 			heading.update( dt );
+			if(( Math.abs(heading.heading_pid.get_error()) > HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD) && ( Math.abs(distance.move_pid.get_error()) > HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+				heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
+			} else {
+				heading.heading_pid.set_pid( looseHeadingMoveP, looseHeadingMoveI, looseHeadingMoveI );
+			}
+			spin = PID.clamp( heading.get(), MAX_HEADING_TURN_SPEED );
 			SmartDashboard_Wrapper.printToSmartDashboard( "Right_Encoder", distance.right_drive_encoder.getRaw() );
 			SmartDashboard_Wrapper.printToSmartDashboard("Fused_Heading", heading.gyro.getFusedHeading());
-
+			SmartDashboard_Wrapper.printToSmartDashboard("Forward Out", PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp));
+			SmartDashboard.putNumber( "Heading Steady State Error", heading.get_steady_state_error());
+			
 	//		drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
 			//SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
-			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp), heading.get());
+			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp), spin);
 //			distance.networktable.putNumber("Distance P out", distance.move_pid.p_out());
 //			distance.networktable.putNumber("Distance I out", distance.move_pid.i_out());
 //			distance.networktable.putNumber("Distance D out", distance.move_pid.d_out() );
@@ -135,7 +152,12 @@ public class Autonomous {
 		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Moving Forward! " + timer.timeSinceStart() + " : dt is " + dt );
-		
+		//Timer.delay(1.0);
+		timer.update();
+		dt = timer.get_dt();
+		heading.update(dt);
+		System.out.println( "Final Error(FT): " + distance.move_pid.get_error());
+		System.out.println( "Final Error(IN): " + distance.move_pid.get_error() * 12.0 );
 	}
 	
 	public void turnToGear(double timeOut) {
@@ -170,7 +192,11 @@ public class Autonomous {
 		headingMoveI = i;
 		headingMoveD = d;
 	}
-	
+	public static void set_loose_heading_move_pid_values(double p, double i, double d) {
+		looseHeadingMoveP = p;
+		looseHeadingMoveI = i;
+		looseHeadingMoveD = d;
+	}
 	private void set_heading_to_turn() {
 		heading.set_pid(headingTurnP, headingTurnI, headingTurnD);
 	}

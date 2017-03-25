@@ -115,8 +115,10 @@ public class PID {
 	public double steady_state_error() {
 		return error_stack.absolute_mean();
 	}
+	
 	int i = 0;
 	double derivative_dt = 0;
+	
 	public void update( double dt ){
 		error = setpoint - functions.getValue();
 		error_stack_dt += dt;
