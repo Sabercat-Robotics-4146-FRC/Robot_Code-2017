@@ -10,7 +10,7 @@ public class Move_Distance {
 	private final double WHEEL_DIAMETER = 7.625; // Inches
 	private final double ENCODER_CONVERSION = (  ENCODER_TICKS_PER_REVOLUTION / ( WHEEL_DIAMETER * Math.PI ) ) * 12;// YAY.
 	//Tested ticks per foot is 1300
-	private final double ENCODER_RAW_CONVERSION = 1193.287; //ticks per foot //was 1317
+	private final double ENCODER_RAW_CONVERSION = 1300; //ticks per foot //was 1317  //1193.287
 	
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
