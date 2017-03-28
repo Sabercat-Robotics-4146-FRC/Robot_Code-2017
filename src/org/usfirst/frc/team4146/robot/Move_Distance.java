@@ -61,7 +61,8 @@ public class Move_Distance {
 	}
 	// Converts encoder ticks to feet
 	private double convert_to_feet( double e ) {
-		return ( e / ENCODER_RAW_CONVERSION );
+		return ( e + 134.9 ) / 1225.4;
+		//return ( e / ENCODER_RAW_CONVERSION );
 	}
 	// Returns average encoder ticks
 	private double encoder_distance() {

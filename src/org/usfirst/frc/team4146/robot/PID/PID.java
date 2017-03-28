@@ -28,7 +28,8 @@ public class PID {
 	private SizedStack derivative_stack;
 	/* Make error tolerance stack, used for steady state error breakouts */
 	private SizedStack error_stack;
-	private int error_stack_size = 1000;
+	private int error_stack_size = 100; //Default value
+	private double error_stack_sample_rate = 0.001; //Default value, will push 100 times per second.
 	private double error_stack_dt;
 	
 	private String instName;
@@ -88,6 +89,9 @@ public class PID {
 		error_stack.resize( n );
 		error_stack_size = n;
 	}
+	public void set_error_sample_rate(int n ) {
+		error_stack_sample_rate = n;
+	}
 	public void set_setpoint( double s ){
 		if ( sp_ramp_enabled ) {
 			sp_ramp_pid.set_setpoint( s );
@@ -123,7 +127,7 @@ public class PID {
 		error = setpoint - functions.getValue();
 		error_stack_dt += dt;
 		
-		if( error_stack_dt > (0.001)) {//The value is 1/1000 which is time in secs that it will push error at. So it will push 100 times per second. 
+		if( error_stack_dt > (error_stack_sample_rate)) {
 			error_stack.push( error );
 			error_stack_dt = 0.0;
 			//System.out.println( error );

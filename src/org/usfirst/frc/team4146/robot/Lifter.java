@@ -73,6 +73,7 @@ public class Lifter {
 			lifter.set( 0.0 );
 		}
 		
+		
 //		switch( state ) {
 //		
 //			case close:

@@ -13,13 +13,13 @@ public class Autonomous {
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	//Constants
-	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083;
-	private final double ACCEPTABLE_ANGLE_ERROR = 1.0;
+	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083; // Used to be 0.083
+	private final double ACCEPTABLE_ANGLE_ERROR = 1.0; // Used to be 1.0
 	private final double DEFAULT_TIME_OUT = 5.0;
-	private final double MAX_MOVE_SPEED = 0.7;
+	private final double MAX_MOVE_SPEED = 0.9; //0.7
 	private final double MAX_TURN_SPEED = 0.7;
 	private final double MAX_HEADING_TURN_SPEED = 0.7;
-	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 1;
+	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 4/12;	//Use to be 1 foot
 	private final double HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD = 0.00625;
 	private final int WHILE_WAIT_TIME = 1;
 	//Variables
@@ -117,6 +117,7 @@ public class Autonomous {
 		distance.set_distance(dis);
 		timer.reset();
 		distance.move_pid.fill_error( 1000 );
+		heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
 		do {
 			SmartDashboard_Wrapper.printToSmartDashboard( "Feet Moved", distance.right_drive_encoder.getRaw()/1300 );
 
@@ -128,12 +129,18 @@ public class Autonomous {
 			// Update subsystem PIDs
 			distance.update( dt );
 			heading.update( dt );
-			if(( Math.abs(heading.heading_pid.get_error()) > HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD) && ( Math.abs(distance.move_pid.get_error()) > HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+			/*if(( Math.abs(heading.heading_pid.get_error()) > HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD) && ( Math.abs(distance.move_pid.get_error()) > HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
 				heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
 			} else {
 				heading.heading_pid.set_pid( looseHeadingMoveP, looseHeadingMoveI, looseHeadingMoveI );
-			}
+			}*/
 			spin = PID.clamp( heading.get(), MAX_HEADING_TURN_SPEED );
+			if(( Math.abs(distance.move_pid.get_error()) < HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+				spin = 0;
+			}
+			
+			
+			
 			SmartDashboard_Wrapper.printToSmartDashboard( "Right_Encoder", distance.right_drive_encoder.getRaw() );
 			SmartDashboard_Wrapper.printToSmartDashboard("Fused_Heading", heading.gyro.getFusedHeading());
 			SmartDashboard_Wrapper.printToSmartDashboard("Forward Out", PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp));

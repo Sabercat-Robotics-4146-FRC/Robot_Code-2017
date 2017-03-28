@@ -301,11 +301,12 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Side Gear on Left":
-			auto.move_heading_lock(-7.5, 8);	//-8.04
+			auto.move_heading_lock(-7.2, 8);	//-8.04
 			//Timer.delay(0.3);
 			auto.turn(60, 7);					//60
 			//Timer.delay(0.3);
-			auto.move_heading_lock(-1.75, 3);	//-1.75
+			auto.move_heading_lock(-3.166, 3);	//-1.75
+			auto.move_heading_lock(3, 3);
 			break;
 			
 		case "Side Gear on Right":			
@@ -388,6 +389,10 @@ public class Robot extends SampleRobot {
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
     	
+    	gyro.reset();
+    	right_drive_encoder.reset();
+		left_drive_encoder.reset();
+		
     	robot_state state = robot_state.idle;
     	gear_state gear = gear_state.out; //Should be first state to run since gear servo starts closed
     	
@@ -420,6 +425,9 @@ public class Robot extends SampleRobot {
     		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
     		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
     		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading() );
+    		network_table.putNumber( "Z_Displacement", gyro.getDisplacementZ() );
+    		network_table.putNumber( "Y_Displacement", gyro.getDisplacementY() );
+    		network_table.putNumber( "X_Displacement", gyro.getDisplacementX() );
 //    		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
 //    		network_table.putNumber( "New_Right_Encoder", testing );
