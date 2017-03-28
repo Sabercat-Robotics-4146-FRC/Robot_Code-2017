@@ -13,12 +13,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.CANSpeedController;
-
 import edu.wpi.first.wpilibj.Spark;
-
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.*;
-
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
@@ -29,21 +26,22 @@ public class Robot extends SampleRobot {
 		//Unreverse lifter motor
 		//Undeinvert Right Encoder -- So invert it
 		//Make sure autonomous has no test code in it.
+	
 	/* Robot State Machine Lists */
 	
-	// Linear Servo State Machine
+	/*Linear Servo State Machine*/
 	enum servo_state {
 		extending,
 		retracting
 	}
 	
-	// Gear Servo State Machine
+	/*Gear Servo State Machine*/
 	enum gear_state {
 		out,
 		in
 	}
 	
-	// Robot State Machine
+	/*Robot State Machine*/
 	enum robot_state {
 		shooting,
 		testing_shooter,
@@ -59,9 +57,9 @@ public class Robot extends SampleRobot {
 	private final double GEAR_IN = 0.35;
 	private final double GEAR_OUT = 0.64;
 	
-	// Shooter RPM parameters
-	static double shooter_rpm_tolerance = 10; //was 50
-	static double shooter_rpm_setpoint  = -2700.0;
+	/*Shooter RPM parameters*/
+	static double shooter_rpm_tolerance = 10.0; //was 50
+	static double shooter_rpm_setpoint  = -2000.0;// In competition set it to: -2700.0
 	static double shooter_intake_speed  = -0.8;
 	static double vibrator_speed = 0.8;
 	
@@ -73,7 +71,7 @@ public class Robot extends SampleRobot {
 	
 	/* Motor Controller initialization */
 	
-	// Talon SR Motor Controller init
+	/*Talon SR Motor Controller init*/
 	Talon front_left;
 	Talon rear_left;
 	
@@ -84,7 +82,7 @@ public class Robot extends SampleRobot {
 	Talon shooter_intake;
 	Talon vibrator;
 		
-	//CANTalon SRX Motor Controller init
+	/*CANTalon SRX Motor Controller init*/
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
@@ -98,17 +96,17 @@ public class Robot extends SampleRobot {
 	//Navx Gyro init
 	AHRS gyro;
 	
-	//Encoder init
+	/*Encoder init*/
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
-	//NetworkTable init
+	/*NetworkTable init*/
 	NetworkTable network_table;
 	
 	
 	/* Subclass initialization */
 	
-	//RobotDrive init
+	/*RobotDrive init*/
 	RobotDrive drive;
 	
 	//Ramp_Drive init 
@@ -307,6 +305,8 @@ public class Robot extends SampleRobot {
 			//Timer.delay(0.3);
 			auto.move_heading_lock(-3.166, 3);	//-1.75
 			auto.move_heading_lock(3, 3);
+			auto.turn( -10, 4 );
+			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			break;
 			
 		case "Side Gear on Right":			
@@ -320,7 +320,9 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Testing 1":
-			auto.turn(30, 5);
+//			auto.turn(30, 5);
+			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+
 			//auto.move_heading_lock( 10, 10 );
 			break;
 			
@@ -382,6 +384,7 @@ public class Robot extends SampleRobot {
 			}
 		}
     }
+    
     public void operatorControl() {
     	double dt;
     	boolean x_button_toggle = true;
