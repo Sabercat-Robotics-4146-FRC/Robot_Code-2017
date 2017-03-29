@@ -213,10 +213,12 @@ public class Robot extends SampleRobot {
     	
     	chooser = new SendableChooser();
     	chooser.addDefault("Do Nothing", "Do Nothing");						//Autonomous that does nothing. It is the default
-    	chooser.addObject("Gear from Center", "Gear from Center");			//Delivering gear to center from center	
     	chooser.addObject("Cross Baseline", "Cross Baseline");				//Only drives forward about 6 feet
-    	chooser.addObject("Side Gear on Left", "Side Gear on Left");		
-    	chooser.addObject("Side Gear on Right", "Side Gear on Right");
+    	chooser.addObject("Gear from Center", "Gear from Center");			//Delivering gear to center from center	
+    	chooser.addObject("Blue Gear Boiler Side", "Blue Gear Boiler Side");
+    	chooser.addObject("Blue Gear NOT Boiler Side", "Blue Gear NOT Boiler Side");
+    	chooser.addObject("Red Gear Boiler Side", "Red Gear Boiler Side");
+    	chooser.addObject("Red Gear NOT Boiler Side", "Red Gear NOT Boiler Side");
     	chooser.addObject("Testing 1", "Testing 1");
     	chooser.addObject("Testing 2", "Testing 2");
     	chooser.addObject("Testing 3", "Testing 3");
@@ -281,11 +283,11 @@ public class Robot extends SampleRobot {
 		switch(autoSelected)
 		{
 		case "Do Nothing":
-			default:
+			default: //This does nothing!
 			break;
 			
 		case "Gear from Center":
-			auto.move_heading_lock( -6.8, 5.0 );
+			auto.move_heading_lock( -6.66, 5.0 ); //-6.8
 			Timer.delay(0.3);
 
 	    	gear_servo.set( GEAR_OUT );
@@ -298,25 +300,56 @@ public class Robot extends SampleRobot {
 			auto.move_heading_lock( -7, 15 );	//Is this suppose to be positive?
 			break;
 			
-		case "Side Gear on Left":
+		case "Blue Gear Boiler Side":
 			auto.move_heading_lock(-7.2, 8);	//-8.04
-			//Timer.delay(0.3);
 			auto.turn(60, 7);					//60
-			//Timer.delay(0.3);
+			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+			master_shooter.changeControlMode(TalonControlMode.Speed);
+			master_shooter.set( shooter_rpm_setpoint );
 			auto.move_heading_lock(-3.166, 3);	//-1.75
+			gear_servo.set( GEAR_OUT );
+	    	Timer.delay(0.3);
 			auto.move_heading_lock(3, 3);
+			gear_servo.set( GEAR_IN );
 			auto.turn( -10, 4 );
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+			master_shooter.disableControl();
 			break;
 			
-		case "Side Gear on Right":			
+		case "Blue Gear NOT Boiler Side":
+			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			auto.turn(-60, 7);//60
+			auto.move_heading_lock(-3.166, 3);	//-1.75
+			gear_servo.set( GEAR_OUT );
+	    	Timer.delay(0.3);
+			auto.move_heading_lock(2, 3);
+			gear_servo.set( GEAR_IN );
+			break;
 			
-			auto.move_heading_lock(-7.5, 8);	//-8.04
-			//Timer.delay(0.3);
-			auto.turn(-60, 7);					//60
-			//Timer.delay(0.3);
-			auto.move_heading_lock(-1.75, 5);	//-1.75
+		case "Red Gear Boiler Side":			
+			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			auto.turn(-60, 7);//60
+			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+			master_shooter.changeControlMode(TalonControlMode.Speed);
+			master_shooter.set( shooter_rpm_setpoint );
+			auto.move_heading_lock(-3.166, 3);	//-1.75
+			gear_servo.set( GEAR_OUT );
+	    	Timer.delay(0.3);
+			auto.move_heading_lock(2, 3);
+			gear_servo.set( GEAR_IN );
+			auto.turn( -10, 4 );
+			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+			master_shooter.disableControl();
+			break;
 			
+		case "Red Gear NOT Boiler Side":
+			auto.move_heading_lock(-7.2, 8);	//-8.04
+			auto.turn(60, 7);					//60
+			auto.move_heading_lock(-3.166, 3);	//-1.75
+			gear_servo.set( GEAR_OUT );
+	    	Timer.delay(0.3);
+			auto.move_heading_lock(3, 3);
+			gear_servo.set( GEAR_IN );
 			break;
 			
 		case "Testing 1":
