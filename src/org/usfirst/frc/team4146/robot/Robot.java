@@ -272,6 +272,7 @@ public class Robot extends SampleRobot {
      */
 	
     public void autonomous() {
+    	long start_time = System.nanoTime();
     	Preferences prefs = Preferences.getInstance();
     	
     	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
@@ -303,17 +304,17 @@ public class Robot extends SampleRobot {
 		case "Blue Gear Boiler Side":
 			auto.move_heading_lock(-7.2, 8);	//-8.04
 			auto.turn(60, 7);					//60
-			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
-			master_shooter.changeControlMode(TalonControlMode.Speed);
-			master_shooter.set( shooter_rpm_setpoint );
+//			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+//			master_shooter.changeControlMode(TalonControlMode.Speed);
+//			master_shooter.set( shooter_rpm_setpoint );
 			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
-	    	Timer.delay(0.3);
-			auto.move_heading_lock(3, 3);
-			gear_servo.set( GEAR_IN );
-			auto.turn( -10, 4 );
-			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
-			master_shooter.disableControl();
+//			gear_servo.set( GEAR_OUT );
+//	    	Timer.delay(0.3);
+//			auto.move_heading_lock(3, 3);
+//			gear_servo.set( GEAR_IN );
+//			auto.turn( -10, 4 );
+//			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+//			master_shooter.disableControl();
 			break;
 			
 		case "Blue Gear NOT Boiler Side":
@@ -391,6 +392,8 @@ public class Robot extends SampleRobot {
 
     	/* End auto */
 		network_table.putBoolean( "isAutoComplete", true );
+		
+		System.out.println( "Time taken: " + ( ( (double)System.nanoTime() - start_time ) * 1e-9 ) );
     }
     
     
