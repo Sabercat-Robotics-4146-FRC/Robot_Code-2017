@@ -36,20 +36,22 @@ public class Autonomous {
 	private final double MAX_HEADING_TURN_SPEED = 0.7; //0.7
 	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 4/12;	//Use to be 1 foot
 	private final double HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD = 0.00625;
-	private final int WHILE_WAIT_TIME = 1;
+	private final int WHILE_WAIT_TIME = 1;// This variable changes nothing. It will always be 1 miliseconds or 0.001 second. Look at waitMilli in Iterative_Timer.
 	//Variables
 	private static double headingTurnP;
 	private static double headingTurnI;
 	private static double headingTurnD;
+	
 	private static double headingMoveP;
 	private static double headingMoveI;
 	private static double headingMoveD;
+	
 	private static double looseHeadingMoveP;
 	private static double looseHeadingMoveI;
 	private static double looseHeadingMoveD;
 	
 	
-	Autonomous(Heading h, Move_Distance md, RobotDrive rd, Vision v) {
+	Autonomous( Heading h, Move_Distance md, RobotDrive rd, Vision v ) {
 		heading = h;
 		distance = md;
 		drive = rd;

@@ -86,14 +86,14 @@ public class Robot extends SampleRobot {
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
-	//Servo Motor Controller init
+	/*Servo Motor Controller init*/
 	Servo linear_servo;
 	Servo gear_servo;
 	
 	
 	/* Sensor and NetworkTable initialization */
 	
-	//Navx Gyro init
+	/*Navx Gyro init*/
 	AHRS gyro;
 	
 	/*Encoder init*/

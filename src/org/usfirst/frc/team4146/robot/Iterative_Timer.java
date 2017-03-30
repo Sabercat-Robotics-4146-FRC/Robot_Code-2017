@@ -45,7 +45,7 @@ public class Iterative_Timer {
 		} catch (InterruptedException e) {
 			// MOVE THIS TO ITERATIVE_TIMER
 			//OK
-			System.out.println("Thread.sleep was Interrupted!");
+			System.out.println("Thread.sleep was Interrupted in Iterative_Timer!");
 			e.printStackTrace();
 		}
 	}

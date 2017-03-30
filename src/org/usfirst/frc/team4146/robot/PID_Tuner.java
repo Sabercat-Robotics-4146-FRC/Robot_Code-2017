@@ -1,9 +1,7 @@
 package org.usfirst.frc.team4146.robot;
 
 import org.usfirst.frc.team4146.robot.PID.*;
-
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -26,7 +24,7 @@ public class PID_Tuner {
 		prefs.putDouble( name + "_p", 0.0 );
 		prefs.putDouble( name + "_i", 0.0 );
 		prefs.putDouble( name + "_d", 0.0 );
-		prefs.putDouble( name +"_setpoint", 0.0);
+		prefs.putDouble( name + "_setpoint", 0.0);
 	}
 	public double update( double dt ) {		//added toReturn and changed void to double to return turn amount
 		double toReturn = 0.0;
