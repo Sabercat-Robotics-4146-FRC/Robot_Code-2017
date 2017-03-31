@@ -261,7 +261,8 @@ public class Robot_Map {
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper( network_table );
     	
     	/*Autonomous initialization*/
-    	auto = new Autonomous( heading, distance, drive, gear_vision);
+    	auto = new Autonomous( heading, distance, drive, gear_vision, this );
+    	
 	/*-------Tertiary Initilization-------*/
     	
     	/*Set SafetyEnabled to false for talons*/   //Without this the RoboRio complains a lot, which caused a crash in a qualification match.

@@ -1,32 +1,35 @@
 package org.usfirst.frc.team4146.robot;
-import org.usfirst.frc.team4146.robot.PID.*;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.networktables.*;
-import edu.wpi.first.wpilibj.CANSpeedController;
-import edu.wpi.first.wpilibj.Spark;
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.*;
-import com.ctre.CANTalon.TalonControlMode;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+//import org.usfirst.frc.team4146.robot.PID.*;
+//import com.kauailabs.navx.frc.AHRS;
+//import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.RobotDrive;
+//import edu.wpi.first.wpilibj.SPI;
+//import edu.wpi.first.wpilibj.SampleRobot;
+//import edu.wpi.first.wpilibj.Talon;
+//import edu.wpi.first.wpilibj.Encoder;
+//import edu.wpi.first.wpilibj.Preferences;
+//import edu.wpi.first.wpilibj.Timer;
+//import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.Servo;
+//import edu.wpi.first.wpilibj.networktables.*;
+//import edu.wpi.first.wpilibj.CANSpeedController;
+//import edu.wpi.first.wpilibj.Spark;
+//import com.ctre.CANTalon;
+//import com.ctre.CANTalon.*;
+//import com.ctre.CANTalon.TalonControlMode;
+//import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Autonomous {
-	Heading heading;
-	Move_Distance distance;
-	RobotDrive drive;
-	Vision autoVision;
-	Iterative_Timer timer = new Iterative_Timer();
 	
+//	Heading heading;
+//	Move_Distance distance;
+//	RobotDrive drive;
+//	Vision autoVision;
+	Robot_Map map;
+//	Iterative_Timer timer = new Iterative_Timer();
+	
+	/*
 	//Constants
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083; // Used to be 0.083
 	private final double ACCEPTABLE_ANGLE_ERROR = 0.5; // Used to be 1.0
@@ -37,6 +40,7 @@ public class Autonomous {
 	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 4/12;	//Use to be 1 foot
 	private final double HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD = 0.00625;
 	private final int WHILE_WAIT_TIME = 1;
+	*/
 	//Variables
 	private static double headingTurnP;
 	private static double headingTurnI;
@@ -50,52 +54,54 @@ public class Autonomous {
 	private static double looseHeadingMoveI;
 	private static double looseHeadingMoveD;
 	
-	Autonomous( Heading h, Move_Distance md, RobotDrive rd, Vision v ) {
-		heading = h;
-		distance = md;
-		drive = rd;
-		autoVision = v;
+	Autonomous( /*Heading h, Move_Distance md, RobotDrive rd, Vision v,*/ Robot_Map m ) {
+//		heading = h;
+//		distance = md;
+//		drive = rd;
+//		autoVision = v;
+		map = m;
+		
 	}
 	
 	public void move_forward( double dis, double timeOut ) {// uses given timeout value
 		set_heading_to_move();
 		double dt;
 		double clamp = 0.0;
-		distance.reset();
-		distance.set_distance(dis);
-		timer.reset();
-		distance.move_pid.fill_error( 1000 );
+		map.distance.reset();
+		map.distance.set_distance(dis);
+		map.timer.reset();
+		map.distance.move_pid.fill_error( 1000 );
 		do {
-			timer.update();
-			dt = timer.get_dt();
+			map.timer.update();
+			dt = map.timer.get_dt();
 			clamp += (1 * dt); // really REALLY getto pid ramp
 			// Update subsystem PIDs
-			distance.update( dt );
+			map.distance.update( dt );
 			
-			drive.arcadeDrive(distance.get(), 0.0 );
+			map.drive.arcadeDrive( map.distance.get(), 0.0 );
 		//	distance.move_pid.print_pid();
 //			SmartDashboard.putNumber("Gyro", heading.gyro.getFusedHeading());
-			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
-		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+			Iterative_Timer.waitMilli( map.WHILE_WAIT_TIME );
+		} while( ( map.distance.get_steady_state_error() > map.ACCEPTABLE_DISTANCE_ERROR ) && ( map.timer.timeSinceStart() < timeOut ) );
 		
 	}
 	
 	public void move_forward( double dis ) {// uses default timeout value
-		move_forward( dis, DEFAULT_TIME_OUT);
+		move_forward( dis, map.DEFAULT_TIME_OUT);
 	}
 	
 	public void turn(double angle, double timeOut) {// uses given timeout value
 		double dt;
 		double clamp = 0.0;
 		set_heading_to_turn();
-		timer.reset();
-		heading.rel_angle_turn( angle );
+		map.timer.reset();
+		map.heading.rel_angle_turn( angle );
 		
-		heading.heading_pid.fill_error( 1000 );
-		System.out.println("running 1");
+		map.heading.heading_pid.fill_error( 1000 );
+//		System.out.println("running 1"); //IDK why this is a thing.
 
 		do {
-		//System.out.println("running 2");
+		//System.out.println("running 2");  
     		SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
     		SmartDashboard.putNumber( "Heading Steady State Error", heading.get_steady_state_error());
 
@@ -109,7 +115,7 @@ public class Autonomous {
 			//heading.heading_pid.print_pid();
 			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
 			
-		} while( ((heading.heading_pid.get_error() > ACCEPTABLE_ANGLE_ERROR) || (heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR)) && (timer.timeSinceStart() < timeOut) );
+		} while( ( ( map.heading.heading_pid.get_error() > map.ACCEPTABLE_ANGLE_ERROR ) || ( map.heading.get_steady_state_error() > map.ACCEPTABLE_ANGLE_ERROR ) ) && ( map.timer.timeSinceStart() < timeOut ) );
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Turning! " + timer.timeSinceStart() + ": Dt = " + dt );
 		System.out.println( "Turn Error: " + heading.heading_pid.get_error() );
@@ -176,7 +182,7 @@ public class Autonomous {
 			
 			SmartDashboard_Wrapper.printToSmartDashboard( "Spin", spin );
 			
-		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		} while ( ( Math.abs(distance.get_steady_state_error() ) > ACCEPTABLE_DISTANCE_ERROR ) && ( timer.timeSinceStart() < timeOut ) );
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Moving Forward! " + timer.timeSinceStart() + " : dt is " + dt );
 		//Timer.delay(1.0);
