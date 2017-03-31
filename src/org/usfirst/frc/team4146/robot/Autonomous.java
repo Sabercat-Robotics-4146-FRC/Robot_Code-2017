@@ -29,14 +29,14 @@ public class Autonomous {
 	
 	//Constants
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083; // Used to be 0.083
-	private final double ACCEPTABLE_ANGLE_ERROR = 1.0; // Used to be 1.0
+	private final double ACCEPTABLE_ANGLE_ERROR = 0.5; // Used to be 1.0
 	private final double DEFAULT_TIME_OUT = 5.0;
 	private final double MAX_MOVE_SPEED = 0.7; //0.7
 	private final double MAX_TURN_SPEED = 0.7; // 0.7
 	private final double MAX_HEADING_TURN_SPEED = 0.7; //0.7
 	private final double HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD = 4/12;	//Use to be 1 foot
 	private final double HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD = 0.00625;
-	private final int WHILE_WAIT_TIME = 1;// This variable changes nothing. It will always be 1 miliseconds or 0.001 second. Look at waitMilli in Iterative_Timer.
+	private final int WHILE_WAIT_TIME = 1;
 	//Variables
 	private static double headingTurnP;
 	private static double headingTurnI;
@@ -49,7 +49,6 @@ public class Autonomous {
 	private static double looseHeadingMoveP;
 	private static double looseHeadingMoveI;
 	private static double looseHeadingMoveD;
-	
 	
 	Autonomous( Heading h, Move_Distance md, RobotDrive rd, Vision v ) {
 		heading = h;

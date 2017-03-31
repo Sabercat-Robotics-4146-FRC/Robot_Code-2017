@@ -51,22 +51,22 @@ public class Robot_Map {
 	final double left_lifter_finger_servo_open = 0.0;	//Fill These with correct values - 0.99
 	
 	boolean fingerServoFlag = false;
-
-	/*-----Enums-----*/
+/*
+	-----Enums-----
 	
-	/*Linear Servo State Machine*/
-	static enum servo_state {
+	Linear Servo State Machine
+	public enum servo_state { 
 		extending,
 		retracting
 	}
 	
-	/*Gear Servo State Machine*/
+	Gear Servo State Machine
 	enum gear_state {
 		out,
 		in
 	}
 	
-	/*Robot State Machine*/
+	Robot State Machine
 	enum robot_state {
 		shooting,
 		testing_shooter,
@@ -75,7 +75,7 @@ public class Robot_Map {
 		sicem, // Growl mode
 		idle
 	}
-	
+	*/
 	/*-----Joystick Controllers-----*/ 
 	
 	Controller drive_controller;
@@ -108,7 +108,7 @@ public class Robot_Map {
 	
 	Servo left_lifter_finger_servo;
 	Servo right_lifter_finger_servo;
-	
+									//Rip Locking Servo
 	
 	/*-----Sensor and NetworkTable initialization-----*/
 	
@@ -148,6 +148,9 @@ public class Robot_Map {
 	
 	/*Sendable Chooser initialization*/
 	SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard!
+	
+	/*Autonomous initialization*/
+	Autonomous auto;
 	
 	public Robot_Map(){
 		/*-------Secondary Initilization-------*/
@@ -257,6 +260,8 @@ public class Robot_Map {
     	
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper( network_table );
     	
+    	/*Autonomous initialization*/
+    	auto = new Autonomous( heading, distance, drive, gear_vision);
 	/*-------Tertiary Initilization-------*/
     	
     	/*Set SafetyEnabled to false for talons*/   //Without this the RoboRio complains a lot, which caused a crash in a qualification match.

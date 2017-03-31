@@ -41,7 +41,7 @@ public class Iterative_Timer {
 	
 	public static void waitMilli( int waitTime ) {
 		try {
-			Thread.sleep(1);
+			Thread.sleep( waitTime );
 		} catch (InterruptedException e) {
 			// MOVE THIS TO ITERATIVE_TIMER
 			//OK

@@ -19,18 +19,11 @@ import com.ctre.CANTalon.*;
 import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
-	
-	//Things to change when not working on practice bot
-		//Change to use both encoders
-		//Change password back in build.properties
-		//Unreverse lifter motor
-		//Undeinvert Right Encoder -- So invert it
-		//Make sure autonomous has no test code in it.
-	
-	/* Robot State Machine Lists */
+	Robot_Map map = new Robot_Map(); //Do not Touch this....
+	/*-----Enums-----*/
 	
 	/*Linear Servo State Machine*/
-	enum servo_state {
+	public enum servo_state { 
 		extending,
 		retracting
 	}
@@ -51,27 +44,58 @@ public class Robot extends SampleRobot {
 		idle
 	}
 	
+	//Things to change when not working on practice bot
+		//Change to use both encoders
+		//Change password back in build.properties
+		//Unreverse lifter motor
+		//Undeinvert Right Encoder -- So invert it
+		//Make sure autonomous has no test code in it.
 	
-	/* Global Constants */
+	/* Robot State Machine Lists */
 	
-	private final double GEAR_IN = 0.35;
+	/*Linear Servo State Machine*/
+	/*enum servo_state {
+		extending,
+		retracting
+	}
+	
+	Gear Servo State Machine
+	enum gear_state {
+		out,
+		in
+	}
+	
+	Robot State Machine
+	enum robot_state {
+		shooting,
+		testing_shooter,
+		intaking,
+		gear_tracking,
+		sicem, // Growl mode
+		idle
+	}
+	
+	
+	 Global Constants 
+	
+//	private final double GEAR_IN = 0.35;
 	private final double GEAR_OUT = 0.64;
 	
-	/*Shooter RPM parameters*/
+	Shooter RPM parameters
 	static double shooter_rpm_tolerance = 10.0; //was 50
 	static double shooter_rpm_setpoint  = -2000.0;// In competition set it to: -2700.0
 	static double shooter_intake_speed  = -0.8;
 	static double vibrator_speed = 0.8;
 	
-	/* Joystick Controllers */ 
+	 Joystick Controllers  
 	
 	Controller drive_controller;
 	Controller lifter_controller;
 	
 	
-	/* Motor Controller initialization */
+	 Motor Controller initialization 
 	
-	/*Talon SR Motor Controller init*/
+	Talon SR Motor Controller init
 	Talon front_left;
 	Talon rear_left;
 	
@@ -82,31 +106,31 @@ public class Robot extends SampleRobot {
 	Talon shooter_intake;
 	Talon vibrator;
 		
-	/*CANTalon SRX Motor Controller init*/
+	CANTalon SRX Motor Controller init
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
-	/*Servo Motor Controller init*/
+	Servo Motor Controller init
 	Servo linear_servo;
 	Servo gear_servo;
 	
 	
-	/* Sensor and NetworkTable initialization */
+	 Sensor and NetworkTable initialization 
 	
-	/*Navx Gyro init*/
+	Navx Gyro init
 	AHRS gyro;
 	
-	/*Encoder init*/
+	Encoder init
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
-	/*NetworkTable init*/
+	NetworkTable init
 	NetworkTable network_table;
 	
 	
-	/* Subclass initialization */
+	 Subclass initialization 
 	
-	/*RobotDrive init*/
+	RobotDrive init
 	RobotDrive drive;
 	
 	//Ramp_Drive init 
@@ -126,17 +150,17 @@ public class Robot extends SampleRobot {
 	
 	//Sendable Chooser init
 	SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
-	
+	*/
     public Robot() {
-    
-    	/* Joystick Controllers */ 
+    /*
+    	 Joystick Controllers  
     	
     	//Controller Initialization 
     	drive_controller = new Controller( 0 );
     	lifter_controller = new Controller( 1 );
     	
 
-    	/* Motor Controller initialization */
+    	 Motor Controller initialization 
     	
     	// Talon SR Motor Controller init
     	front_left  	= new Talon( 0 );
@@ -176,7 +200,7 @@ public class Robot extends SampleRobot {
     	gear_servo = new Servo( 8 );
     	
 
-    	/* Sensor and NetworkTable initialization */
+    	 Sensor and NetworkTable initialization 
     	
     	//Navx Gyro init
     	gyro = new AHRS( SPI.Port.kMXP );
@@ -189,7 +213,7 @@ public class Robot extends SampleRobot {
     	network_table = NetworkTable.getTable( "SmartDashboard" );
     	
     	
-    	/* Subclass initialization */
+    	 Subclass initialization 
     	
     	// Instantiate robot's drive with Talons
     	//RobotDrive init
@@ -226,18 +250,19 @@ public class Robot extends SampleRobot {
     	SmartDashboard.putData("Auto mode", chooser);
     	
     	SmartDashboard_Wrapper dashboard = new SmartDashboard_Wrapper(network_table);
+    */
     }
     
     public void robotInit() {
     	//Set SafetyEnabled to false. Without this the RoboRio complains a lot, which caused a crash in a qualification match.
-    	front_left.setSafetyEnabled( false );
-		rear_left.setSafetyEnabled( false );
-		front_right.setSafetyEnabled( false );
-		rear_right.setSafetyEnabled( false );
-		drive.setSafetyEnabled(false);
+    	map.front_left.setSafetyEnabled( false );
+    	map.rear_left.setSafetyEnabled( false );
+    	map.front_right.setSafetyEnabled( false );
+    	map.rear_right.setSafetyEnabled( false );
+    	map.drive.setSafetyEnabled(false);
 		
-		right_drive_encoder.reset();
-		left_drive_encoder.reset();
+    	map.right_drive_encoder.reset();
+    	map.left_drive_encoder.reset();
 
 		//heading.set_pid( 0.07, 0.1, 0.0 ); //0.07, 0.1, 0.0 
 		Autonomous.set_heading_turn_pid_values( 0.06, 0.25, 0.0 );
@@ -246,14 +271,14 @@ public class Robot extends SampleRobot {
 		
 		Autonomous.set_heading_move_pid_values( 0.35, 0.022, 0.0 );
 		Autonomous.set_loose_heading_move_pid_values( 0.0, 0.02, 0.0 );
-		distance.set_pid( 0.7, 2.0, 0.0);
+		map.distance.set_pid( 0.7, 2.0, 0.0);
 		//0.4, 0.0, 0.0  
 		//0.4, 0.1, 0.0 Integral Range of 3, this one crawls a little bit after stopping	
 		//0.4, 0.6, 0.0 Integral Range is 2, Overshoots 
 		// Fix error stack! 
 		// Add the ability to start integral when within a value
 		
-		gear_servo.set( GEAR_IN );
+		map.gear_servo.set( map.GEAR_IN );
 		
     }
     
@@ -275,12 +300,12 @@ public class Robot extends SampleRobot {
     	long start_time = System.nanoTime();
     	Preferences prefs = Preferences.getInstance();
     	
-    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
-    	distance.reset();
-		heading.set_heading();
-		network_table.putBoolean( "isAutoComplete", false );
+    	
+    	map.distance.reset();
+    	map.heading.set_heading();
+    	map.network_table.putBoolean( "isAutoComplete", false );
 		
-		String autoSelected = (String) chooser.getSelected();
+		String autoSelected = (String) map.chooser.getSelected();
 		switch(autoSelected)
 		{
 		case "Do Nothing":
@@ -288,26 +313,26 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Gear from Center":
-			auto.move_heading_lock( -6.66, 5.0 ); //-6.8
+			map.auto.move_heading_lock( -6.66, 5.0 ); //-6.8
 			Timer.delay(0.3);
 
-	    	gear_servo.set( GEAR_OUT );
+			map.gear_servo.set( map.GEAR_OUT );
 	    	Timer.delay(0.3);
-	    	auto.move_heading_lock(2.0, 2.0);
-	    	gear_servo.set( GEAR_IN );
+	    	map.auto.move_heading_lock(2.0, 2.0);
+	    	map.gear_servo.set( map.GEAR_IN );
 	    	break;
 	    	
 		case "Cross Baseline":
-			auto.move_heading_lock( -7, 15 );	//Is this suppose to be positive?
+			map.auto.move_heading_lock( -7, 15);	//Is this suppose to be positive?
 			break;
 			
 		case "Blue Gear Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04
-			auto.turn(60, 7);					//60
+			map.auto.move_heading_lock(-7.2, 8);	//-8.04
+			map.auto.turn(60, 7);					//60
 //			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 //			master_shooter.changeControlMode(TalonControlMode.Speed);
 //			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-3.166, 3);	//-1.75
+			map.auto.move_heading_lock(-3.166, 3);	//-1.75
 //			gear_servo.set( GEAR_OUT );
 //	    	Timer.delay(0.3);
 //			auto.move_heading_lock(3, 3);
@@ -318,50 +343,50 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Blue Gear NOT Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
-			auto.turn(-60, 7);//60
-			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			map.auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			map.auto.turn(-60, 7);//60
+			map.auto.move_heading_lock(-3.166, 3);	//-1.75
+			map.gear_servo.set( map.GEAR_OUT );
 	    	Timer.delay(0.3);
-			auto.move_heading_lock(2, 3);
-			gear_servo.set( GEAR_IN );
+	    	map.auto.move_heading_lock(2, 3);
+	    	map.gear_servo.set( map.GEAR_IN );
 			break;
 			
 		case "Red Gear Boiler Side":			
-			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
-			auto.turn(-60, 7);//60
-			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
-			master_shooter.changeControlMode(TalonControlMode.Speed);
-			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			map.auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			map.auto.turn(-60, 7);//60
+			map.master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+			map.master_shooter.changeControlMode(TalonControlMode.Speed);
+			map.master_shooter.set( map.shooter_rpm_setpoint );
+			map.auto.move_heading_lock(-3.166, 3);	//-1.75
+			map.gear_servo.set( map.GEAR_OUT );
 	    	Timer.delay(0.3);
-			auto.move_heading_lock(2, 3);
-			gear_servo.set( GEAR_IN );
-			auto.turn( -10, 4 );
-			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
-			master_shooter.disableControl();
+	    	map.auto.move_heading_lock(2, 3);
+	    	map.gear_servo.set( map.GEAR_IN );
+	    	map.auto.turn( -10, 4 );
+			map.auto.shoot( map.master_shooter, map.ball_intake, map.vibrator, map.shooter_intake, map.shooter_rpm_setpoint, map.vibrator_speed, map.shooter_rpm_tolerance, map.shooter_intake_speed, 5.0 );
+			map.master_shooter.disableControl();
 			break;
 			
 		case "Red Gear NOT Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04
-			auto.turn(60, 7);					//60
-			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			map.auto.move_heading_lock(-7.2, 8);	//-8.04
+			map.auto.turn(60, 7);					//60
+			map.auto.move_heading_lock(-3.166, 3);	//-1.75
+			map.gear_servo.set( map.GEAR_OUT );
 	    	Timer.delay(0.3);
-			auto.move_heading_lock(3, 3);
-			gear_servo.set( GEAR_IN );
+	    	map.auto.move_heading_lock(3, 3);
+	    	map.gear_servo.set( map.GEAR_IN );
 			break;
 			
 		case "Testing 1":
 //			auto.turn(30, 5);
-			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+			map.auto.shoot( map.master_shooter, map.ball_intake, map.vibrator, map.shooter_intake, map.shooter_rpm_setpoint, map.vibrator_speed, map.shooter_rpm_tolerance, map.shooter_intake_speed, 5.0 );
 
 			//auto.move_heading_lock( 10, 10 );
 			break;
 			
 		case "Testing 2":
-			auto.turn(60, 6);
+			map.auto.turn(60, 6);
 
 			break;
 			
@@ -378,7 +403,7 @@ public class Robot extends SampleRobot {
 			Autonomous.set_loose_heading_move_pid_values( looseP, looseI, looseD );
 			//distance.set_pid( testP, testI, testD );
 			System.out.println("move distance: " + moveDis);
-			auto.move_heading_lock(moveDis, 15);
+			map.auto.move_heading_lock(moveDis, 15);
 
 			break;
 		}
@@ -391,13 +416,14 @@ public class Robot extends SampleRobot {
     	//auto.move_heading_lock(12, 10.0);
 
     	/* End auto */
-		network_table.putBoolean( "isAutoComplete", true );
+		map.network_table.putBoolean( "isAutoComplete", true );
 		
 		System.out.println( "Time taken: " + ( ( (double)System.nanoTime() - start_time ) * 1e-9 ) );
     }
     
     
     double time_accumulator = 0.0;
+    
     servo_state linear_servo_state = servo_state.extending;
     
     public void oscillate_servo () {
@@ -405,12 +431,12 @@ public class Robot extends SampleRobot {
     	if( time_accumulator > 5.5 ) {
 			switch ( linear_servo_state ) {
 				case extending:
-					linear_servo.set( 0.2 );
+					map.linear_servo.set( 0.2 );
 					time_accumulator = 0.0;
 					linear_servo_state = servo_state.retracting;
 					break;
 				case retracting:
-					linear_servo.set( 0.7 );
+					map.linear_servo.set( 0.7 );
 					time_accumulator = 0.0;
 					linear_servo_state = servo_state.extending;
 					break;
@@ -428,19 +454,19 @@ public class Robot extends SampleRobot {
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
     	
-    	gyro.reset();
-    	right_drive_encoder.reset();
-		left_drive_encoder.reset();
+    	map.gyro.reset();
+    	map.right_drive_encoder.reset();
+		map.left_drive_encoder.reset();
 		
     	robot_state state = robot_state.idle;
     	gear_state gear = gear_state.out; //Should be first state to run since gear servo starts closed
     	
     	
     	// Resets the servo in the beginning of Operator Control
-    	if ( linear_servo.get() >= 0.5 ) {
-    		linear_servo.set( 0.2 );
+    	if ( map.linear_servo.get() >= 0.5 ) {
+    		map.linear_servo.set( 0.2 );
     	} else {
-    		linear_servo.set( 0.9 );
+    		map.linear_servo.set( 0.9 );
     	}
     	
 //    	double forward_torque;
@@ -452,50 +478,50 @@ public class Robot extends SampleRobot {
     		
     		timer.update();
     		dt = timer.get_dt();
-    		gear_vision.update( dt );
-    		lifter.update( dt );
+    		map.gear_vision.update( dt );
+    		map.lifter.update( dt );
 //    		forward_torque = smooth_drive.ramp_drive( dt );
-    		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
+    		spin_torque = -1 * map.drive_controller.get_deadband_right_x_axis();
     		
 //    		network_table.putNumber( "Forward_Torque", forward_torque );
-    		network_table.putNumber( "Spin_Torque", spin_torque );
+    		map.network_table.putNumber( "Spin_Torque", spin_torque );
     		
     		time_accumulator += dt;
-    		network_table.putNumber( "Right_Encoder", right_drive_encoder.getRaw() );
-    		network_table.putNumber( "Left_Encoder", left_drive_encoder.getRaw() );
-    		network_table.putNumber( "Fused_Heading", gyro.getFusedHeading() );
-    		network_table.putNumber( "Z_Displacement", gyro.getDisplacementZ() );
-    		network_table.putNumber( "Y_Displacement", gyro.getDisplacementY() );
-    		network_table.putNumber( "X_Displacement", gyro.getDisplacementX() );
+    		map.network_table.putNumber( "Right_Encoder", map.right_drive_encoder.getRaw() );
+    		map.network_table.putNumber( "Left_Encoder", map.left_drive_encoder.getRaw() );
+    		map.network_table.putNumber( "Fused_Heading", map.gyro.getFusedHeading() );
+    		map.network_table.putNumber( "Z_Displacement", map.gyro.getDisplacementZ() );
+    		map.network_table.putNumber( "Y_Displacement", map.gyro.getDisplacementY() );
+    		map.network_table.putNumber( "X_Displacement", map.gyro.getDisplacementX() );
 //    		double testing = right_drive_encoder.getRaw();
 //    		System.out.println( testing );
 //    		network_table.putNumber( "New_Right_Encoder", testing );
     		// Check button inputs and change state 
-    		if ( drive_controller.get_right_trigger() ) { // Shoot with right trigger,
+    		if ( map.drive_controller.get_right_trigger() ) { // Shoot with right trigger,
     			state = robot_state.shooting;
-    		} else if ( drive_controller.get_left_trigger() ) { // Ball intake with left trigger.
+    		} else if ( map.drive_controller.get_left_trigger() ) { // Ball intake with left trigger.
     			state = robot_state.intaking;
-    		} else if ( drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
+    		} else if ( map.drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
     			state = robot_state.testing_shooter;
-    		} else if ( drive_controller.get_left_bumper() ) {
+    		} else if ( map.drive_controller.get_left_bumper() ) {
     			state = robot_state.gear_tracking;
-    		} else if ( drive_controller.get_right_bumper() ) {
+    		} else if ( map.drive_controller.get_right_bumper() ) {
     			state = robot_state.sicem;
     		} else { // Robot Idle State
     			state = robot_state.idle;
     		}
     		
     		// handle gear servo
-    		if ( drive_controller.get_x_button() && x_button_toggle ) {
+    		if ( map.drive_controller.get_x_button() && x_button_toggle ) {
     			x_button_toggle = false;
     			switch ( gear ) {
     				case in:
     					System.out.println( "Moving In! / Closing" );
-    					gear_servo.set( GEAR_IN ); // In number
+    					map.gear_servo.set( map.GEAR_IN ); // In number
     					break;
     				case out:
     					System.out.println( "Moving Out! / Opening" );
-    					gear_servo.set( GEAR_OUT ); // Out number
+    					map.gear_servo.set( map.GEAR_OUT ); // Out number
     					break;
     				default:
     					break;
@@ -506,48 +532,48 @@ public class Robot extends SampleRobot {
     				gear = gear_state.in;
     			}
     		}
-    		if ( !drive_controller.get_x_button() ) {
+    		if ( !map.drive_controller.get_x_button() ) {
     			x_button_toggle = true;
     		}
     		// Handle States
     		switch ( state ) {
     			case shooting: 
-    				master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
-    				master_shooter.changeControlMode(TalonControlMode.Speed);
-    				master_shooter.set( shooter_rpm_setpoint );
+    				map.master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+    				map.master_shooter.changeControlMode(TalonControlMode.Speed);
+    				map.master_shooter.set( map.shooter_rpm_setpoint );
     				
     				// Network Table debugging
-    				network_table.putNumber( "Shooter_RPM",  master_shooter.getSpeed() );
-    				network_table.putNumber( "Shooter Error", master_shooter.getSpeed() - master_shooter.getSetpoint() );
-    				network_table.putNumber( "Get value", master_shooter.get() );
-    				network_table.putNumber( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
-    				network_table.putNumber( "Closed_Loop_Error", master_shooter.getClosedLoopError() );
+    				map.network_table.putNumber( "Shooter_RPM",  map.master_shooter.getSpeed() );
+    				map.network_table.putNumber( "Shooter Error", map.master_shooter.getSpeed() - map.master_shooter.getSetpoint() );
+    				map.network_table.putNumber( "Get value", map.master_shooter.get() );
+    				map.network_table.putNumber( "Motor Output", map.master_shooter.getOutputVoltage() / map.master_shooter.getBusVoltage() );
+    				map.network_table.putNumber( "Closed_Loop_Error", map.master_shooter.getClosedLoopError() );
     				
-        			ball_intake.set( -0.3 );
-        			vibrator.set( vibrator_speed );
+    				map.ball_intake.set( -0.3 );
+    				map.vibrator.set( map.vibrator_speed );
         			oscillate_servo();
         			// Only feed balls to shooter if RPM is within a tolerance.
-        			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
-        				shooter_intake.set( shooter_intake_speed );
+        			if ( Math.abs( map.master_shooter.getSpeed() - map.master_shooter.getSetpoint() ) <= map.shooter_rpm_tolerance ) {
+        				map.shooter_intake.set( map.shooter_intake_speed );
         			} else {
-        				shooter_intake.set( 0.0 );
+        				map.shooter_intake.set( 0.0 );
         			}
     				break;
     			case sicem:
-    				ball_intake.set( -1.0 );
-        			vibrator.set( 0.9 );
+    				map.ball_intake.set( -1.0 );
+    				map.vibrator.set( 0.9 );
         			oscillate_servo();
         			
-        			master_shooter.changeControlMode( TalonControlMode.Speed );
-        			master_shooter.set( -3000 );
-        			master_shooter.enableControl();
+        			map.master_shooter.changeControlMode( TalonControlMode.Speed );
+        			map.master_shooter.set( -3000 );
+        			map.master_shooter.enableControl();
         			
-        			if ( Math.abs( master_shooter.getSpeed() ) >= 2900 ) {
-        				shooter_intake.set( -1.0 );
+        			if ( Math.abs( map.master_shooter.getSpeed() ) >= 2900 ) {
+        				map.shooter_intake.set( -1.0 );
         			}
     				break;
     			case intaking:
-    				ball_intake.set( -1.0 );
+    				map.ball_intake.set( -1.0 );
     				break;
     			case testing_shooter:
 //    				master_shooter.changeControlMode( TalonControlMode.Speed );
@@ -556,18 +582,18 @@ public class Robot extends SampleRobot {
 //    				System.out.println( master_shooter.getError() );
     				//shooter_intake.set( -0.3 );
     				//shooter_intake.set( -0.6 );
-    				vibrator.set( 0.6 );
-    				shooter_intake.set(-1.0);
+    				map.vibrator.set( 0.6 );
+    				map.shooter_intake.set(-1.0);
     				break;
     			case idle:
-    				master_shooter.disableControl();
-        			ball_intake.set( 0.0 );
-        			shooter_intake.set( 0.0 );
-        			vibrator.set( 0.0 );
+    				map.master_shooter.disableControl();
+    				map.ball_intake.set( 0.0 );
+    				map.shooter_intake.set( 0.0 );
+    				map.vibrator.set( 0.0 );
     				break;
     			case gear_tracking:
-    				spin_torque = gear_vision.get();
-    				network_table.putNumber( "vision_out", spin_torque );
+    				spin_torque = map.gear_vision.get();
+    				map.network_table.putNumber( "vision_out", spin_torque );
     				break;
     			default:
     				System.out.println( "Defaulting in robot state!" );
@@ -576,7 +602,7 @@ public class Robot extends SampleRobot {
     		} // End of state switch
     		
     		//drive.arcadeDrive( drive_controller.get_left_y_axis(), -drive_controller.get_right_x_axis() );
-    		drive.arcadeDrive( drive_controller.get_deadband_left_y_axis(), spin_torque );
+    		map.drive.arcadeDrive( map.drive_controller.get_deadband_left_y_axis(), spin_torque );
     		//drive.arcadeDrive( forward_torque, -1 * drive_controller.get_deadband_right_x_axis() );
     		//drive.arcadeDrive(  drive_controller.get_deadband_left_y_axis(), -1 * drive_controller.get_deadband_right_x_axis() );
     		
@@ -592,14 +618,14 @@ public class Robot extends SampleRobot {
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
     	double dt;
-    	heading.set_heading();
+    	map.heading.set_heading();
     	while ( isTest() && isEnabled() ) {
     		timer.update();
     		dt = timer.get_dt();
     		
-    		if ( drive_controller.get_a_button() ) {
+    		if ( map.drive_controller.get_a_button() ) {
     			motor.set( 0.5 );
-    		} else if ( drive_controller.get_b_button() ) {
+    		} else if ( map.drive_controller.get_b_button() ) {
     			motor.set( -0.5 );
     		} else {
     			motor.set( 0.0 );
