@@ -29,7 +29,7 @@ public class Autonomous {
 	
 	//Constants
 	private final double ACCEPTABLE_DISTANCE_ERROR = 0.083; // Used to be 0.083
-	private final double ACCEPTABLE_ANGLE_ERROR = 1.0; // Used to be 1.0
+	private final double ACCEPTABLE_ANGLE_ERROR = 0.5; // Used to be 1.0
 	private final double DEFAULT_TIME_OUT = 5.0;
 	private final double MAX_MOVE_SPEED = 0.8; //0.7
 	private final double MAX_TURN_SPEED = 0.7;

@@ -35,11 +35,7 @@ public class Robot extends SampleRobot {
 		retracting
 	}
 	
-	/*Gear Servo State Machine*/
-	enum gear_state {
-		out,
-		in
-	}
+	
 	
 	/*Robot State Machine*/
 	enum robot_state {
@@ -54,8 +50,7 @@ public class Robot extends SampleRobot {
 	
 	/* Global Constants */
 	
-	private final double GEAR_IN = 0.35;
-	private final double GEAR_OUT = 0.64;
+	
 	
 	/*Shooter RPM parameters*/
 	static double shooter_rpm_tolerance = 10.0; //was 50
@@ -90,6 +85,11 @@ public class Robot extends SampleRobot {
 	Servo linear_servo;
 	Servo gear_servo;
 	
+	/*Spark Motor COntroller init*/
+	Spark tilt_motor;
+	
+	/* Gear Assembly*/
+	Gear gear_assembly;
 	
 	/* Sensor and NetworkTable initialization */
 	
@@ -175,7 +175,11 @@ public class Robot extends SampleRobot {
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
     	
-
+    	//Spark init
+    	//tilt_motor = new Spark( 13 );
+    	
+    	gear_assembly = new Gear( gear_servo, tilt_motor, drive_controller ); 
+    	
     	/* Sensor and NetworkTable initialization */
     	
     	//Navx Gyro init
@@ -253,7 +257,7 @@ public class Robot extends SampleRobot {
 		// Fix error stack! 
 		// Add the ability to start integral when within a value
 		
-		gear_servo.set( GEAR_IN );
+		gear_servo.set( Gear.GEAR_IN );
 		
     }
     
@@ -290,10 +294,10 @@ public class Robot extends SampleRobot {
 			auto.move_heading_lock( -6.66, 5.0 ); //-6.8
 			Timer.delay(0.3);
 
-	    	gear_servo.set( GEAR_OUT );
+	    	gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 	    	auto.move_heading_lock(2.0, 2.0);
-	    	gear_servo.set( GEAR_IN );
+	    	gear_servo.set( Gear.GEAR_IN );
 	    	break;
 	    	
 		case "Cross Baseline":
@@ -303,27 +307,27 @@ public class Robot extends SampleRobot {
 		case "Blue Gear Boiler Side":
 			auto.move_heading_lock(-7.2, 8);	//-8.04
 			auto.turn(60, 7);					//60
-			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
-			master_shooter.changeControlMode(TalonControlMode.Speed);
-			master_shooter.set( shooter_rpm_setpoint );
+//			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+//			master_shooter.changeControlMode(TalonControlMode.Speed);
+//			master_shooter.set( shooter_rpm_setpoint );
 			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
-	    	Timer.delay(0.3);
-			auto.move_heading_lock(3, 3);
-			gear_servo.set( GEAR_IN );
-			auto.turn( -10, 4 );
-			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
-			master_shooter.disableControl();
+//			gear_servo.set( Gear.GEAR_OUT );
+//	    	Timer.delay(0.3);
+//			auto.move_heading_lock(3, 3);
+//			gear_servo.set( Gear.GEAR_IN );
+//			auto.turn( -10, 4 );
+//			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
+//			master_shooter.disableControl();
 			break;
 			
 		case "Blue Gear NOT Boiler Side":
 			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
 			auto.turn(-60, 7);//60
 			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(2, 3);
-			gear_servo.set( GEAR_IN );
+			gear_servo.set( Gear.GEAR_IN );
 			break;
 			
 		case "Red Gear Boiler Side":			
@@ -333,10 +337,10 @@ public class Robot extends SampleRobot {
 			master_shooter.changeControlMode(TalonControlMode.Speed);
 			master_shooter.set( shooter_rpm_setpoint );
 			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(2, 3);
-			gear_servo.set( GEAR_IN );
+			gear_servo.set( Gear.GEAR_IN );
 			auto.turn( -10, 4 );
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			master_shooter.disableControl();
@@ -346,10 +350,10 @@ public class Robot extends SampleRobot {
 			auto.move_heading_lock(-7.2, 8);	//-8.04
 			auto.turn(60, 7);					//60
 			auto.move_heading_lock(-3.166, 3);	//-1.75
-			gear_servo.set( GEAR_OUT );
+			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(3, 3);
-			gear_servo.set( GEAR_IN );
+			gear_servo.set( Gear.GEAR_IN );
 			break;
 			
 		case "Testing 1":
@@ -420,7 +424,6 @@ public class Robot extends SampleRobot {
     
     public void operatorControl() {
     	double dt;
-    	boolean x_button_toggle = true;
     	
     	Iterative_Timer timer = new Iterative_Timer();
     	timer.reset();
@@ -430,7 +433,6 @@ public class Robot extends SampleRobot {
 		left_drive_encoder.reset();
 		
     	robot_state state = robot_state.idle;
-    	gear_state gear = gear_state.out; //Should be first state to run since gear servo starts closed
     	
     	
     	// Resets the servo in the beginning of Operator Control
@@ -449,6 +451,7 @@ public class Robot extends SampleRobot {
     		
     		timer.update();
     		dt = timer.get_dt();
+    		gear_assembly.update( dt );
     		gear_vision.update( dt );
     		lifter.update( dt );
 //    		forward_torque = smooth_drive.ramp_drive( dt );
@@ -474,38 +477,13 @@ public class Robot extends SampleRobot {
     			state = robot_state.intaking;
     		} else if ( drive_controller.get_b_button() ) { // Test shooter at full speed with B button,
     			state = robot_state.testing_shooter;
-    		} else if ( drive_controller.get_left_bumper() ) {
-    			state = robot_state.gear_tracking;
     		} else if ( drive_controller.get_right_bumper() ) {
     			state = robot_state.sicem;
     		} else { // Robot Idle State
     			state = robot_state.idle;
     		}
     		
-    		// handle gear servo
-    		if ( drive_controller.get_x_button() && x_button_toggle ) {
-    			x_button_toggle = false;
-    			switch ( gear ) {
-    				case in:
-    					System.out.println( "Moving In! / Closing" );
-    					gear_servo.set( GEAR_IN ); // In number
-    					break;
-    				case out:
-    					System.out.println( "Moving Out! / Opening" );
-    					gear_servo.set( GEAR_OUT ); // Out number
-    					break;
-    				default:
-    					break;
-    			}
-    			if ( gear == gear_state.in ) {
-    				gear = gear_state.out;
-    			} else {
-    				gear = gear_state.in;
-    			}
-    		}
-    		if ( !drive_controller.get_x_button() ) {
-    			x_button_toggle = true;
-    		}
+    		
     		// Handle States
     		switch ( state ) {
     			case shooting: 
