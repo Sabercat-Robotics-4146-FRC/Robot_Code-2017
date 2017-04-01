@@ -172,7 +172,7 @@ public class Robot extends SampleRobot {
     	//Servo Motor Controller init
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
-    	tilt_servo = new Servo( 14 );
+    	tilt_servo = new Servo( 9 );
     	
     	gear_assembly = new Gear( gear_servo, tilt_servo, drive_controller ); 
     	
