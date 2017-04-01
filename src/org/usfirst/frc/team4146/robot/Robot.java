@@ -84,9 +84,7 @@ public class Robot extends SampleRobot {
 	//Servo Motor Controller init
 	Servo linear_servo;
 	Servo gear_servo;
-	
-	/*Spark Motor COntroller init*/
-	Spark tilt_motor;
+	Servo tilt_servo;
 	
 	/* Gear Assembly*/
 	Gear gear_assembly;
@@ -174,11 +172,9 @@ public class Robot extends SampleRobot {
     	//Servo Motor Controller init
     	linear_servo = new Servo( 10 );
     	gear_servo = new Servo( 8 );
+    	tilt_servo = new Servo( 14 );
     	
-    	//Spark init
-    	//tilt_motor = new Spark( 13 );
-    	
-    	gear_assembly = new Gear( gear_servo, tilt_motor, drive_controller ); 
+    	gear_assembly = new Gear( gear_servo, tilt_servo, drive_controller ); 
     	
     	/* Sensor and NetworkTable initialization */
     	
