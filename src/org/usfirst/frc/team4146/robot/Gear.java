@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.Spark;
 
 public class Gear {
 
-	public static final double GEAR_IN = 0.9;
-	public static final double GEAR_OUT = 0.9;
+	public static final double GEAR_IN = 0.23;
+	public static final double GEAR_OUT = 0.05;
 	public static final double TILT_IN = 0.3; //Fill These
 	public static final double TILT_OUT = 0.8;//Fill These 
 	//public final double TILT_IN_SPEED = -0.4;
