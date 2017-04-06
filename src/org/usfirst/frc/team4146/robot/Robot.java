@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;	//part of pdp test
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,13 +21,23 @@ import org.usfirst.frc.team4146.robot.PID.*;
 
 public class Robot extends SampleRobot {
 	
-	//Things to change when not working on practice bot
-		//Change to use both encoders
-		//Change password back in build.properties
-		//Unreverse lifter motor
-		//Undeinvert Right Encoder -- So invert it
-		//Make sure autonomous has no test code in it.
+	//Things to to do
+		//test left encoder --Currently not using left encoder
 	
+	//Things that have been changed but not yet tested
+		//Changed Shooter RPM Setpoint from 2000 to 2700
+		//Inverted Right Encoder
+		
+		//Commented out PowerDistributionPanel
+	
+	//Things to change when not working on practice bot
+		//Change to use both encoders									-Done --Refer to above
+		//Change password back in build.properties						-Done --Make sure this works
+		//Unreverse lifter motor		//probably not idk lol			-Done --Not needed
+		//Undeinvert Right Encoder -- So invert it						-Done
+		//Make sure autonomous has no test code in it.					-Done --Can never be too sure
+		//Evalute whether to keep powerdistributionpanel check			-Done --Commented Out for now
+
 	/* Robot State Machine Lists */
 	
 	/*Linear Servo State Machine*/
@@ -50,23 +61,20 @@ public class Robot extends SampleRobot {
 	
 	/* Global Constants */
 	
-	
-	
-	/*Shooter RPM parameters*/
+		/*Shooter RPM parameters*/
 	static double shooter_rpm_tolerance = 10.0; //was 50
-	static double shooter_rpm_setpoint  = -2000.0;// In competition set it to: -2700.0
+	static double shooter_rpm_setpoint  = -2700.0;// In competition set it to: -2700.0
 	static double shooter_intake_speed  = -0.8;
 	static double vibrator_speed = 0.8;
 	
-	/* Joystick Controllers */ 
-	
+		/* Joystick Controllers */ 
 	Controller drive_controller;
 	Controller lifter_controller;
 	
 	
 	/* Motor Controller initialization */
 	
-	/*Talon SR Motor Controller init*/
+		/*Talon SR Motor Controller init*/
 	Talon front_left;
 	Talon rear_left;
 	
@@ -77,52 +85,54 @@ public class Robot extends SampleRobot {
 	Talon shooter_intake;
 	Talon vibrator;
 		
-	/*CANTalon SRX Motor Controller init*/
+		/*CANTalon SRX Motor Controller init*/
 	CANTalon master_shooter;
 	CANTalon slave_shooter;
 	
-	//Servo Motor Controller init
+		/*Servo Motor Controller init*/
 	Servo linear_servo;
 	Servo gear_servo;
 	Servo tilt_servo;
 	
-	/* Gear Assembly*/
-	Gear gear_assembly;
-	
 	/* Sensor and NetworkTable initialization */
 	
-	//Navx Gyro init
+		/*Navx Gyro init*/
 	AHRS gyro;
 	
-	/*Encoder init*/
+		/*Encoder init*/
 	Encoder right_drive_encoder;
 	Encoder left_drive_encoder;
 	
-	/*NetworkTable init*/
+		/*NetworkTable init*/
 	NetworkTable network_table;
 	
+	//Test PowerDistributionPanel
+	//PowerDistributionPanel pdp;	//part of pdp test
 	
 	/* Subclass initialization */
 	
-	/*RobotDrive init*/
+		/*RobotDrive init*/
 	RobotDrive drive;
 	
-	//Ramp_Drive init 
+		/*Ramp_Drive init*/ 
 	Ramp_Drive smooth_drive;
 	
-	//Vision init
+	/*Vision init*/
 	Vision gear_vision;
 	
-	//Lifter init
+	/*Lifter init*/
 	Lifter lifter;
 	
-	//Heading init
+	/* Gear Assembly*/
+	Gear gear_assembly;
+	
+	/*Heading init*/
 	Heading heading;
 	
-	//Move_Distance init
+	/*Move_Distance init*/
 	Move_Distance distance;
 	
-	//Sendable Chooser init
+	/*Sendable Chooser init*/
 	SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
 	
     public Robot() {
@@ -174,20 +184,19 @@ public class Robot extends SampleRobot {
     	gear_servo = new Servo( 8 );
     	tilt_servo = new Servo( 9 );
     	
-    	gear_assembly = new Gear( gear_servo, tilt_servo, drive_controller ); 
-    	
     	/* Sensor and NetworkTable initialization */
     	
     	//Navx Gyro init
     	gyro = new AHRS( SPI.Port.kMXP );
     	
     	//Encoder init
-    	right_drive_encoder = new Encoder( 8, 9, false, Encoder.EncodingType.k4X );
+    	right_drive_encoder = new Encoder( 8, 9, true, Encoder.EncodingType.k4X );
     	left_drive_encoder = new Encoder( 6, 7, false, Encoder.EncodingType.k4X );
     
     	//NetworkTable init
     	network_table = NetworkTable.getTable( "SmartDashboard" );
     	
+    	//pdp = new PowerDistributionPanel(); //part of pdp test
     	
     	/* Subclass initialization */
     	
@@ -204,7 +213,11 @@ public class Robot extends SampleRobot {
     	
     	//Lifter init
     	lifter = new Lifter( lifter_controller );
-    		
+    
+    	//Gear Assembly init
+    	gear_assembly = new Gear( gear_servo, tilt_servo, drive_controller ); 
+    
+    	
     	//Heading init
     	heading = new Heading( gyro);
     	
@@ -287,7 +300,7 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Gear from Center":
-			auto.move_heading_lock( -6.66, 5.0 ); //-6.8
+			auto.move_heading_lock( -6.08, 5.0 ); //-6.8
 			Timer.delay(0.3);
 
 	    	gear_servo.set( Gear.GEAR_OUT );
@@ -297,29 +310,31 @@ public class Robot extends SampleRobot {
 	    	break;
 	    	
 		case "Cross Baseline":
-			auto.move_heading_lock( -7, 15 );	//Is this suppose to be positive?
+			auto.move_heading_lock( -8, 15 );	//Is this suppose to be positive?
+			
 			break;
 			
 		case "Blue Gear Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04
+			auto.move_heading_lock(-7.625, 8);	//-8.04 //-7.29
 			auto.turn(60, 7);					//60
 			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 			master_shooter.changeControlMode(TalonControlMode.Speed);
 			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-3.166, 3);	//-1.75
+			auto.move_heading_lock(-2.65, 3);	//-1.75 //-3.166 //-2.48
 			gear_servo.set( Gear.GEAR_OUT );
-	    	Timer.delay(0.3);
-			auto.move_heading_lock(3, 3);
+	    	Timer.delay(0.4);
+			auto.move_heading_lock(2.65, 3);
 			gear_servo.set( Gear.GEAR_IN );
-			auto.turn( -10, 4 );
+			auto.turn( -32, 4 ); //-30
+			auto.move_heading_lock(4.42, 5);
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			master_shooter.disableControl();
 			break;
 			
 		case "Blue Gear NOT Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			auto.move_heading_lock(-6.33, 8);	//-8.04 //-7.5 guess
 			auto.turn(-60, 7);//60
-			auto.move_heading_lock(-3.166, 3);	//-1.75
+			auto.move_heading_lock(-4.29, 3);	//-1.75
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(2, 3);
@@ -327,25 +342,25 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Red Gear Boiler Side":			
-			auto.move_heading_lock(-7.2, 8);	//-8.04 //-7.5 guess
+			auto.move_heading_lock(-7.42, 8);	//-8.04 //-7.5 guess
 			auto.turn(-60, 7);//60
 			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 			master_shooter.changeControlMode(TalonControlMode.Speed);
 			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-3.166, 3);	//-1.75
+			auto.move_heading_lock(-2.25, 3);	//-1.75 //-3.166
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
-			auto.move_heading_lock(2, 3);
+			auto.move_heading_lock(2.25, 3);
 			gear_servo.set( Gear.GEAR_IN );
-			auto.turn( -10, 4 );
+			auto.turn( 22, 4 );
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			master_shooter.disableControl();
 			break;
 			
 		case "Red Gear NOT Boiler Side":
-			auto.move_heading_lock(-7.2, 8);	//-8.04
+			auto.move_heading_lock(-6.396, 8);	//-8.04 //-7.2
 			auto.turn(60, 7);					//60
-			auto.move_heading_lock(-3.166, 3);	//-1.75
+			auto.move_heading_lock(-4.46, 3);	//-1.75
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(3, 3);
@@ -437,7 +452,7 @@ public class Robot extends SampleRobot {
     	} else {
     		linear_servo.set( 0.9 );
     	}
-    	
+    //	pdp.startLiveWindowMode(); //part of pdp test
 //    	double forward_torque;
     	double spin_torque;
     	//gear_servo.set( 0.2 );
@@ -452,6 +467,8 @@ public class Robot extends SampleRobot {
     		lifter.update( dt );
 //    		forward_torque = smooth_drive.ramp_drive( dt );
     		spin_torque = -1 * drive_controller.get_deadband_right_x_axis();
+    		
+    		//pdp.updateTable(); // part of pdp test
     		
 //    		network_table.putNumber( "Forward_Torque", forward_torque );
     		network_table.putNumber( "Spin_Torque", spin_torque );

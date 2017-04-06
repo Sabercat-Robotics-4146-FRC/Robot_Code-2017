@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj.Talon;
 // Note: -60% stall torque for climber
 public class Lifter {
 	
-	private final double right_lifter_finger_servo_close = 0.0;	//Fill These with correct values - 0.9
-	private final double right_lifter_finger_servo_open = 1.0;		//Fill These with correct values
+	private final double right_lifter_finger_servo_close = 0.0;	//Fill These with correct values - 0.9 //0.0
+	private final double right_lifter_finger_servo_open = 1.0;		//Fill These with correct values //1.0
 	
-	private final double left_lifter_finger_servo_close = 1.0;	//Fill These with correct values
-	private final double left_lifter_finger_servo_open = 0.0;	//Fill These with correct values - 0.99
+	private final double left_lifter_finger_servo_close = 1.0;	//Fill These with correct values //1.0
+	private final double left_lifter_finger_servo_open = 0.0;	//Fill These with correct values - 0.99 //0.0
 	
 //	private double time_accumulator = 0.0;
 	
