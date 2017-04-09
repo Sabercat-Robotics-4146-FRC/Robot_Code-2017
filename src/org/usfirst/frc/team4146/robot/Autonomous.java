@@ -25,6 +25,7 @@ public class Autonomous {
 	Move_Distance distance;
 	RobotDrive drive;
 	Vision autoVision;
+	Robot robot;
 	Iterative_Timer timer = new Iterative_Timer();
 	
 	//Constants
@@ -49,11 +50,12 @@ public class Autonomous {
 	private static double looseHeadingMoveD;
 	
 	
-	Autonomous(Heading h, Move_Distance md, RobotDrive rd, Vision v) {
+	Autonomous(Heading h, Move_Distance md, RobotDrive rd, Vision v, Robot r) {
 		heading = h;
 		distance = md;
 		drive = rd;
 		autoVision = v;
+		robot = r;
 	}
 	
 	public void move_forward( double dis, double timeOut ) {// uses given timeout value
@@ -75,7 +77,7 @@ public class Autonomous {
 		//	distance.move_pid.print_pid();
 //			SmartDashboard.putNumber("Gyro", heading.gyro.getFusedHeading());
 			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
-		} while((distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		} while(robot.isEnabled() && (distance.get_steady_state_error() > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		
 	}
 	
@@ -108,7 +110,7 @@ public class Autonomous {
 			//heading.heading_pid.print_pid();
 			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
 			
-		} while( ((heading.heading_pid.get_error() > ACCEPTABLE_ANGLE_ERROR) || (heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR)) && (timer.timeSinceStart() < timeOut) );
+		} while( robot.isEnabled() && ((heading.heading_pid.get_error() > ACCEPTABLE_ANGLE_ERROR) || (heading.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR)) && (timer.timeSinceStart() < timeOut) );
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Turning! " + timer.timeSinceStart() + ": Dt = " + dt );
 		/*while(timer.timeSinceStart() < (timeOut * 2 ))
@@ -132,7 +134,7 @@ public class Autonomous {
 		distance.set_distance(dis);
 		timer.reset();
 		distance.move_pid.fill_error( 1000 );
-		heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
+		heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);		//THIS IS USELESS
 		do {
 			SmartDashboard_Wrapper.printToSmartDashboard( "Feet Moved", distance.right_drive_encoder.getRaw()/1300 );
 
@@ -171,7 +173,7 @@ public class Autonomous {
 //			distance.networktable.putNumber("Heading I out", heading.heading_pid.i_out());
 //			distance.networktable.putNumber("Heading D out", heading.heading_pid.d_out() );
 			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
-		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		} while(robot.isEnabled() && (Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
 		drive.arcadeDrive( 0.0, 0.0 );
 		System.out.println( "Done Moving Forward! " + timer.timeSinceStart() + " : dt is " + dt );
 		//Timer.delay(1.0);
@@ -184,7 +186,7 @@ public class Autonomous {
 	
 	public void shoot( CANTalon master_shooter, Talon ball_intake, Talon vibrator, Talon shooter_intake, double shooter_rpm_setpoint, double vibrator_speed, double shooter_rpm_tolerance, double shooter_intake_speed, double timeOut ){
 		timer.reset();
-		while( timer.timeSinceStart() < timeOut ){
+		while( robot.isEnabled() && timer.timeSinceStart() < timeOut ){
 			timer.update();
 			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 			master_shooter.changeControlMode(TalonControlMode.Speed);
@@ -217,6 +219,152 @@ public class Autonomous {
 		
 	}//End of shooter
 	
+	public void shoot_and_drive( double dis, CANTalon master_shooter, Talon ball_intake, Talon vibrator, Talon shooter_intake, double shooter_rpm_setpoint, double vibrator_speed, double shooter_rpm_tolerance, double shooter_intake_speed, double timeOut ){
+		
+		set_heading_to_move();
+		double dt;
+		double clamp = 0.0;
+		double spin;
+		distance.reset();
+		distance.set_distance(dis);
+		timer.reset();
+		distance.move_pid.fill_error( 1000 );
+		heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
+		do {
+			SmartDashboard_Wrapper.printToSmartDashboard( "Feet Moved", distance.right_drive_encoder.getRaw()/1300 );
+			
+			timer.update();
+			dt = timer.get_dt();
+			clamp += (1 * dt); // really REALLY getto pid ramp
+			// Update subsystem PIDs
+			distance.update( dt );
+			heading.update( dt );
+			/*if(( Math.abs(heading.heading_pid.get_error()) > HEADING_LOCK_ANGLE_LOOSEN_THRESHOLD) && ( Math.abs(distance.move_pid.get_error()) > HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+				heading.heading_pid.set_pid( headingMoveP, headingMoveI, headingMoveD);
+			} else {
+				heading.heading_pid.set_pid( looseHeadingMoveP, looseHeadingMoveI, looseHeadingMoveI );
+			}*/
+			spin = PID.clamp( heading.get(), MAX_HEADING_TURN_SPEED );
+			if(( Math.abs(distance.move_pid.get_error()) < HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+				spin = 0;
+			}
+			
+			
+			
+			SmartDashboard_Wrapper.printToSmartDashboard( "Right_Encoder", distance.right_drive_encoder.getRaw() );
+			SmartDashboard_Wrapper.printToSmartDashboard("Fused_Heading", heading.gyro.getFusedHeading());
+			SmartDashboard_Wrapper.printToSmartDashboard("Forward Out", PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp));
+			SmartDashboard.putNumber( "Heading Steady State Error", heading.get_steady_state_error());
+			
+	//		drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), clamp), MAX_MOVE_SPEED), heading.get());
+			//SmartDashboard.putNumber("Move PID out, Unclamped", distance.get());
+			drive.arcadeDrive(PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp), spin);
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
+			
+			//timer.update();
+			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
+			master_shooter.changeControlMode(TalonControlMode.Speed);
+			master_shooter.set( shooter_rpm_setpoint );
+			
+			// Network Table debugging
+			SmartDashboard_Wrapper.printToSmartDashboard( "Shooter_RPM",  master_shooter.getSpeed() );
+			SmartDashboard_Wrapper.printToSmartDashboard( "Shooter Error", master_shooter.getSpeed() - master_shooter.getSetpoint() );
+			SmartDashboard_Wrapper.printToSmartDashboard( "Get value", master_shooter.get() );
+			SmartDashboard_Wrapper.printToSmartDashboard( "Motor Output", master_shooter.getOutputVoltage() / master_shooter.getBusVoltage() );
+			SmartDashboard_Wrapper.printToSmartDashboard( "Closed_Loop_Error", master_shooter.getClosedLoopError() );
+			
+			ball_intake.set( -0.3 );
+			vibrator.set( vibrator_speed );
+//			oscillate_servo();
+			// Only feed balls to shooter if RPM is within a tolerance.
+			if ( Math.abs( master_shooter.getSpeed() - master_shooter.getSetpoint() ) <= shooter_rpm_tolerance ) {
+				shooter_intake.set( shooter_intake_speed );
+			} else {
+				shooter_intake.set( 0.0 );
+			}
+		} while(robot.isEnabled() && (Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		drive.arcadeDrive( 0.0, 0.0 );
+		System.out.println( "Done Moving Forward! " + timer.timeSinceStart() + " : dt is " + dt );
+		//Timer.delay(1.0);
+		timer.update();
+		dt = timer.get_dt();
+		heading.update(dt);
+		System.out.println( "Final Error(FT): " + distance.move_pid.get_error());
+		System.out.println( "Final Error(IN): " + distance.move_pid.get_error() * 12.0 );
+		
+	}
+	/*
+	public void curveDrive(double dis, double angle, double timeOut) {
+		set_heading_to_move();
+		double dt;
+	
+		double currentDistanceTraveled;
+		double prevDistanceTraveled;
+		double distanceSinceLastDT;
+		double totalAngleTurned;
+		double angleSinceLastDT;
+		double currentError;
+		
+		double spin;
+		distance.reset();
+		distance.set_distance(dis);
+		timer.reset();
+		distance.move_pid.fill_error( 1000 );
+		heading.heading_pid.fill_error( 1000 );
+			do {
+			SmartDashboard_Wrapper.printToSmartDashboard( "Feet Moved", distance.right_drive_encoder.getRaw()/1300 );
+
+    		//SmartDashboard.putNumber( "Fused_Heading", heading.get_fused_heading());
+			
+			timer.update();
+			dt = timer.get_dt();
+			
+			
+			
+			// Update subsystem PIDs
+			distance.update( dt );
+			
+			currentDistanceTraveled = dis - distance.move_pid.getError();
+			distanceSinceLastDT = currentDistanceTraveled - prevDistanceTraveled;
+			prevDistanceTraveled = currentDistanceTraveled;
+			angleSinceLastDT = (distanceSinceLastDT / dis) * angle;
+			if((angleSinceLastDT + totalAngleTurned) <= angle)
+			{
+				totalAngleTurned += angleSinceLastDT;
+				heading.rel_angle_turn( angleSinceLastDT );
+		
+		
+			}
+			
+			
+			heading.update( dt );
+			spin = PID.clamp( heading.get(), MAX_HEADING_TURN_SPEED );
+			if(( Math.abs(distance.move_pid.get_error()) < HEADING_LOCK_DISTANCE_LOOSEN_THRESHOLD)  ){
+				spin = 0;
+			}
+			
+			USE BOTH ENCODERS
+			
+			SmartDashboard_Wrapper.printToSmartDashboard( "Right_Encoder", distance.right_drive_encoder.getRaw() );
+			SmartDashboard_Wrapper.printToSmartDashboard("Fused_Heading", heading.gyro.getFusedHeading());
+			SmartDashboard_Wrapper.printToSmartDashboard("Forward Out", PID.clamp(PID.clamp(distance.get(), MAX_MOVE_SPEED), clamp));
+			SmartDashboard.putNumber( "Heading Steady State Error", heading.get_steady_state_error());
+			
+			drive.arcadeDrive(PID.clamp(distance.get(), MAX_MOVE_SPEED), spin);
+			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
+		} while((Math.abs(distance.get_steady_state_error()) > ACCEPTABLE_DISTANCE_ERROR) && (timer.timeSinceStart() < timeOut));
+		drive.arcadeDrive( 0.0, 0.0 );
+		System.out.println( "Done Moving Forward and Turning! " + timer.timeSinceStart() + " : dt is " + dt );
+		//Timer.delay(1.0);
+		
+		System.out.println( "Final Error(FT): " + distance.move_pid.get_error());
+		System.out.println( "Final Error(IN): " + distance.move_pid.get_error() * 12.0 );
+	
+	
+	
+	
+	
+	*/
 	public void turnToGear(double timeOut) {
 		set_heading_to_turn();
 		double dt;
@@ -228,7 +376,7 @@ public class Autonomous {
 			autoVision.update(dt);
 			drive.arcadeDrive( 0.0, autoVision.get()); //autovision get might have to be negative
 			Iterative_Timer.waitMilli(WHILE_WAIT_TIME);
-		}while((autoVision.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR) && (timer.timeSinceStart() < timeOut));
+		}while(robot.isEnabled() && (autoVision.get_steady_state_error() > ACCEPTABLE_ANGLE_ERROR) && (timer.timeSinceStart() < timeOut));
 		
 	}
 	

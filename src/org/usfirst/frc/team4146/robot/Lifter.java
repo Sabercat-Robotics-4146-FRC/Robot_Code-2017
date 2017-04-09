@@ -14,7 +14,9 @@ public class Lifter {
 	
 //	private double time_accumulator = 0.0;
 	
-	private boolean fingerServoFlag = false;
+	private boolean leftFingerServoFlag = false;
+	private boolean rightFingerServoFlag = false;
+
 
 //	enum lifter_state{
 //		close,
@@ -49,26 +51,37 @@ public class Lifter {
 
 	public void update( double dt ) {
 		
-		if ( lifting_controller.get_a_button() && fingerServoFlag ) {
+		if ( lifting_controller.get_left_bumper() && leftFingerServoFlag ) {
 			left_lifter_finger_servo.set( left_lifter_finger_servo_close );
-			right_lifter_finger_servo.set( right_lifter_finger_servo_close );
-			fingerServoFlag = false;
+			leftFingerServoFlag = false;
 		} 
-		else if ( !lifting_controller.get_a_button() && !fingerServoFlag ) {
+		else if ( !lifting_controller.get_left_bumper() && !leftFingerServoFlag ) {
 			left_lifter_finger_servo.set( left_lifter_finger_servo_open );
-			right_lifter_finger_servo.set( right_lifter_finger_servo_open );
-			fingerServoFlag = true;
+			leftFingerServoFlag = true;
 		}
 		
-		if ( lifting_controller.get_b_button() ){
+		if ( lifting_controller.get_right_bumper() && rightFingerServoFlag ) {
+			right_lifter_finger_servo.set( right_lifter_finger_servo_close );
+			rightFingerServoFlag = false;
+		} 
+		else if ( !lifting_controller.get_right_bumper() && !rightFingerServoFlag ) {
+			right_lifter_finger_servo.set( right_lifter_finger_servo_open );
+			rightFingerServoFlag = true;
+		}
+		
+		
+		if ( lifting_controller.get_b_button() ) {
 			lifter.set( -1.0 );
 		}
-		else if ( lifting_controller.get_x_button() ){
-			lifter.set( -0.6 );
-		} 
-		else if( lifting_controller.get_left_bumper() && lifting_controller.get_right_bumper() ) {
+		else if( lifting_controller.get_a_button() ) {
 			lifter.set( 1.0 );
 		} 
+		else if ( lifting_controller.get_x_button() ) {
+			lifter.set( -0.4  );
+		} 
+		else if( lifting_controller.get_y_button() ) {
+			lifter.set( 0.4  );
+		}
 		else {
 			lifter.set( 0.0 );
 		}

@@ -23,6 +23,9 @@ public class Robot extends SampleRobot {
 	
 	//Things to to do
 		//test left encoder --Currently not using left encoder
+		//
+	//FIX THE HEADING REEEEEEEEEEEEEEEE 
+	//Rework Arm Control Scheme
 	
 	//Things that have been changed but not yet tested
 		//Changed Shooter RPM Setpoint from 2000 to 2700
@@ -37,6 +40,7 @@ public class Robot extends SampleRobot {
 		//Undeinvert Right Encoder -- So invert it						-Done
 		//Make sure autonomous has no test code in it.					-Done --Can never be too sure
 		//Evalute whether to keep powerdistributionpanel check			-Done --Commented Out for now
+		
 
 	/* Robot State Machine Lists */
 	
@@ -61,8 +65,10 @@ public class Robot extends SampleRobot {
 	
 	/* Global Constants */
 	
+	
+	
 		/*Shooter RPM parameters*/
-	static double shooter_rpm_tolerance = 10.0; //was 50
+	static double shooter_rpm_tolerance = 10.0; //was 50 //10.0
 	static double shooter_rpm_setpoint  = -2700.0;// In competition set it to: -2700.0
 	static double shooter_intake_speed  = -0.8;
 	static double vibrator_speed = 0.8;
@@ -257,8 +263,11 @@ public class Robot extends SampleRobot {
 		
 		
 		
-		Autonomous.set_heading_move_pid_values( 0.35, 0.022, 0.0 );
-		Autonomous.set_loose_heading_move_pid_values( 0.0, 0.02, 0.0 );
+		Autonomous.set_heading_move_pid_values( 0.25, 0.022, 0.0 );	
+		//0.35, 0.022, 0.0 <-- these were the old values, changed because heading was unstable sometimes
+		//after a softish kick, p spiked to 1.5 which is way too high for heading. It needs to be lower than .25 for sure, maybe increase i???
+		
+		Autonomous.set_loose_heading_move_pid_values( 0.0, 0.02, 0.0 );					
 		distance.set_pid( 0.7, 2.0, 0.0);
 		//0.4, 0.0, 0.0  
 		//0.4, 0.1, 0.0 Integral Range of 3, this one crawls a little bit after stopping	
@@ -267,7 +276,12 @@ public class Robot extends SampleRobot {
 		// Add the ability to start integral when within a value
 		
 		gear_servo.set( Gear.GEAR_IN );
+		tilt_servo.set( Gear.TILT_IN );
 		
+    }
+    
+    public static double inch_to_feet( double inches ) {
+    	return inches / 12.0;
     }
     
     /* 
@@ -287,7 +301,7 @@ public class Robot extends SampleRobot {
     public void autonomous() {
     	Preferences prefs = Preferences.getInstance();
     	
-    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision);
+    	Autonomous auto = new Autonomous( heading, distance, drive, gear_vision, this);
     	distance.reset();
 		heading.set_heading();
 		network_table.putBoolean( "isAutoComplete", false );
@@ -300,6 +314,7 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Gear from Center":
+			//tilt_servo.set( Gear.TILT_OUT);
 			auto.move_heading_lock( -6.08, 5.0 ); //-6.8
 			Timer.delay(0.3);
 
@@ -315,68 +330,76 @@ public class Robot extends SampleRobot {
 			break;
 			
 		case "Blue Gear Boiler Side":
-			auto.move_heading_lock(-7.625, 8);	//-8.04 //-7.29
+			//tilt_servo.set( Gear.TILT_OUT);
+			auto.move_heading_lock(-7.29 + inch_to_feet( -2 ), 8);	//-8.04 //-7.29
 			auto.turn(60, 7);					//60
+			
+			auto.move_heading_lock(-2.48 + inch_to_feet( -1 ), 3);	//-1.75 //-3.166 //-2.48
+			gear_servo.set( Gear.GEAR_OUT );
+	    	Timer.delay(0.3);
+			auto.move_heading_lock(2.48 + inch_to_feet( 1 ), 3);
+			gear_servo.set( Gear.GEAR_IN );
+			auto.turn( -32, 4 ); //-30 // the other on is 22???
 			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 			master_shooter.changeControlMode(TalonControlMode.Speed);
 			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-2.65, 3);	//-1.75 //-3.166 //-2.48
-			gear_servo.set( Gear.GEAR_OUT );
-	    	Timer.delay(0.4);
-			auto.move_heading_lock(2.65, 3);
-			gear_servo.set( Gear.GEAR_IN );
-			auto.turn( -32, 4 ); //-30
-			auto.move_heading_lock(4.42, 5);
+			//auto.move_heading_lock(4.42, 5);
+			auto.shoot_and_drive(4.42, master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5);
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			master_shooter.disableControl();
 			break;
 			
 		case "Blue Gear NOT Boiler Side":
-			auto.move_heading_lock(-6.33, 8);	//-8.04 //-7.5 guess
+			//tilt_servo.set( Gear.TILT_OUT);
+			auto.move_heading_lock(-6.33 + inch_to_feet( -3 ), 8);	//-8.04 //-7.5 guess
 			auto.turn(-60, 7);//60
-			auto.move_heading_lock(-4.29, 3);	//-1.75
+			auto.move_heading_lock(-4.29 + inch_to_feet( -4 ), 3);	//-1.75
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(2, 3);
 			gear_servo.set( Gear.GEAR_IN );
 			break;
 			
-		case "Red Gear Boiler Side":			
+		case "Red Gear Boiler Side":
+			//tilt_servo.set( Gear.TILT_OUT);
 			auto.move_heading_lock(-7.42, 8);	//-8.04 //-7.5 guess
 			auto.turn(-60, 7);//60
 			master_shooter.enableControl(); // Allow talon internal PID to apply control to the talon
 			master_shooter.changeControlMode(TalonControlMode.Speed);
 			master_shooter.set( shooter_rpm_setpoint );
-			auto.move_heading_lock(-2.25, 3);	//-1.75 //-3.166
+			auto.move_heading_lock(-2.25 + inch_to_feet( -8 ), 3);	//-1.75 //-3.166	//+ inch_to_feet( -2 )
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
-			auto.move_heading_lock(2.25, 3);
+			auto.move_heading_lock(2.25 + inch_to_feet( 8 ), 3); //+ inch_to_feet( 2 )
 			gear_servo.set( Gear.GEAR_IN );
 			auto.turn( 22, 4 );
+			//auto.move_heading_lock(4.42, 5);
+			auto.shoot_and_drive(4.42, master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5);
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 			master_shooter.disableControl();
 			break;
 			
 		case "Red Gear NOT Boiler Side":
+			//tilt_servo.set( Gear.TILT_OUT);
 			auto.move_heading_lock(-6.396, 8);	//-8.04 //-7.2
 			auto.turn(60, 7);					//60
-			auto.move_heading_lock(-4.46, 3);	//-1.75
+			auto.move_heading_lock(-4.46 + inch_to_feet( -2 ), 3);	//-1.75
 			gear_servo.set( Gear.GEAR_OUT );
 	    	Timer.delay(0.3);
 			auto.move_heading_lock(3, 3);
 			gear_servo.set( Gear.GEAR_IN );
 			break;
 			
-		case "Testing 1":
+		case "Testing 1":			
 //			auto.turn(30, 5);
 			auto.shoot( master_shooter, ball_intake, vibrator, shooter_intake, shooter_rpm_setpoint, vibrator_speed, shooter_rpm_tolerance, shooter_intake_speed, 5.0 );
 
 			//auto.move_heading_lock( 10, 10 );
 			break;
 			
-		case "Testing 2":
-			auto.turn(60, 6);
-
+		case "Testing 2":			//Using to test CurveDrive
+			//auto.turn(60, 6);
+			//curveDrive(double dis, double angle, double timeOut)
 			break;
 			
 		case "Testing 3":
@@ -408,6 +431,10 @@ public class Robot extends SampleRobot {
 		network_table.putBoolean( "isAutoComplete", true );
     }
     
+    public boolean getIsEnabled() {
+    	return this.isEnabled();
+    	
+    }
     
     double time_accumulator = 0.0;
     servo_state linear_servo_state = servo_state.extending;
