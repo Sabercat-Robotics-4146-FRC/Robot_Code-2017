@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4146.robot;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -21,17 +23,26 @@ public class RobotMap {
 	public static Controller lifterController;
 	
 	// Motor Controllers Declaration
-	public static Talon talon;
-	public static CANTalon canTalon;
+	public static Talon frontLeft;
+	public static Talon rearLeft;
+	public static Talon frontRight;
+	public static Talon rearRight;
+	public static Talon ballIntake;
+	public static Talon shooterIntake;
+	public static Talon vibrator;
+	
+	public static CANTalon masterShooter;
+	public static CANTalon slaveShooter;
 	
 	// Servos Declaration
-	public static Servo servo;
+	public static Servo linearServo;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
 	
 	// Encoders Declaration
-	public static Encoder encoder;
+	public static Encoder rightDriveEncoder;
+	public static Encoder leftDriveEncoder;
 	
 	// Network Table Declaration
 	public static NetworkTable networkTable;
@@ -40,10 +51,16 @@ public class RobotMap {
 	public static RobotDrive drive;
 	
 	// Vision Declaration
-	public static Vision vision;
+	public static Vision Vision;
+	
+	// Lifter Declaration
+	public static Lifter Lifter;
+	
+	// Gear Assembly Declaration
+	public static Gear GearAssembly;
 	
 	// Heading Declaration
-	public static Heading heading;
+	public static Heading Heading;
 	
 	// Sendable Chooser Declaration
 	public static SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
@@ -55,34 +72,66 @@ public class RobotMap {
     	lifterController = new Controller(1);
     	
     	// Motor Controllers Initialization
-    	talon = new Talon(0);
-    	canTalon = new CANTalon(0);
+    	frontLeft = new Talon(0);
+    	rearLeft = new Talon(1);
+    	frontRight = new Talon(2);
+    	rearRight = new Talon(3);
+    	ballIntake = new Talon(4);
+    	shooterIntake = new Talon(5);
+    	vibrator = new Talon(6);
     	
-    	talon.setSafetyEnabled(false);
-    	canTalon.setSafetyEnabled(false);
+    	frontLeft.setSafetyEnabled(false);
+    	rearLeft.setSafetyEnabled(false);
+    	frontRight.setSafetyEnabled(false);
+    	rearRight.setSafetyEnabled(false);
+    	
+    	masterShooter = new CANTalon(0);
+    	slaveShooter = new CANTalon(1);
+    	
+    	masterShooter.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+    	masterShooter.reverseSensor(false);
+    		
+    	masterShooter.configNominalOutputVoltage(+0.0f, -0.0f);
+    	masterShooter.configPeakOutputVoltage(+12.0f, -12.0f);	//One of these might suppose to be 0
+    	
+    	masterShooter.setProfile(0);
+    	masterShooter.changeControlMode(TalonControlMode.Speed);
+    		
+    	//Setting slave_talon 
+    	slaveShooter.changeControlMode(CANTalon.TalonControlMode.Follower);
+    	slaveShooter.set(masterShooter.getDeviceID());
     	
     	// Servos Initialization
-    	servo = new Servo(1);
+    	linearServo = new Servo(10);
     	
     	// Navx Gyro Initialization
     	gyro = new AHRS(SPI.Port.kMXP);
     	
     	// Encoders Initialization
-    	encoder = new Encoder(8, 9, true, Encoder.EncodingType.k4X);
+    	rightDriveEncoder = new Encoder(8, 9, true, Encoder.EncodingType.k4X);
+    	leftDriveEncoder = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
     	
-    	encoder.reset();
+    	rightDriveEncoder.reset();
+    	leftDriveEncoder.reset();
 
     	// NetworkTable Initialization
     	networkTable = NetworkTable.getTable("SmartDashboard");
 
     	// RobotDrive Initialization
-    	drive = new RobotDrive(); // fill with frontLeft, rearLeft, frontRight, rearRight
+    	drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
+    	drive.setSafetyEnabled(false);
     	
     	// Vision Initialization
-    	vision = new Vision();
+    	Vision = new Vision();
+    	
+    	// Lifter Initialization
+    	Lifter = new Lifter();
+    	
+    	// Gear Assembly Initialization 
+    	GearAssembly = new Gear();
     	
     	// Heading Initialization
-    	heading = new Heading(gyro);
+    	Heading = new Heading();
     	
     	// Sendable Chooser Initialization
     	chooser = new SendableChooser();

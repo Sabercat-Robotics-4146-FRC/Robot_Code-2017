@@ -45,8 +45,10 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void operatorControl() {
-		while (isOperatorControl() && isEnabled()) { // Loops as long as it is the teleop time period and the robot is enabled.
-
+		// Loops as long as it is the teleop time period and the robot is enabled.
+		while (isOperatorControl() && isEnabled()) { 
+			RobotMap.drive.arcadeDrive(RobotMap.driveController.get_deadband_left_y_axis(),
+					RobotMap.driveController.get_deadband_right_x_axis());
 		}
 	}
 
