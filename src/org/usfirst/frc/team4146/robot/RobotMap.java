@@ -30,6 +30,7 @@ public class RobotMap {
 	public static Talon ballIntake;
 	public static Talon shooterIntake;
 	public static Talon vibrator;
+	public static Talon climber;
 	
 	public static CANTalon masterShooter;
 	public static CANTalon slaveShooter;
@@ -53,8 +54,8 @@ public class RobotMap {
 	// Vision Declaration
 	public static Vision Vision;
 	
-	// Lifter Declaration
-	public static Lifter Lifter;
+	// Climber Declaration
+	public static Climber Climber;
 	
 	// Gear Assembly Declaration
 	public static Gear GearAssembly;
@@ -79,6 +80,7 @@ public class RobotMap {
     	ballIntake = new Talon(4);
     	shooterIntake = new Talon(5);
     	vibrator = new Talon(6);
+    	climber = new Talon(7);
     	
     	frontLeft.setSafetyEnabled(false);
     	rearLeft.setSafetyEnabled(false);
@@ -125,7 +127,7 @@ public class RobotMap {
     	Vision = new Vision();
     	
     	// Lifter Initialization
-    	Lifter = new Lifter();
+    	Climber = new Climber();
     	
     	// Gear Assembly Initialization 
     	GearAssembly = new Gear();
