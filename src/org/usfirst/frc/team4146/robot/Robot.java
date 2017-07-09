@@ -41,7 +41,7 @@ public class Robot extends SampleRobot {
 	}
 
 	/**
-	 * Runs the motors with arcade steering.
+	 * Runs during the teleop period.
 	 */
 	@Override
 	public void operatorControl() {
@@ -52,8 +52,8 @@ public class Robot extends SampleRobot {
 			RobotMap.Climber.update();
 			
 			//Drive Code
-			RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeft$Y$Axis(),
-					RobotMap.driveController.getDeadbandRight$X$Axis());
+			RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeftYAxis(),
+					RobotMap.driveController.getDeadbandRightXAxis());
 		}
 	}
 

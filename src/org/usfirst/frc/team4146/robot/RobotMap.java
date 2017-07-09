@@ -58,7 +58,7 @@ public class RobotMap {
 	public static Climber Climber;
 	
 	// Gear Assembly Declaration
-	public static Gear GearAssembly;
+	public static GearAssembly GearAssembly;
 	
 	// Heading Declaration
 	public static Heading Heading;
@@ -130,7 +130,7 @@ public class RobotMap {
     	Climber = new Climber();
     	
     	// Gear Assembly Initialization 
-    	GearAssembly = new Gear();
+    	GearAssembly = new GearAssembly();
     	
     	// Heading Initialization
     	Heading = new Heading();
