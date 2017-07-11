@@ -53,7 +53,7 @@ public class Robot extends SampleRobot {
 			
 			//Drive Code
 			RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeftYAxis(),
-					RobotMap.driveController.getDeadbandRightXAxis());
+					-RobotMap.driveController.getDeadbandRightXAxis());
 		}
 	}
 

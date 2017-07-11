@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
  * 
  * @author GowanR
  * @author JacobE
- * @author EliE
+ * @author EliA
  * @version 2.2.1
  * // (MAJOR.MINOR.PATCH)
  * 

@@ -30,7 +30,8 @@ public class RobotMap {
 	public static Talon ballIntake;
 	public static Talon shooterIntake;
 	public static Talon vibrator;
-	public static Talon climber;
+	public static Talon climberA;
+	public static Talon climberB;
 	
 	public static CANTalon masterShooter;
 	public static CANTalon slaveShooter;
@@ -80,7 +81,10 @@ public class RobotMap {
     	ballIntake = new Talon(4);
     	shooterIntake = new Talon(5);
     	vibrator = new Talon(6);
-    	climber = new Talon(7);
+    	climberA = new Talon(14);
+    	climberB = new Talon(15);
+    	climberA.setInverted(true);
+    	climberB.setInverted(true);
     	
     	frontLeft.setSafetyEnabled(false);
     	rearLeft.setSafetyEnabled(false);
