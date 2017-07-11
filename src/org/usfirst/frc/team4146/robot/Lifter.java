@@ -31,7 +31,8 @@ public class Lifter {
 	
 	Controller lifting_controller;
 	
-	Talon lifter;
+	Talon lifterA;
+	Talon lifterB;
 	
 	Servo left_lifter_finger_servo;
 	Servo right_lifter_finger_servo;
@@ -39,8 +40,10 @@ public class Lifter {
 	public Lifter( Controller lifting_controller ) {
 		this.lifting_controller = lifting_controller;
 		
-		lifter = new Talon( 7 );
-		lifter.setInverted(true);
+		lifterA = new Talon(14);
+		lifterB = new Talon(15);
+		lifterA.setInverted(true);
+		lifterB.setInverted(true);
 		
 		left_lifter_finger_servo = new Servo( 12 );//was 12.
     	right_lifter_finger_servo = new Servo( 11 );
@@ -71,19 +74,24 @@ public class Lifter {
 		
 		
 		if ( lifting_controller.get_b_button() ) {
-			lifter.set( -1.0 );
+			lifterA.set( 0.2 );
+			lifterB.set( 0.2 );
 		}
 		else if( lifting_controller.get_a_button() ) {
-			lifter.set( 1.0 );
+			lifterA.set( 1.0 );
+			lifterB.set( 1.0 );
 		} 
 		else if ( lifting_controller.get_x_button() ) {
-			lifter.set( -0.4  );
+			lifterA.set( 0.7 );
+			lifterB.set( 0.7 );
 		} 
 		else if( lifting_controller.get_y_button() ) {
-			lifter.set( 0.4  );
+			lifterA.set( -0.7 );
+			lifterB.set( -0.7 );
 		}
 		else {
-			lifter.set( 0.0 );
+			lifterA.set( 0.0 );
+			lifterB.set( 0.0 );
 		}
 		
 		
