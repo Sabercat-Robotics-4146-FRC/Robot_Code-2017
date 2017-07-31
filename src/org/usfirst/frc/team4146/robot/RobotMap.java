@@ -16,7 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 public class RobotMap {
 	
 	// Constants
-	final double THIS_IS_A_CONSTANT = 0.0;
+	
+	/*Shooter parameters*/
+	public static final double SHOOTER_RPM_TOLERANCE = 10.0; //was 50 //10.0
+	public static final double SHOOTER_RPM_SETPOINT  = -2700.0;// In competition set it to: -2700.0
+	public static final double SHOOTER_INTAKE_SPEED  = -0.8;
+	public static final double VIBRATOR_SPEED = 0.8;
 	
 	////// Declarations //////
 	public static Controller driveController;
@@ -60,6 +65,9 @@ public class RobotMap {
 	
 	// Gear Assembly Declaration
 	public static GearAssembly GearAssembly;
+	
+	// Shooter Assembly Declaration
+	public static ShooterAssembly ShooterAssembly;
 	
 	// Heading Declaration
 	public static Heading Heading;
@@ -135,6 +143,9 @@ public class RobotMap {
     	
     	// Gear Assembly Initialization 
     	GearAssembly = new GearAssembly();
+    	
+    	// Shooter Assembly Initialization
+    	ShooterAssembly = new ShooterAssembly();
     	
     	// Heading Initialization
     	Heading = new Heading();
