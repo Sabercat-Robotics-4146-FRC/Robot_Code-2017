@@ -35,6 +35,9 @@ public class RobotMap {
 	public static Talon ballIntake;
 	public static Talon shooterIntake;
 	public static Talon vibrator;
+	public static Talon gearTilt;
+	public static Talon gearWheelLeft;
+	public static Talon gearWheelRight;
 	public static Talon climberA;
 	public static Talon climberB;
 	
@@ -89,6 +92,9 @@ public class RobotMap {
     	ballIntake = new Talon(4);
     	shooterIntake = new Talon(5);
     	vibrator = new Talon(6);
+    	gearTilt = new Talon(11);
+    	gearWheelLeft = new Talon(12);
+    	gearWheelRight = new Talon(13);
     	climberA = new Talon(14);
     	climberB = new Talon(15);
     	climberA.setInverted(true);

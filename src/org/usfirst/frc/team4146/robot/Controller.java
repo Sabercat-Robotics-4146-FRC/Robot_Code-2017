@@ -271,10 +271,10 @@ public class Controller {
 	 */
 	
 //	public void rumble(float l, float r){
-//		setRumble(RumbleType.kLeftRumble, l);
-//		setRumble(RumbleType.kRightRumble, r);
+//		joy.setRumble( l, r);
+//		joy.setRumble( l, r)
 //	}
-	
+//	
 	/**
 	 * Used just in case we need the raw joystick.
 	 *
