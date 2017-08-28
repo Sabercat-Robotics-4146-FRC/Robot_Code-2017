@@ -51,6 +51,7 @@ public class Robot extends SampleRobot {
 			//Subsystem Updates
 			RobotMap.Climber.update();
 			RobotMap.ShooterAssembly.update();
+			RobotMap.GearAssembly.update();
 			
 			//Drive Code
 			RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeftYAxis(),

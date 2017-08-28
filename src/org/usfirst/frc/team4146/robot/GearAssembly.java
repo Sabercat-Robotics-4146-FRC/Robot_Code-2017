@@ -34,10 +34,10 @@ public class GearAssembly {
 			} else {
 				tiltState = TiltState.TILTED_UP;
 			}
-			
-			if ( !RobotMap.driveController.getRightBumper() ) {
-				gearTiltToggle = true;
-			}
+		}
+		
+		if (!RobotMap.driveController.getRightBumper()) {
+			gearTiltToggle = true;
 		}
 		
 		// Checks controller inputs for gear wheel operations and changes states accordingly.
@@ -54,7 +54,6 @@ public class GearAssembly {
 		// Changes gear tilt motor values in accordance with gear tilt state machine.
 		switch (tiltState) {
 			case TILTED_UP:
-				// 
 				
 				break;
 			case TILTED_DOWN:
