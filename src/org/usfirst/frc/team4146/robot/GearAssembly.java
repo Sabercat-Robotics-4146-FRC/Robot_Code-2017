@@ -22,9 +22,13 @@ public class GearAssembly {
 	public GearAssembly() {
 		
 	}
-	
+	int i = 0;
 	public void update() {
-		
+		if (i >= 10){
+			
+			i = 0;
+		}
+		i++;
 		// Checks controller inputs for gear tilting operations and toggles tilt state accordingly.
 		if (RobotMap.driveController.getRightBumper() && gearTiltToggle) {
 			gearTiltToggle = false;
@@ -65,6 +69,18 @@ public class GearAssembly {
 		
 		//Changes gear wheel motor values in accordance with gear 
 		switch (wheelState) {
+			case CATCH_GEAR:
+				
+				break;
+			case RELEASE_GEAR:
+				
+				break;
+			case HOLD_GEAR:
+				
+				break;
+			case IDLE:
+				
+				break;
 			
 		}
 		

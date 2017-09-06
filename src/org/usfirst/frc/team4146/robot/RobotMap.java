@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 
 public class RobotMap {
 	
@@ -22,6 +23,13 @@ public class RobotMap {
 	public static final double SHOOTER_RPM_SETPOINT  = -2700.0;// In competition set it to: -2700.0
 	public static final double SHOOTER_INTAKE_SPEED  = -0.8;
 	public static final double VIBRATOR_SPEED = 0.8;
+	
+	//Gear Constants
+	public static final double TILT_UPPER_STOP = ;
+	public static final double TILT_LOWER_STOP = ;
+	public static final double TILLT_UP_POWER = 0.4;
+	public static final double TILT_DOWN_POWER = -0.4;
+	public static final double TILT_STALL_TORQUE = 0.1;
 	
 	////// Declarations //////
 	public static Controller driveController;
@@ -46,6 +54,9 @@ public class RobotMap {
 	
 	// Servos Declaration
 	public static Servo linearServo;
+	
+	//hferjkekjfejrkfn Declaration ask Jacob
+	public AnalogPotentiometer pot;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
@@ -123,6 +134,9 @@ public class RobotMap {
     	
     	// Servos Initialization
     	linearServo = new Servo(10);
+    	
+    	// ask Jacob Initialization 
+    	pot = new AnalogPotentiometer(?);
     	
     	// Navx Gyro Initialization
     	gyro = new AHRS(SPI.Port.kMXP);
