@@ -56,7 +56,7 @@ public class RobotMap {
 	public static Servo linearServo;
 	
 	//hferjkekjfejrkfn Declaration ask Jacob
-	public AnalogPotentiometer pot;
+	public static AnalogPotentiometer pot;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;

@@ -22,10 +22,11 @@ public class GearAssembly {
 	public GearAssembly() {
 		
 	}
+	
 	int i = 0;
 	public void update() {
-		if (i >= 10){
-			
+		if (i >= 17){ // This prints out the value of the Potentiometer every 17 iterations for testing.
+			System.out.println("Pot Value: " + RobotMap.pot.get());
 			i = 0;
 		}
 		i++;
@@ -58,10 +59,18 @@ public class GearAssembly {
 		// Changes gear tilt motor values in accordance with gear tilt state machine.
 		switch (tiltState) {
 			case TILTED_UP:
-				
+				if (RobotMap.pot.get() > RobotMap.TILT_UPPER_STOP) {
+					RobotMap.gearTilt.set(RobotMap.TILT_STALL_TORQUE);
+				} else {
+					RobotMap.gearTilt.set(RobotMap.TILLT_UP_POWER);
+				}
 				break;
 			case TILTED_DOWN:
-				
+				if (RobotMap.pot.get() > RobotMap.TILT_LOWER_STOP) {
+					RobotMap.gearTilt.set(RobotMap.TILT_DOWN_POWER);
+				} else {
+					RobotMap.gearTilt.set(0.0);
+				}
 				break;
 			default:
 				System.out.println("Defaulting in Gear Tilt State!!!!!");
