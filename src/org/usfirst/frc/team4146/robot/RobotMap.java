@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class RobotMap {
 	
@@ -57,6 +58,9 @@ public class RobotMap {
 	
 	//hferjkekjfejrkfn Declaration ask Jacob
 	public static AnalogPotentiometer pot;
+	
+	//Limit Switch Declaration
+	static DigitalInput limitSwitch;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
@@ -137,6 +141,9 @@ public class RobotMap {
     	
     	// ask Jacob Initialization 
     	pot = new AnalogPotentiometer(?);
+    	
+    	//Limit Switch Initialization
+    	limitSwitch = new DigitalInput(?);
     	
     	// Navx Gyro Initialization
     	gyro = new AHRS(SPI.Port.kMXP);
