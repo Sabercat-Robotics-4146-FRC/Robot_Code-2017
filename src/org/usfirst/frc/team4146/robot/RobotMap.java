@@ -26,11 +26,14 @@ public class RobotMap {
 	public static final double VIBRATOR_SPEED = 0.8;
 	
 	//Gear Constants
-	public static final double TILT_UPPER_STOP = ;
-	public static final double TILT_LOWER_STOP = ;
-	public static final double TILLT_UP_POWER = 0.4;
-	public static final double TILT_DOWN_POWER = -0.4;
-	public static final double TILT_STALL_TORQUE = 0.1;
+	public static final double TILT_UPPER_STOP = 0.60;
+	public static final double TILT_LOWER_STOP = 0.40;
+	public static final double TILLT_UP_POWER = 0.35;
+	public static final double TILT_DOWN_POWER = -0.1;
+	public static final double TILT_STALL_TORQUE = 0.075;
+	public static final double GEAR_CATCH_SPEED = 0.6;
+	public static final double GEAR_RELEASE_SPEED = -0.5;
+	public static final double GEAR_HOLD_SPEED = 0.08;
 	
 	////// Declarations //////
 	public static Controller driveController;
@@ -110,6 +113,8 @@ public class RobotMap {
     	gearTilt = new Talon(11);
     	gearWheelLeft = new Talon(12);
     	gearWheelRight = new Talon(13);
+    	gearWheelRight.setInverted(true); 
+    	// Inverted so we can give them the same value and turn in on each other.
     	climberA = new Talon(14);
     	climberB = new Talon(15);
     	climberA.setInverted(true);
@@ -140,10 +145,10 @@ public class RobotMap {
     	linearServo = new Servo(10);
     	
     	// ask Jacob Initialization 
-    	pot = new AnalogPotentiometer(?);
+    	pot = new AnalogPotentiometer(3);
     	
     	//Limit Switch Initialization
-    	limitSwitch = new DigitalInput(?);
+    	limitSwitch = new DigitalInput(0);
     	
     	// Navx Gyro Initialization
     	gyro = new AHRS(SPI.Port.kMXP);

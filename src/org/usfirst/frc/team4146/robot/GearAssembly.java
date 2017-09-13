@@ -25,8 +25,9 @@ public class GearAssembly {
 	
 	int i = 0;
 	public void update() {
-		if (i >= 17){ // This prints out the value of the Potentiometer every 17 iterations for testing.
-			System.out.println("Pot Value: " + RobotMap.pot.get());
+		if (i >= 50){ // This prints out the value of the Potentiometer every 17 iterations for testing.
+			//System.out.println("Pot Value: " + RobotMap.pot.get());
+			//System.out.println(RobotMap.limitSwitch.get());
 			i = 0;
 		}
 		i++;
@@ -46,13 +47,13 @@ public class GearAssembly {
 		}
 		
 		// Checks controller inputs for gear wheel operations and changes states accordingly.
-		if (RobotMap.limitSwitch.get() == true) { // Hold Gear
-			wheelState = WheelState.HOLD_GEAR;
-		} else if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
+		if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
 			wheelState = WheelState.CATCH_GEAR;
 		} else if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
 			wheelState = WheelState.RELEASE_GEAR;
-		} else { // Idle
+		} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
+			wheelState = WheelState.HOLD_GEAR;
+		} else  { // Idle
 			wheelState = WheelState.IDLE;
 		}
 		
@@ -79,19 +80,22 @@ public class GearAssembly {
 		//Changes gear wheel motor values in accordance with gear 
 		switch (wheelState) {
 			case CATCH_GEAR:
-				
+				RobotMap.gearWheelLeft.set(RobotMap.GEAR_CATCH_SPEED);
+				RobotMap.gearWheelRight.set(RobotMap.GEAR_CATCH_SPEED);
 				break;
 			case RELEASE_GEAR:
-				
+				RobotMap.gearWheelLeft.set(RobotMap.GEAR_RELEASE_SPEED);
+				RobotMap.gearWheelRight.set(RobotMap.GEAR_RELEASE_SPEED);
 				break;
 			case HOLD_GEAR:
-				
+				RobotMap.gearWheelLeft.set(RobotMap.GEAR_HOLD_SPEED);
+				RobotMap.gearWheelRight.set(RobotMap.GEAR_HOLD_SPEED);
 				break;
 			case IDLE:
-				
+				RobotMap.gearWheelLeft.set(0.0);
+				RobotMap.gearWheelRight.set(0.0);
 				break;
-			
-		}
+		} 
 		
 	}
 }
