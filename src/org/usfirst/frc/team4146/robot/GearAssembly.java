@@ -97,6 +97,5 @@ public class GearAssembly {
 				RobotMap.gearWheelRight.set(0.0);
 				break;
 		} 
-		
 	}
 }

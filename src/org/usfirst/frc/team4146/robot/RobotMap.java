@@ -28,12 +28,12 @@ public class RobotMap {
 	//Gear Constants
 	public static final double TILT_UPPER_STOP = 0.60;
 	public static final double TILT_LOWER_STOP = 0.40;
-	public static final double TILLT_UP_POWER = 0.35;
+	public static final double TILLT_UP_POWER = 0.4;
 	public static final double TILT_DOWN_POWER = -0.1;
-	public static final double TILT_STALL_TORQUE = 0.075;
+	public static final double TILT_STALL_TORQUE = 0.18;
 	public static final double GEAR_CATCH_SPEED = 0.6;
 	public static final double GEAR_RELEASE_SPEED = -0.5;
-	public static final double GEAR_HOLD_SPEED = 0.0;
+	public static final double GEAR_HOLD_SPEED = 0.2;
 	
 	////// Declarations //////
 	public static Controller driveController;
