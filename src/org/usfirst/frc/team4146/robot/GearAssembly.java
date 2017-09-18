@@ -47,12 +47,13 @@ public class GearAssembly {
 		}
 		
 		// Checks controller inputs for gear wheel operations and changes states accordingly.
-		if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
-			wheelState = WheelState.CATCH_GEAR;
-		} else if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
+		
+		if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
 			wheelState = WheelState.RELEASE_GEAR;
 		} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
 			wheelState = WheelState.HOLD_GEAR;
+		} else if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
+				wheelState = WheelState.CATCH_GEAR;
 		} else  { // Idle
 			wheelState = WheelState.IDLE;
 		}

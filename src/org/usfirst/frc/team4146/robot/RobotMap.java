@@ -33,7 +33,7 @@ public class RobotMap {
 	public static final double TILT_STALL_TORQUE = 0.075;
 	public static final double GEAR_CATCH_SPEED = 0.6;
 	public static final double GEAR_RELEASE_SPEED = -0.5;
-	public static final double GEAR_HOLD_SPEED = 0.08;
+	public static final double GEAR_HOLD_SPEED = 0.0;
 	
 	////// Declarations //////
 	public static Controller driveController;
