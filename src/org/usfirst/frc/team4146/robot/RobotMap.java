@@ -26,14 +26,19 @@ public class RobotMap {
 	public static final double VIBRATOR_SPEED = 0.8;
 	
 	//Gear Constants
-	public static final double TILT_UPPER_STOP = 0.60;
+	public static final double TILT_UPPER_STOP = 0.70; //was .6 for testing 
 	public static final double TILT_LOWER_STOP = 0.40;
 	public static final double TILLT_UP_POWER = 0.4;
 	public static final double TILT_DOWN_POWER = -0.1;
-	public static final double TILT_STALL_TORQUE = 0.18;
+	public static final double TILT_STALL_TORQUE = 0.25;
 	public static final double GEAR_CATCH_SPEED = 0.6;
 	public static final double GEAR_RELEASE_SPEED = -0.5;
 	public static final double GEAR_HOLD_SPEED = 0.2;
+	
+	// Heading Constants
+	public static final double HEADING_KP = 0.05;
+	public static final double HEADING_KI = 0.0;
+	public static final double HEADING_KD = 0.0;
 	
 	////// Declarations //////
 	public static Controller driveController;
