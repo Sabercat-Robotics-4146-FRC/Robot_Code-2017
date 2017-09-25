@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4146.robot;
 
 import edu.wpi.first.wpilibj.SampleRobot;
+import edu.wpi.first.wpilibj.CameraServer;
 
 public class Robot extends SampleRobot {
 	
@@ -39,22 +40,25 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void operatorControl() {
+		CameraServer.getInstance().startAutomaticCapture();
 		Timer timer = new Timer();
 		double dt = 0.0;
+		double spin;
 		// Loops as long as it is the teleop time period and the robot is enabled.
 		while (isOperatorControl() && isEnabled()) {
 			dt = timer.getDT();
 			//Subsystem Updates
 			RobotMap.Climber.update();
 			RobotMap.ShooterAssembly.update();
-			RobotMap.GearAssembly.update();
+			//RobotMap.GearAssembly.update();
 			RobotMap.Heading.update(dt);
+			RobotMap.MoveDistance.update(dt);
+			spin = RobotMap.Heading.get();
+			timer.update();
 			
 			//Drive Code
 			if (RobotMap.driveController.getButtonStart()) {
-			RobotMap.drive.arcadeDrive(spin, -RobotMap.driveController.getDeadbandRightXAxis());
-			timer.update();
-		
+				RobotMap.drive.arcadeDrive(0, -spin);
 			} else {
 				RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeftYAxis(),
 						-RobotMap.driveController.getDeadbandRightXAxis());

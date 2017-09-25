@@ -21,4 +21,7 @@ public class Dashboard {
 	public static void send(String fieldName, boolean value) {
 		networktable.putBoolean(fieldName, value);
 	}
+	public static void publishImage() {
+		
+	}
 }

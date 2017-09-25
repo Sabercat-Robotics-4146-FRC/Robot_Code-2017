@@ -17,12 +17,15 @@ public class Heading {
 	public void update(double dt) {
 		headingPID.update(dt);
 		if (i > 50) { 
-			System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
+			//System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
 			//System.out.println("dt: " + dt);
 			//System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
-			//System.out.println( headingPID.get());
+			System.out.println(headingPID.get());
 			i = 0;
 		}
 		i++;
+	}
+	public double get(){
+		return headingPID.get();
 	}
 }

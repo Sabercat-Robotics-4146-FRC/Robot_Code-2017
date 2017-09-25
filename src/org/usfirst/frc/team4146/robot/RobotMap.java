@@ -36,9 +36,18 @@ public class RobotMap {
 	public static final double GEAR_HOLD_SPEED = 0.2;
 	
 	// Heading Constants
-	public static final double HEADING_KP = 0.05;
-	public static final double HEADING_KI = 0.0;
-	public static final double HEADING_KD = 0.0;
+	// Ku = 0.15
+	// Tu = 1
+	public static final double HEADING_KU = 0.15;
+	public static final double HEADING_TU = .8;
+	public static final double HEADING_KP = HEADING_KU * 0.6;
+	public static final double HEADING_KI = HEADING_TU/2;
+	public static final double HEADING_KD = HEADING_TU/8;
+	
+	// MoveDistance Constants
+	public static final double MoveDistance_KP = 0.0;
+	public static final double MoveDistance_KI = 0.0;
+	public static final double MoveDistance_KD = 0.0;
 	
 	////// Declarations //////
 	public static Controller driveController;
@@ -97,6 +106,9 @@ public class RobotMap {
 	
 	// Heading Declaration
 	public static Heading Heading;
+	
+	// Move Distance Declaration
+	public static MoveDistance MoveDistance;
 	
 	// Sendable Chooser Declaration
 	public static SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
@@ -186,6 +198,9 @@ public class RobotMap {
     	
     	// Heading Initialization
     	Heading = new Heading();
+    	
+    	// Move Distance Initialization
+    	MoveDistance = new MoveDistance();
     	
     	// Sendable Chooser Initialization
     	chooser = new SendableChooser();
