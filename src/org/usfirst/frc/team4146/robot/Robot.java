@@ -44,25 +44,28 @@ public class Robot extends SampleRobot {
 		Timer timer = new Timer();
 		double dt = 0.0;
 		double spin;
+		double move;
 		// Loops as long as it is the teleop time period and the robot is enabled.
 		while (isOperatorControl() && isEnabled()) {
 			dt = timer.getDT();
 			//Subsystem Updates
 			RobotMap.Climber.update();
-			RobotMap.ShooterAssembly.update();
-			//RobotMap.GearAssembly.update();
+			//RobotMap.ShooterAssembly.update();
+			RobotMap.GearAssembly.update();
 			RobotMap.Heading.update(dt);
 			RobotMap.MoveDistance.update(dt);
-			spin = RobotMap.Heading.get();
 			timer.update();
+			move = RobotMap.driveController.getDeadbandLeftYAxis();
+			spin = -RobotMap.driveController.getDeadbandRightXAxis();
 			
 			//Drive Code
 			if (RobotMap.driveController.getButtonStart()) {
-				RobotMap.drive.arcadeDrive(0, -spin);
-			} else {
-				RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandLeftYAxis(),
-						-RobotMap.driveController.getDeadbandRightXAxis());
+				spin = -RobotMap.Heading.get();
 			}
+			if(RobotMap.driveController.getButtonBack()) {
+				move = RobotMap.MoveDistance.get();
+			}
+			RobotMap.drive.arcadeDrive(move, spin);
 		}
 	}
 
