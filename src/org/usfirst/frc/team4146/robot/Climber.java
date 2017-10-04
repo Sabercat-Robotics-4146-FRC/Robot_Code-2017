@@ -7,17 +7,21 @@ public class Climber {
 	}
 	
 	public void update() {
+		//X --> Catch
+		//Y --> Climb
+		//B --> Stall
+		//A --> Backdrive
 		
-		if (RobotMap.lifterController.getButtonA()) { // use to hold once at the top
+		if (RobotMap.lifterController.getButtonA()) { // Stall
 			RobotMap.climberA.set(-0.2);
 			RobotMap.climberB.set(-0.2);
-		} else if (RobotMap.lifterController.getButtonB()) { // backdrive the climber to get the rope out
+		} else if (RobotMap.lifterController.getButtonB()) { // Backdrive
 			RobotMap.climberA.set(0.1);
 			RobotMap.climberB.set(0.1);
-		} else if (RobotMap.lifterController.getButtonX()) { // Use to catch the rope
+		} else if (RobotMap.lifterController.getButtonX()) { // Catch
 			RobotMap.climberA.set(0.35);
 			RobotMap.climberB.set(0.35);
-		} else if (RobotMap.lifterController.getButtonY()) { // Once caught use to climb the rest of the way to the top
+		} else if (RobotMap.lifterController.getButtonY()) { // Climb
 			RobotMap.climberA.set(0.5);
 			RobotMap.climberB.set(0.5);
 		} else {

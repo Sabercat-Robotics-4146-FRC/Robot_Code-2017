@@ -26,9 +26,9 @@ public class RobotMap {
 	public static final double VIBRATOR_SPEED = 0.8;
 	
 	//Gear Constants
-	public static final double TILT_UPPER_STOP = 0.70; //was .6 for testing 
-	public static final double TILT_LOWER_STOP = 0.40;
-	public static final double TILLT_UP_POWER = 0.4;
+	public static final double TILT_UPPER_STOP = 0.90; //was .7 
+	public static final double TILT_LOWER_STOP = 0.70; // was .4
+	public static final double TILLT_UP_POWER = 0.47;
 	public static final double TILT_DOWN_POWER = -0.1;
 	public static final double TILT_STALL_TORQUE = 0.25;
 	public static final double GEAR_CATCH_SPEED = 0.6;
@@ -152,11 +152,11 @@ public class RobotMap {
     	masterShooter.configPeakOutputVoltage(+12.0f, -12.0f);	//One of these might suppose to be 0
     	
     	masterShooter.setProfile(0);
-    	masterShooter.changeControlMode(TalonControlMode.Speed);
+    	////masterShooter.changeControlMode(TalonControlMode.Speed);
     		
     	//Setting slave_talon 
-    	slaveShooter.changeControlMode(CANTalon.TalonControlMode.Follower);
-    	slaveShooter.set(masterShooter.getDeviceID());
+    	////slaveShooter.changeControlMode(CANTalon.TalonControlMode.Follower);
+    	////slaveShooter.set(masterShooter.getDeviceID());
     	
     	// Servos Initialization
     	linearServo = new Servo(10);

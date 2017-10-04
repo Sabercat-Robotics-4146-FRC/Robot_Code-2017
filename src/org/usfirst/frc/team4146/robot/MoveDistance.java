@@ -1,6 +1,8 @@
 package org.usfirst.frc.team4146.robot;
 import org.usfirst.frc.team4146.robot.PID.*;
 
+import edu.wpi.first.wpilibj.Encoder;
+
 public class MoveDistance {
 	private PID moveDistancePID;
 	

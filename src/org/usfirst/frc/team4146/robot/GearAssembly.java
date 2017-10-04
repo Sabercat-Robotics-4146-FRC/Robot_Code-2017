@@ -10,6 +10,7 @@ public class GearAssembly {
 	enum WheelState {
 		CATCH_GEAR,
 		RELEASE_GEAR,
+		PLACE_GEAR,
 		HOLD_GEAR,
 		IDLE
 	}
@@ -26,14 +27,14 @@ public class GearAssembly {
 	int i = 0;
 	 public void update() {
 		if (i >= 50) { // This prints out the value of the Potentiometer every 17 iterations for testing.
-			System.out.println("Pot Value: " + RobotMap.pot.get());
-			//System.out.println(tiltState);
+			//System.out.println("Pot Value: " + RobotMap.pot.get());
+			System.out.println(tiltState);
 			//System.out.println(RobotMap.limitSwitch.get());
 			i = 0;
 		}
 		i++;
 		// Checks controller inputs for gear tilting operations and toggles tilt state accordingly.
-		/*if (RobotMap.driveController.getRightBumper() && gearTiltToggle) {
+		if (RobotMap.driveController.getRightBumper() && gearTiltToggle) {
 			gearTiltToggle = false;
 			
 			if (tiltState == TiltState.TILTED_UP) {
@@ -51,7 +52,9 @@ public class GearAssembly {
 		
 		if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
 			wheelState = WheelState.RELEASE_GEAR;
-		} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
+		} else if (RobotMap.driveController.getLeftBumper()){
+			wheelState = WheelState.PLACE_GEAR;
+	 	} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
 			wheelState = WheelState.HOLD_GEAR;
 		} else if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
 				wheelState = WheelState.CATCH_GEAR;
@@ -89,6 +92,11 @@ public class GearAssembly {
 				RobotMap.gearWheelLeft.set(RobotMap.GEAR_RELEASE_SPEED);
 				RobotMap.gearWheelRight.set(RobotMap.GEAR_RELEASE_SPEED);
 				break;
+			case PLACE_GEAR:
+				RobotMap.gearWheelLeft.set(RobotMap.GEAR_RELEASE_SPEED);
+				RobotMap.gearWheelRight.set(RobotMap.GEAR_RELEASE_SPEED);
+				tiltState = TiltState.TILTED_DOWN;
+				break;
 			case HOLD_GEAR:
 				RobotMap.gearWheelLeft.set(RobotMap.GEAR_HOLD_SPEED);
 				RobotMap.gearWheelRight.set(RobotMap.GEAR_HOLD_SPEED);
@@ -97,6 +105,6 @@ public class GearAssembly {
 				RobotMap.gearWheelLeft.set(0.0);
 				RobotMap.gearWheelRight.set(0.0);
 				break;
-		} */
+		} 
 	} 
 }
