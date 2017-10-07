@@ -19,7 +19,7 @@ public class Heading {
 		if (i > 50) { 
 			//System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
 			//System.out.println("dt: " + dt);
-			//System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
+			System.out.println("Gryo Angle: " + RobotMap.gyro.getAngle());
 			//System.out.println(headingPID.get());
 			i = 0;
 		}

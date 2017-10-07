@@ -40,9 +40,9 @@ public class RobotMap {
 	// Tu = 1
 	public static final double HEADING_KU = 0.15; // 0.15
 	public static final double HEADING_TU = .8; // 0.8
-	public static final double HEADING_KP = 0.06; // HEADING_KU * 0.6
-	public static final double HEADING_KI = 0.25; // HEADING_TU/2
-	public static final double HEADING_KD = 0.0; // HEADING_TU/8
+	public static final double HEADING_KP = HEADING_KU * 0.6; // 0.06
+	public static final double HEADING_KI = HEADING_TU/2; // 0.25
+	public static final double HEADING_KD = HEADING_TU/8;  // 0.0
 	
 	// MoveDistance Constants
 	public static final double MoveDistance_KP = 0.25;
@@ -179,6 +179,7 @@ public class RobotMap {
 
     	// NetworkTable Initialization
     	networkTable = NetworkTable.getTable("SmartDashboard");
+    	Dashboard.setNetworkTable(networkTable);
 
     	// RobotDrive Initialization
     	drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);

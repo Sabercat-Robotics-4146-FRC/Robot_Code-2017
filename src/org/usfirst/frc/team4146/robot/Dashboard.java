@@ -6,7 +6,7 @@ public class Dashboard {
 	
 	private static NetworkTable networktable;
 	
-	public Dashboard(NetworkTable n) {
+	public static void setNetworkTable(NetworkTable n) {
 		networktable = n;
 	}
 	
