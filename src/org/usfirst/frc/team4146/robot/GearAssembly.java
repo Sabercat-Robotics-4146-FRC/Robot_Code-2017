@@ -7,7 +7,7 @@ public class GearAssembly {
 		TILTED_DOWN
 	}
 	
-	enum WheelState {
+	public enum WheelState {
 		CATCH_GEAR,
 		RELEASE_GEAR,
 		PLACE_GEAR,
@@ -33,6 +33,7 @@ public class GearAssembly {
 			i = 0;
 		}
 		i++;
+		if ( !RobotMap.ROBOT.isAutonomous() ){
 		// Checks controller inputs for gear tilting operations and toggles tilt state accordingly.
 		if (RobotMap.driveController.getRightBumper() && gearTiltToggle) {
 			gearTiltToggle = false;
@@ -50,18 +51,19 @@ public class GearAssembly {
 		
 		// Checks controller inputs for gear wheel operations and changes states accordingly.
 		
-		if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
-			wheelState = WheelState.RELEASE_GEAR;
-		} else if (RobotMap.driveController.getLeftBumper()){
-			wheelState = WheelState.PLACE_GEAR;
-	 	} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
-			wheelState = WheelState.HOLD_GEAR;
-		} else if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
-				wheelState = WheelState.CATCH_GEAR;
-		} else  { // Idle
-			wheelState = WheelState.IDLE;
-		}
 		
+			if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
+				wheelState = WheelState.RELEASE_GEAR;
+			} else if (RobotMap.driveController.getLeftBumper()){
+				wheelState = WheelState.PLACE_GEAR;
+	 		} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
+	 			wheelState = WheelState.HOLD_GEAR;
+	 		} else if (RobotMap.driveController.getRightTrigger()) { // Catch Gear
+					wheelState = WheelState.CATCH_GEAR;
+			} else  { // Idle
+				wheelState = WheelState.IDLE;
+			}
+		}
 		// Changes gear tilt motor values in accordance with gear tilt state machine.
 		switch (tiltState) {
 			case TILTED_UP:
@@ -107,4 +109,13 @@ public class GearAssembly {
 				break;
 		} 
 	} 
+	
+	 public void placeGear(){
+		 wheelState = WheelState.PLACE_GEAR;
+	 }
+	 
+	 public void resetGear(){
+		 wheelState = WheelState.IDLE;
+		 tiltState = TiltState.TILTED_UP;
+	 }
 }

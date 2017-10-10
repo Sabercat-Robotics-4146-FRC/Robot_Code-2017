@@ -19,6 +19,7 @@ public class RobotMap {
 	
 	// Constants
 	
+	public static Robot ROBOT;
 	/*Shooter parameters*/
 	public static final double SHOOTER_RPM_TOLERANCE = 10.0; //was 50 //10.0
 	public static final double SHOOTER_RPM_SETPOINT  = -2700.0;// In competition set it to: -2700.0
@@ -38,16 +39,29 @@ public class RobotMap {
 	// Heading Constants
 	// Ku = 0.15
 	// Tu = 1
-	public static final double HEADING_KU = 0.15; // 0.15
-	public static final double HEADING_TU = .8; // 0.8
-	public static final double HEADING_KP = HEADING_KU * 0.6; // 0.06
-	public static final double HEADING_KI = HEADING_TU/2; // 0.25
-	public static final double HEADING_KD = HEADING_TU/8;  // 0.0
+//	public static final double HEADING_KU = 0.15; // 0.15
+//	public static final double HEADING_TU = .8; // 0.8
+	public static final double HEADING_TURN_KP = 0.06; // HEADING_KU * 0.6
+	public static final double HEADING_TURN_KI = 0.25; // HEADING_TU/2
+	public static final double HEADING_TURN_KD = 0.0;  // HEADING_TU/8
+	public static final double HEADING_TURN_INTEGRAL_ACTIVATION_RANGE = 0.0;
+	
+	public static final double HEADING_LOCK_KP = 0.25; // HEADING_KU * 0.6
+	public static final double HEADING_LOCK_KI = 0.022; // HEADING_TU/2
+	public static final double HEADING_LOCK_KD = 0.0;  // HEADING_TU/8
 	
 	// MoveDistance Constants
-	public static final double MoveDistance_KP = 0.25;
-	public static final double MoveDistance_KI = 0.022;
+	public static final double MoveDistance_KP = 0.7;
+	public static final double MoveDistance_KI = 2.0;
 	public static final double MoveDistance_KD = 0.0;
+	
+	//PID Constants
+	public static final double ACCEPTABLE_ANGLE_ERROR = 0.5;
+	public static final double ACCEPTABLE_DISTANCE_ERROR = 0.083;
+	
+	//Autonomous COnstants
+	public static final double MAX_TURN_SPEED = 0.7;
+	public static final double MAX_MOVE_SPEED = 0.8;
 	
 	////// Declarations //////
 	public static Controller driveController;
@@ -112,6 +126,9 @@ public class RobotMap {
 	
 	// Sendable Chooser Declaration
 	public static SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
+	
+	// Autonomous Declaration
+	public static Autonomous auto;
 	
 	public static void init() { // This is to be called in robitInit and instantiates stuff.
 		
@@ -202,6 +219,9 @@ public class RobotMap {
     	
     	// Move Distance Initialization
     	MoveDistance = new MoveDistance();
+    	
+    	// Autonomous Initiilization
+    	auto = new Autonomous();
     	
     	// Sendable Chooser Initialization
     	chooser = new SendableChooser();

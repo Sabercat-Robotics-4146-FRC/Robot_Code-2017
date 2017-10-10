@@ -37,4 +37,14 @@ public class Timer {
 	/*public void reset_start() {  // If you can't find any reason to have this, take it out.
 		startTime = System.nanoTime();
 	}*/
+	public static void waitMilli() {
+		try {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
+			// MOVE THIS TO ITERATIVE_TIMER
+			//OK
+			System.out.println("Thread.sleep was Interrupted!");
+			e.printStackTrace();
+		}
+	}
 }

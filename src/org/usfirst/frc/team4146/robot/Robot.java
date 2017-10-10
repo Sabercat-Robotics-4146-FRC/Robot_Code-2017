@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 public class Robot extends SampleRobot {
 	
 	public Robot() {
-		
+		RobotMap.ROBOT = this;
 	}
 	
 	/**
@@ -26,13 +26,21 @@ public class Robot extends SampleRobot {
 	public void autonomous() {
 //		Preferences prefs = Preferences.getInstance(); // Currently unused.
     	
-    	Autonomous auto = new Autonomous();
+    	
     	// Castes the current selection of chooser into autoSelected.
-    	String autoSelected = (String) RobotMap.chooser.getSelected(); 
-		switch(autoSelected) { // runs the selected autonomous determined by autoSelected.
-			case "Do Nothing": // This does nothing!
-				default: 
-				break;
+//    	String autoSelected = (String) RobotMap.chooser.getSelected(); 
+//		switch(autoSelected) { // runs the selected autonomous determined by autoSelected.
+//			case "Do Nothing": // This does nothing!
+//				default: 
+//				break;
+//		}
+		//RobotMap.auto.turn(60, 5);
+		try {
+			//RobotMap.auto.move(4, 10);
+			RobotMap.auto.placeGear();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -48,6 +56,8 @@ public class Robot extends SampleRobot {
 		double move;
 		boolean gyroToggle = true;
 		// Loops as long as it is the teleop time period and the robot is enabled.
+		RobotMap.Heading.setTurnMode();
+		RobotMap.Heading.headingPID.set_setpoint(15);
 		while (isOperatorControl() && isEnabled()) {
 			dt = timer.getDT();
 			// Start of Subsystem Updates
@@ -74,7 +84,6 @@ public class Robot extends SampleRobot {
 			RobotMap.MoveDistance.update(dt);
 			// End of Subsystem Updates
 			
-			timer.update();
 			Dashboard.send("Gyro Angle", RobotMap.gyro.getAngle());
 			
 			if (RobotMap.driveController.getButtonX() && gyroToggle) {
@@ -97,8 +106,10 @@ public class Robot extends SampleRobot {
 				move = RobotMap.MoveDistance.get();
 			}
 			RobotMap.drive.arcadeDrive(move, spin);
+			Dashboard.send("Spin", spin);
+			Dashboard.send("Heading Spin Error", RobotMap.Heading.headingPID.get_error());
 			// End of Drive Code
-			
+			timer.update();
 		}
 	}
 

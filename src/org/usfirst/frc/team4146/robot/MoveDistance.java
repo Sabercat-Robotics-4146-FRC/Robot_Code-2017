@@ -5,18 +5,19 @@ import edu.wpi.first.wpilibj.Encoder;
 
 public class MoveDistance {
 	
-	private PID moveDistancePID;
+	public PID moveDistancePID;
 	
 	public MoveDistance() {
 		moveDistancePID = new PID(new signal(){
 			public double getValue(){
 				//return RobotMap.leftDriveEncoder.get();
-				return (RobotMap.leftDriveEncoder.get() + RobotMap.rightDriveEncoder.get()) / 2;
+				return ticksToFeet(encoderTicks());
 				// Returns the average of the two encoders for theoretical more percision.
 				// If no work just use commented code.
 			}
 		});
 		moveDistancePID.set_pid(RobotMap.MoveDistance_KP, RobotMap.MoveDistance_KI, RobotMap.MoveDistance_KD);
+		moveDistancePID.setIntegralActivationRange(0.5);
 	}
 	
 	int i = 0;
@@ -35,13 +36,13 @@ public class MoveDistance {
 
 	// Returns average encoder ticks between the two drive encoders
 	private double encoderTicks() {
-		return ( ( RobotMap.leftDriveEncoder.get() + RobotMap.rightDriveEncoder.get() ) / 2 );
+		//return ((-RobotMap.leftDriveEncoder.getRaw() + RobotMap.rightDriveEncoder.getRaw()) / 2.0 );
+		return (RobotMap.rightDriveEncoder.getRaw());
 	}
 	
-	// Converts encoder ticks to feet
-	private double ticksToFeet( double e ) { // SET THIS UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO
-		System.out.println("ticksToFeet method not set up in Move Distance!!!!!");
-		return 0.0;
+	// Converts encoder ticks to feet 
+	private double ticksToFeet( double e ) {
+		return ( e + 134.9 ) / 1225.4;
 	}
 	
 	// Resets Encoders
@@ -64,12 +65,17 @@ public class MoveDistance {
 	}
 	
 	// Sets Move Distance PID Setpoint
-	public void set_setpoint( double s ) {
-		moveDistancePID.set_setpoint( s );
+	public void setSetpoint(double s) {
+		moveDistancePID.set_setpoint(s);
 	}
 	
 	// Sets PID values to other than default
-	public void set_pid( double p, double i, double d ) {
-		moveDistancePID.set_pid( p, i ,d );
+	public void setPID(double p, double i, double d) {
+		moveDistancePID.set_pid(p, i ,d);
+	}
+	
+	// 
+	public boolean isNotInError(double timeOut, double timeElapsed){
+		return ((moveDistancePID.get_error() > RobotMap.ACCEPTABLE_DISTANCE_ERROR) || (moveDistancePID.steady_state_error() > RobotMap.ACCEPTABLE_DISTANCE_ERROR)) && (timeElapsed < timeOut);
 	}
 }

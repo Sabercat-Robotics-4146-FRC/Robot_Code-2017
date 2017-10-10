@@ -1,29 +1,104 @@
 package org.usfirst.frc.team4146.robot;
+
 import org.usfirst.frc.team4146.robot.PID.*;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.networktables.*;
-import edu.wpi.first.wpilibj.CANSpeedController;
-import edu.wpi.first.wpilibj.Spark;
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.*;
-import com.ctre.CANTalon.TalonControlMode;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Autonomous {
 	
+	double theoreticalAngle = 0.0;
+	
+	double dt;
+	
+	Timer timer;
+	
 	Autonomous() {
-		
+		timer = new Timer();
 	}
 	
+	public void turn(double angle, double timeOut){
+		double timeElapsed = 0.0;
+		timer.reset();
+		theoreticalAngle += angle;
+		RobotMap.Heading.headingPID.set_setpoint(theoreticalAngle);
+		RobotMap.Heading.headingPID.set_integral_sum(0);
+		RobotMap.Heading.headingPID.fill_error(100);
+		RobotMap.Heading.setTurnMode();
+		
+		int i = 0;
+		
+		while(RobotMap.ROBOT.isEnabled() && RobotMap.Heading.isNotInError(timeOut, timeElapsed)){
+			RobotMap.GearAssembly.update();
+			timer.update();
+			dt = timer.getDT();
+			RobotMap.Heading.update(dt);
+			double turn = PID.clamp(RobotMap.Heading.get(), RobotMap.MAX_TURN_SPEED);
+			//double turn =  RobotMap.Heading.get();
+			timeElapsed += dt;
+			RobotMap.drive.arcadeDrive(0.0, -turn );
+			Dashboard.send("Heading Spin Error", RobotMap.Heading.headingPID.get_error());
+			
+			
+			if(i > 30){
+				System.out.println(RobotMap.gyro.getAngle());
+				i = 0;
+			}
+			i++;
+		}
+		System.out.println("Finished Turning in: " + timeElapsed);
+	}
+	
+	public void move(double distance, double timeOut) throws InterruptedException{
+//		RobotMap.gyro.reset();
+		double timeElapsed = 0.0;
+		timer.reset();
+		RobotMap.MoveDistance.resetEncoders();
+		RobotMap.MoveDistance.moveDistancePID.set_setpoint(distance);
+		RobotMap.MoveDistance.moveDistancePID.set_integral_sum(0);
+		RobotMap.MoveDistance.moveDistancePID.fill_error(100);
+		RobotMap.MoveDistance.moveDistancePID.set_error_range(200);
+		//RobotMap.MoveDistance.setLockMode();
+		RobotMap.Heading.headingPID.set_setpoint(RobotMap.gyro.getAngle());
+		RobotMap.Heading.headingPID.set_integral_sum(0);
+		RobotMap.Heading.headingPID.fill_error(100);
+		RobotMap.Heading.setLockMode();
+		
+		int i = 0;
+		
+		while(RobotMap.ROBOT.isEnabled() && RobotMap.MoveDistance.isNotInError(timeOut, timeElapsed)){
+			RobotMap.GearAssembly.update();
+			timer.update();
+			dt = timer.getDT();
+			RobotMap.MoveDistance.update(dt);
+			RobotMap.Heading.update(dt);
+			double move = PID.clamp(RobotMap.MoveDistance.get(), RobotMap.MAX_MOVE_SPEED);
+			double spin = PID.clamp(RobotMap.Heading.get(), RobotMap.MAX_TURN_SPEED);
+			timeElapsed += dt;
+			RobotMap.drive.arcadeDrive(move, -spin);
+			Dashboard.send("Move Distance Error", RobotMap.MoveDistance.moveDistancePID.get_error());
+			Dashboard.send("Move Distance PID Out", RobotMap.MoveDistance.moveDistancePID.get());
+			Dashboard.send("Left Drive Encoder", RobotMap.leftDriveEncoder.getRaw());
+			Dashboard.send("Right Drive Encoder", RobotMap.rightDriveEncoder.getRaw());
+			
+			if(i > 30){
+				//System.out.println((RobotMap.leftDriveEncoder.get() + RobotMap.rightDriveEncoder.get())/2.0);
+				//Dashboard.send("Move Distance Error", RobotMap.MoveDistance.moveDistancePID.get_error());
+				i = 0;
+			}
+			i++;
+			Timer.waitMilli();
+		}
+		RobotMap.drive.arcadeDrive(0.0, 0.0);
+		//Thread.sleep(10000);
+		System.out.println("Move error: " + RobotMap.MoveDistance.moveDistancePID.get_error());
+		System.out.println("Done moving in: " + timeElapsed);
+	}
+	
+	public void placeGear() throws InterruptedException{
+		RobotMap.gearWheelLeft.set(RobotMap.GEAR_RELEASE_SPEED);
+		RobotMap.gearWheelRight.set(RobotMap.GEAR_RELEASE_SPEED);
+		RobotMap.gearTilt.set(RobotMap.TILT_DOWN_POWER);
+		this.move(0.5, 1);
+		//
+		Timer.waitMilli();
+		RobotMap.GearAssembly.update();
+	}
 }
