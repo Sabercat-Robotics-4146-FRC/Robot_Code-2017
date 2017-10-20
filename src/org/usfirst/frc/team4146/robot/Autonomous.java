@@ -116,5 +116,16 @@ public class Autonomous {
 		RobotMap.masterShooter.enableControl(); // Allow talon internal PID to apply control to the talon
 		RobotMap.masterShooter.changeControlMode(TalonControlMode.Speed);
 		RobotMap.masterShooter.set( RobotMap.AUTO_SHOOT_SPEED );
+		
+		RobotMap.ballIntake.set(-0.3);
+		RobotMap.vibrator.set(RobotMap.VIBRATOR_SPEED);
+		RobotMap.ShooterAssembly.oscillateServo();
+		// Only feed balls to shooter if RPM is within a tolerance.
+		if (Math.abs(RobotMap.masterShooter.getSpeed() - RobotMap.masterShooter.getSetpoint())
+				<= RobotMap.SHOOTER_RPM_TOLERANCE) {
+			RobotMap.shooterIntake.set(RobotMap.SHOOTER_INTAKE_SPEED);
+		} else {
+			RobotMap.shooterIntake.set(0.0);
+		}
 	}
 }
