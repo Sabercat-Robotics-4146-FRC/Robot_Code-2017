@@ -2,6 +2,8 @@ package org.usfirst.frc.team4146.robot;
 
 import org.usfirst.frc.team4146.robot.PID.*;
 
+import com.ctre.CANTalon.TalonControlMode;
+
 public class Autonomous {
 	
 	double theoreticalAngle = 0.0;
@@ -96,9 +98,23 @@ public class Autonomous {
 		RobotMap.gearWheelLeft.set(RobotMap.GEAR_RELEASE_SPEED);
 		RobotMap.gearWheelRight.set(RobotMap.GEAR_RELEASE_SPEED);
 		RobotMap.gearTilt.set(RobotMap.TILT_DOWN_POWER);
-		this.move(0.5, 1);
-		//
-		Timer.waitMilli();
+		
+		Timer.waitTime(500);
+		
+		this.move(1.0, 2);
+		
+		RobotMap.gearWheelLeft.set(0.0);
+		RobotMap.gearWheelRight.set(0.0);
+		RobotMap.gearTilt.set(0.0);
+		
+		Timer.waitTime(1000);
+		
 		RobotMap.GearAssembly.update();
+	}
+	
+	public void shoot() {
+		RobotMap.masterShooter.enableControl(); // Allow talon internal PID to apply control to the talon
+		RobotMap.masterShooter.changeControlMode(TalonControlMode.Speed);
+		RobotMap.masterShooter.set( RobotMap.AUTO_SHOOT_SPEED );
 	}
 }

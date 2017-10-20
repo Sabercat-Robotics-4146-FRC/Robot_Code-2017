@@ -24,24 +24,82 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void autonomous() {
+		RobotMap.gyro.reset();
 //		Preferences prefs = Preferences.getInstance(); // Currently unused.
     	
     	
     	// Castes the current selection of chooser into autoSelected.
-//    	String autoSelected = (String) RobotMap.chooser.getSelected(); 
-//		switch(autoSelected) { // runs the selected autonomous determined by autoSelected.
-//			case "Do Nothing": // This does nothing!
-//				default: 
-//				break;
-//		}
-		//RobotMap.auto.turn(60, 5);
-		try {
-			//RobotMap.auto.move(4, 10);
-			RobotMap.auto.placeGear();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+    	String autoSelected = (String) RobotMap.chooser.getSelected(); 
+    	System.out.println(autoSelected);
+    	try {
+    	
+		switch(autoSelected) { // runs the selected autonomous determined by autoSelected.
+		
+			case "Do Nothing": // This does nothing!
+				default: 
+					
+				break;
+				
+			case "Cross Baseline":
+				RobotMap.auto.move(-8.0, 15);
+				break;
+				
+			case "Gear from Center":
+				RobotMap.auto.move(-6.08, 5);
+				RobotMap.auto.placeGear();
+				break;
+				
+			case "Blue Gear Boiler Side":
+				RobotMap.auto.move(-7.29, 8);
+				RobotMap.auto.turn(60, 7);
+				RobotMap.auto.move(-2.48, 3);
+				RobotMap.auto.placeGear();
+				break;
+				
+			case "Blue Gear NOT Boiler Side":
+				RobotMap.auto.move(-7.29, 8);
+				RobotMap.auto.turn(-60, 7);
+				RobotMap.auto.move(-2.48, 3);
+				RobotMap.auto.placeGear();
+				break;
+	
+			case "Red Gear Boiler Side":
+				RobotMap.auto.move(-6.396, 8);
+				RobotMap.auto.turn(-60, 7);
+				RobotMap.auto.move(-2.48, 3);
+				RobotMap.auto.placeGear();
+				break;
+	
+			case "Red Gear NOT Boiler Side":
+				RobotMap.auto.move(-6.396, 8);
+				RobotMap.auto.turn(60, 7);
+				RobotMap.auto.move(-2.48, 3);
+				RobotMap.auto.placeGear();
+				break;
+	
+			case "Testing 1":
+				
+				break;
+	
+			case "Testing 2":
+				
+				break;
+	
+			case "Testing 3":
+				
+				break;
+		}
+		
+    	} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+//		try {
+//			RobotMap.auto.move(-6, 10);
+//			RobotMap.auto.placeGear();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**

@@ -47,4 +47,14 @@ public class Timer {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void waitTime(int i) {
+		try {
+			Thread.sleep(i);
+		} catch (InterruptedException e) {
+			System.out.println("Thread.sleep was Interrupted!");
+			e.printStackTrace();
+		}
+	}
+	
 }

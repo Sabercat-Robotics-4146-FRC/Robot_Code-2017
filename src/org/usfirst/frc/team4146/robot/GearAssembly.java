@@ -26,13 +26,13 @@ public class GearAssembly {
 	
 	int i = 0;
 	 public void update() {
-		if (i >= 50) { // This prints out the value of the Potentiometer every 17 iterations for testing.
-			//System.out.println("Pot Value: " + RobotMap.pot.get());
-			System.out.println(tiltState);
-			//System.out.println(RobotMap.limitSwitch.get());
-			i = 0;
-		}
-		i++;
+//		if (i >= 50) { // This prints out the value of the Potentiometer every 17 iterations for testing.
+//			//System.out.println("Pot Value: " + RobotMap.pot.get());
+//			//System.out.println(tiltState);
+//			//System.out.println(RobotMap.limitSwitch.get());
+//			i = 0;
+//		}
+//		i++;
 		if ( !RobotMap.ROBOT.isAutonomous() ){
 		// Checks controller inputs for gear tilting operations and toggles tilt state accordingly.
 		if (RobotMap.driveController.getRightBumper() && gearTiltToggle) {
@@ -109,10 +109,6 @@ public class GearAssembly {
 				break;
 		} 
 	} 
-	
-	 public void placeGear(){
-		 wheelState = WheelState.PLACE_GEAR;
-	 }
 	 
 	 public void resetGear(){
 		 wheelState = WheelState.IDLE;
