@@ -27,7 +27,7 @@ public class GearAssembly {
 	int i = 0;
 	 public void update() {
 //		if (i >= 50) { // This prints out the value of the Potentiometer every 17 iterations for testing.
-//			//System.out.println("Pot Value: " + RobotMap.pot.get());
+//			System.out.println("Pot Value: " + RobotMap.pot.get());
 //			//System.out.println(tiltState);
 //			//System.out.println(RobotMap.limitSwitch.get());
 //			i = 0;
@@ -54,7 +54,7 @@ public class GearAssembly {
 		
 			if (RobotMap.driveController.getLeftTrigger()) { // Release Gear
 				wheelState = WheelState.RELEASE_GEAR;
-			} else if (RobotMap.driveController.getLeftBumper()){
+			} else if (RobotMap.driveController.getButtonY()){
 				wheelState = WheelState.PLACE_GEAR;
 	 		} else if (RobotMap.limitSwitch.get() == true) { // Hold Gear
 	 			wheelState = WheelState.HOLD_GEAR;

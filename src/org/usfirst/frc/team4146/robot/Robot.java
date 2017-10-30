@@ -17,6 +17,8 @@ public class Robot extends SampleRobot {
 	public void robotInit() {
 		RobotMap.init(); // Instantiates and Declares things to be used from RobotMap.
 		RobotMap.gyro.reset();
+		
+		CameraServer.getInstance().startAutomaticCapture();
 	}
 
 	/**
@@ -40,45 +42,45 @@ public class Robot extends SampleRobot {
 					
 				break;
 				
-			case "Cross Baseline":
-				RobotMap.auto.move(-8.0, 15);
+			case "Cross Baseline": // Updated!!!
+				RobotMap.auto.move(-8.0, 15); //-8
 				break;
 				
-			case "Gear from Center":
-				RobotMap.auto.move(-6.08, 5);
+			case "Gear from Center": // Updated!!!
+				RobotMap.auto.move(-6.08 + RobotMap.inchesToFeet(-20), 5); // -6.08, 5
 				RobotMap.auto.placeGear();
 				break;
 				
-			case "Blue Gear Boiler Side":
-				RobotMap.auto.move(-7.29, 8);
-				RobotMap.auto.turn(60, 7);
-				RobotMap.auto.move(-2.48, 3);
+			case "Blue Gear Boiler Side": // Updated ...
+				RobotMap.auto.move(-7.0, 8); // -7.29
+				RobotMap.auto.turn(60, 3);
+				RobotMap.auto.move(-3.16 + RobotMap.inchesToFeet(-20), 3); // -2.48
 				RobotMap.auto.placeGear();
 				break;
 				
-			case "Blue Gear NOT Boiler Side":
-				RobotMap.auto.move(-7.29, 8);
-				RobotMap.auto.turn(-60, 7);
-				RobotMap.auto.move(-2.48, 3);
+			case "Blue Gear NOT Boiler Side": // Updated
+				RobotMap.auto.move(RobotMap.inchesToFeet(-94), 8); // -7.29, 8
+				RobotMap.auto.turn(-60, 3);
+				RobotMap.auto.move(RobotMap.inchesToFeet(-68), 3); // -2.48, 3
 				RobotMap.auto.placeGear();
 				break;
 	
-			case "Red Gear Boiler Side":
-				RobotMap.auto.move(-6.396, 8);
-				RobotMap.auto.turn(-60, 7);
-				RobotMap.auto.move(-2.48, 3);
+			case "Red Gear Boiler Side": // Updated!!!
+				RobotMap.auto.move(-6.29, 8); // -6.396
+				RobotMap.auto.turn(-60, 3);
+				RobotMap.auto.move(-1.833 + RobotMap.inchesToFeet(-20), 3); //-2.48
 				RobotMap.auto.placeGear();
 				break;
 	
-			case "Red Gear NOT Boiler Side":
-				RobotMap.auto.move(-6.396, 8);
-				RobotMap.auto.turn(60, 7);
-				RobotMap.auto.move(-2.48, 3);
+			case "Red Gear NOT Boiler Side": // Updated!!!
+				RobotMap.auto.move(-6.5 + RobotMap.inchesToFeet(-17), 8); // -6.396
+				RobotMap.auto.turn(60, 3);
+				RobotMap.auto.move(-4.2 + RobotMap.inchesToFeet(-17), 3); // -2.48, 3
 				RobotMap.auto.placeGear();
 				break;
 	
 			case "Testing 1":
-				
+				RobotMap.auto.placeGear();
 				break;
 	
 			case "Testing 2":
@@ -107,62 +109,28 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void operatorControl() {
-		CameraServer.getInstance().startAutomaticCapture();
 		Timer timer = new Timer();
 		double dt = 0.0;
 		double spin;
 		double move;
-		boolean gyroToggle = true;
-		// Loops as long as it is the teleop time period and the robot is enabled.
-		RobotMap.Heading.setTurnMode();
-		RobotMap.Heading.headingPID.set_setpoint(15);
+		
+
 		while (isOperatorControl() && isEnabled()) {
 			dt = timer.getDT();
 			// Start of Subsystem Updates
 			RobotMap.Climber.update();
 			//RobotMap.ShooterAssembly.update();
 			
-			// Testing shooting start
-			if( RobotMap.driveController.getButtonA() ){
-				RobotMap.slaveShooter.set(0.0);
-				RobotMap.masterShooter.set(0.3);
-				//System.out.println("A button");
-			} else if( RobotMap.driveController.getButtonB() ){
-				RobotMap.masterShooter.set(0.0);
-				RobotMap.slaveShooter.set(0.3);
-				//System.out.println("B button");
-			} else {
-				RobotMap.masterShooter.set(0.0);
-				RobotMap.slaveShooter.set(0.0);
-			}
+			RobotMap.ShooterAssembly.update();
 			// Testing shooting end
 			
 			RobotMap.GearAssembly.update();
-			RobotMap.Heading.update(dt);
-			RobotMap.MoveDistance.update(dt);
 			// End of Subsystem Updates
-			
-			Dashboard.send("Gyro Angle", RobotMap.gyro.getAngle());
-			
-			if (RobotMap.driveController.getButtonX() && gyroToggle) {
-				RobotMap.gyro.reset();
-				gyroToggle = false;
-			}
-			if (!RobotMap.driveController.getButtonX()) {
-				gyroToggle = true;
-			}
 			
 			// Start of Drive Code (in testing phase)
 			move = RobotMap.driveController.getDeadbandLeftYAxis();
 			spin = -RobotMap.driveController.getDeadbandRightXAxis();
 			
-			if (RobotMap.driveController.getButtonStart()) {
-				spin = -RobotMap.Heading.get();
-				// System.out.println("spin");
-			}
-			if(RobotMap.driveController.getButtonBack()) {
-				move = RobotMap.MoveDistance.get();
-			}
 			RobotMap.drive.arcadeDrive(move, spin);
 			Dashboard.send("Spin", spin);
 			Dashboard.send("Heading Spin Error", RobotMap.Heading.headingPID.get_error());

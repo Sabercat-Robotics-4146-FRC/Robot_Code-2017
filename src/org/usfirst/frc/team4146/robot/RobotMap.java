@@ -28,9 +28,9 @@ public class RobotMap {
 	public static final double VIBRATOR_SPEED = 0.8;
 	
 	//Gear Constants
-	public static final double TILT_UPPER_STOP = 0.74; //was .7 .74
+	public static final double TILT_UPPER_STOP = 0.71; //was .7 then .74
 	public static final double TILT_LOWER_STOP = 0.45; // was .4 .45
-	public static final double TILLT_UP_POWER = 0.47;
+	public static final double TILLT_UP_POWER = 0.46;
 	public static final double TILT_DOWN_POWER = -0.1;
 	public static final double TILT_STALL_TORQUE = 0.1; //.1
 	public static final double GEAR_CATCH_SPEED = 0.6;
@@ -243,11 +243,11 @@ public class RobotMap {
     	SmartDashboard.putData("Auto mode", chooser);
 	}
 	
-	public double inchesToFeet(double i){
+	public static double inchesToFeet(double i){
 		return i / 12;
 	}
 	
-	public double feetToInches(double i){
+	public static double feetToInches(double i){
 		return i * 12;
 	}
 }

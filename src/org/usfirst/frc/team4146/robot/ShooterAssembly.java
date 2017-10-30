@@ -57,11 +57,13 @@ public class ShooterAssembly {
 		// Check button inputs and change state 
 		if (RobotMap.driveController.getButtonA()) { // Shoot with right trigger,
 			state = RobotState.SHOOTING;
-		} else if (RobotMap.driveController.getLeftBumper()) { // Ball intake with left trigger.
-			state = RobotState.INTAKING;
-		} else if (RobotMap.driveController.getButtonB()) { // Test shooter at full speed with B button
-			state = RobotState.TESTING_SHOOTER;
-		} else if (RobotMap.driveController.getButtonX()) {
+		} 
+//			else if (RobotMap.driveController.getLeftBumper()) { // Ball intake with left trigger.
+//			state = RobotState.INTAKING;
+//		} else if (RobotMap.driveController.getButtonB()) { // Test shooter at full speed with B button
+//			state = RobotState.TESTING_SHOOTER;
+//		}
+		 else if (RobotMap.driveController.getButtonX()) {
 			state = RobotState.SICEM;
 		} else { // Robot Idle State
 			state = RobotState.IDLE;
