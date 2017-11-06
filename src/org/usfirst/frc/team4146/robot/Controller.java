@@ -4,224 +4,283 @@ import edu.wpi.first.wpilibj.Joystick;
 //import edu.wpi.first.wpilibj.;
 
 /**
- * The Controller class is a wrapper for the WPI Joystick class for the use of Xbox 360 Controllers (was Logitech Controllers)
- * 
- * @author GowanR
- * @version 8/20/2016
- * 
- */
+* The Controller class is a wrapper for the WPI Joystick class for the use of Xbox 360 Controllers (was Logitech Controllers)
+* 
+* @author GowanR
+* @author JacobE
+* @author EliA
+* @version 2.2.1
+* // (MAJOR.MINOR.PATCH)
+* 
+*/
 public class Controller {
 	Joystick joy;
 	
 	// Define buttons
-	public static final int A_button          = 1;
-    public static final int B_button          = 2;
-    public static final int X_button          = 3;
-    public static final int Y_button          = 4;
-    public static final int left_bumper       = 5;
-    public static final int right_bumper      = 6;
-    public static final int back_button       = 7;
-    public static final int start_button      = 8;
-    public static final int left_stick_press  = 9;
-    public static final int right_stick_press = 10;
-    
-    // Axes
-    private static final int left_x_axis      = 0;
-    private static final int left_y_axis      = 1;
-    private static final int left_trigger      = 2;			//This was public for seemingly no reason
-    private static final int right_trigger     = 3;			//This was public for seemingly no reason
-    private static final int right_x_axis     = 4;
-    private static final int right_y_axis     = 5;
-    // Constants
-    public static final double ctrl_deadband  = 0.15; // This is the threshold for the controller joystick deadband
+	public static final int aButton = 1;
+  public static final int bButton = 2;
+  public static final int xButton = 3;
+  public static final int yButton = 4;
+  public static final int leftBumper = 5;
+  public static final int rightBumper = 6;
+  public static final int backButton = 7;
+  public static final int startButton = 8;
+  public static final int leftStickPress = 9;
+  public static final int rightStickPress = 10;
+  
+  // Define Axes
+  public static final int leftXAxis = 0;
+  public static final int leftYAxis = 1;
+  public static final int leftTrigger = 2;
+  public static final int rightTrigger = 3;
+  public static final int rightXAxis = 4;
+  public static final int rightYAxis = 5;
+  
+  // Constant Variables
+  /**
+   * used by getDeadband functions. Values within the distance of this value from zero will be set to 0
+   * 
+   * @see #getDeadbandLeftXAxis()
+   * @see #getDeadbandLeftYAxis()
+   * @see #getDeadbandRightXAxis()
+   * @see #getDeadbandRightYAxis()
+   */
+  public static final double CONTROLLER_DEADBAND  = 0.15;
+  
 	/**
-	 * Constructor takes the controller number (0 or 1 with two controllers)
+	 * Constructor takes the controller number (0 or 1 with two controllers) and instantiates a joystick for that port
 	 * 
-	 * @param number int controller number
+	 * @param number integer to define which port a controller is using
 	 */
-	public Controller( int number ) {
-		joy = new Joystick( number );
+	public Controller(int number) {
+		joy = new Joystick(number);
 	}
+	
 	/**
-	 * Gets whether the "X" button is being pushed on the controller.
-	 * @return boolean whether "X" button is pressed
+	 * Returns whether the "A" button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the "A" button is pressed
 	 */
-	public boolean get_x_button() {
-		return joy.getRawButton( X_button );
+	public boolean getButtonA() {
+		return joy.getRawButton(aButton);
 	}
+	
 	/**
-	 * Gets whether the "A" button is being pushed on the controller.
-	 * @return boolean whether "A" button is pressed
+	 * Returns whether the "B" button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the "B" button is pressed
 	 */
-	public boolean get_a_button() {
-		return joy.getRawButton( A_button );
+	public boolean getButtonB() {
+		return joy.getRawButton(bButton);
 	}
+	
 	/**
-	 * Gets whether the "B" button is being pushed on the controller.
-	 * @return boolean whether "B" button is pressed
+	 * Returns whether the "X" button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the "X" button is pressed
 	 */
-	public boolean get_b_button() {
-		return joy.getRawButton( B_button );
+	public boolean getButtonX() {
+		return joy.getRawButton(xButton);
 	}
+	
 	/**
-	 * Gets whether the "Y" button is being pushed on the controller.
-	 * @return boolean whether "Y" button is pressed
+	 * Returns whether the "Y" button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the "Y" button is pressed
 	 */
-	public boolean get_y_button() {
-		return joy.getRawButton( Y_button );
+	public boolean getButtonY() {
+		return joy.getRawButton(yButton);
 	}
+	
 	/**
-	 * Gets whether the left bumper is being pushed on the controller.
-	 * @return boolean whether left bumper is pressed
+	 * Returns whether the left bumper is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the left bumper button is pressed
 	 */
-	public boolean get_left_bumper() {
-		return joy.getRawButton( left_bumper ) ;
+	public boolean getLeftBumper() {
+		return joy.getRawButton(leftBumper) ;
 	}
+	
 	/**
-	 * Gets whether the right bumper is being pushed on the controller.
-	 * @return boolean whether right bumper button is pressed
+	 * Returns whether the right bumper is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the right bumper button is pressed
 	 */
-	public boolean get_right_bumper() {
-		return joy.getRawButton( right_bumper );
+	public boolean getRightBumper() {
+		return joy.getRawButton(rightBumper);
 	}
+	
 	/**
-	 * Gets whether the left trigger is being pushed on the controller.
-	 * @return boolean whether left trigger is pressed
+	 * Returns whether the left trigger is being pushed on the controller.
+	 * <p>
+	 * 
+	 * 
+	 * @return a boolean value of whether the left trigger button is pressed
 	 */
-	public boolean get_left_trigger() {
-		return joy.getRawAxis( left_trigger ) > 0;
+	public boolean getLeftTrigger() {
+		return joy.getRawAxis(leftTrigger) > 0;
 	}
+	
 	/**
-	 * Gets whether the right trigger is being pushed on the controller.
-	 * @return boolean whether right trigger is pressed
+	 * Returns whether the right trigger is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the right trigger button is pressed
 	 */
-	public boolean get_right_trigger() {
-		return joy.getRawAxis( right_trigger ) > 0;
+	public boolean getRightTrigger() {
+		return joy.getRawAxis(rightTrigger) > 0;
 	}
+	
 	/**
-	 * Gets whether the back button is being pushed on the controller.
-	 * @return boolean whether back button is pressed
+	 * Returns whether the back button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the back button is pressed
 	 */
-	public boolean get_back_button() {
-		return joy.getRawButton( back_button );
+	public boolean getButtonBack() {
+		return joy.getRawButton(backButton);
 	}
+	
 	/**
-	 * Gets whether the start button is being pushed on the controller.
-	 * @return boolean whether start button is pressed
+	 * Return whether the start button is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the start button is pressed
 	 */
-	public boolean get_start_button() {
-		return joy.getRawButton( start_button );
+	public boolean getButtonStart() {
+		return joy.getRawButton(startButton);
 	}
+	
 	/**
-	 * Gets whether the left stick is being pushed on the controller.
-	 * @return boolean whether the left stick is pressed
+	 * Returns whether the left stick is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the left stick button is pressed
 	 */
-	public boolean get_left_stick_press() {
-		return joy.getRawButton( left_stick_press );
+	public boolean getLeftStickPress() {
+		return joy.getRawButton(leftStickPress);
 	}
+	
 	/**
-	 * Gets whether the right stick is being pushed on the controller.
-	 * @return boolean whether the right stick is pressed
+	 * Returns whether the right stick is being pushed on the controller.
+	 * 
+	 * @return a boolean value of whether the right stick button is pressed
 	 */
-	public boolean get_right_stick_press() {
-		return joy.getRawButton( right_stick_press );
+	public boolean getRightStickPress() {
+		return joy.getRawButton(rightStickPress);
 	}
+	
+	//Non-Deadbanded Axes:
+	
 	/**
-	 * Gets the value of the x axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * @return double x axis position
+	 * Returns the value of the x axis of the left stick. (-1.0 to 1.0, 0.0 is centered)
+	 * 
+	 * @return a double of the x axis position for the left stick
 	 */
-	public double get_left_x_axis() {
-		return joy.getRawAxis( left_x_axis );
+	public double getLeftXAxis() {
+		return joy.getRawAxis(leftXAxis);
 	}
+	
 	/**
-	 * Gets the value of the x axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Applies deadband, which means -ctrl_deadband to ctrl_deadband values are set to 0
-	 * @return double x axis position
+	 * Returns the value of the y axis of the left stick. (-1.0 to 1.0, 0.0 is centered)
+	 * Value is inverted to make it so forward is positive because the default is backwards is positive
+	 * 
+	 * @return a double of the y axis position for the left stick
 	 */
-	public double get_deadband_left_x_axis() {
-		return joystick_deadband( joy.getRawAxis(left_x_axis) );
+	public double getLeftYAxis() {
+		return -(joy.getRawAxis(leftYAxis));
 	}
+	
 	/**
-	 * Gets the value of the y axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Value is negative to make it so forward is positive, default is backwards is positive
-	 * @return double y axis position
+	 * Returns the value of the x axis of the right stick. (-1.0 to 1.0, 0.0 is centered)
+	 * 
+	 * @return a double of the x axis position for the right stick
 	 */
-	public double get_left_y_axis() {
-		return -( joy.getRawAxis( left_y_axis ) );
+	public double getRightXAxis() {
+		return joy.getRawAxis(rightXAxis);
 	}
+	
 	/**
-	 * Gets the value of the y axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Value is negative to make it so forward is positive, default is backwards is positive
-	 * Applies deadband, which means -ctrl_deadband to ctrl_deadband values are set to 0
-	 * @return double y axis position
+	 * Returns the value of the y axis of the right stick. (-1.0 to 1.0, 0.0 is centered)
+	 * Value is inverted to make it so forward is positive because the default is backwards is positive
+	 * 
+	 * @return a double of the y axis position for the right stick
 	 */
-	public double get_deadband_left_y_axis() {
-		return joystick_deadband( -( joy.getRawAxis(left_y_axis) ) );
+	public double getRightYAxis() {
+		return -(joy.getRawAxis(rightYAxis));
 	}
+	
+	//Deadbanded Axes:
+	
 	/**
-	 * Gets the value of the x axis of the right stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * @return double x axis position
+	 * Returns the value of the x axis of the left stick with a deadband. (-1.0 to 1.0, 0.0 is centered)
+	 * ctrlDeadband is applied. Meaning -{@link #ctrlDeadband} to {@link #ctrlDeadband} values are set to 0
+	 * 
+	 * @return a double from the result of {@link #joystickDeadband(double)} for the x axis position of the left stick
 	 */
-	public double get_right_x_axis() {
-		return joy.getRawAxis( right_x_axis );
+	public double getDeadbandLeftXAxis() {
+		return joystickDeadband(joy.getRawAxis(leftXAxis));
 	}
+	
 	/**
-	 * Gets the value of the x axis of the right stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Applies deadband, which means -ctrl_deadband to ctrl_deadband values are set to 0
-	 * @return double x axis position
+	 * Returns the value of the y axis of the left stick with a deadband. (-1.0 to 1.0, 0.0 is centered)
+	 * Value is inverted to make it so forward is positive because the default is backwards is positive.
+	 * ctrlDeadband is applied. Meaning -{@link #ctrlDeadband} to {@link #ctrlDeadband} values are set to 0
+	 * 
+	 * @return a double from the result of {@link #joystickDeadband(double)} for the y axis position of the left stick
 	 */
-	public double get_deadband_right_x_axis() {
-		return joystick_deadband( joy.getRawAxis(right_x_axis) );
+	public double getDeadbandLeftYAxis() {
+		return joystickDeadband(-(joy.getRawAxis(leftYAxis)));
 	}
+	
 	/**
-	 * Gets the value of the y axis of the right stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Value is negative to make it so forward is positive, default is backwards is positive
-	 * @return double y axis position
+	 * Returns the value of the x axis of the right stick with a deadband. (-1.0 to 1.0, 0.0 is centered)
+	 * ctrlDeadband is applied. Meaning -{@link #ctrlDeadband} to {@link #ctrlDeadband} values are set to 0
+	 * 
+	 * @return a double from the result of {@link #joystickDeadband(double)} for the x axis position of the right stick
 	 */
-	public double get_right_y_axis() {
-		return -( joy.getRawAxis( right_y_axis ) );
+	public double getDeadbandRightXAxis() {
+		return joystickDeadband(joy.getRawAxis(rightXAxis));
 	}
+	
 	/**
-	 * Gets the value of the x axis of the left stick. ( -1.0 to 1.0, 0.0 is centered )
-	 * Value is negative to make it so forward is positive, default is backwards is positive
-	 * Applies deadband, which means -ctrl_deadband to ctrl_deadband values are set to 0
-	 * @return double x axis position
+	 * Returns the value of the y axis of the right stick with a deadband. (-1.0 to 1.0, 0.0 is centered)
+	 * Value is inverted to make it so forward is positive because the default is backwards is positive.
+	 * ctrlDeadband is applied. Meaning -{@link #ctrlDeadband} to {@link #ctrlDeadband} values are set to 0
+	 * 
+	 * @return a double from the result of {@link #joystickDeadband(double)} for the y axis position of the right stick
 	 */
-	public double get_deadband_right_y_axis() {
-		return joystick_deadband( -( joy.getRawAxis(right_y_axis) ) );
+	public double getDeadbandRightYAxis() {
+		return joystickDeadband(-(joy.getRawAxis(rightYAxis)));
 	}
+	
 	/**
-	 * Takes the value of a joystick axis ( -1.0 to 1.0, 0.0 is centered )
-	 * If value is between negative ctrl_deadband and ctrl_deadband then value is set to 0.0
-	 * @return input or 0.0 depending on above condition
+	 * Takes the value of a joystick axis and returns it deadbanded. (-1.0 to 1.0, 0.0 is centered)
+	 * If value is between -{@link #ctrlDeadband} and {@link #ctrlDeadband} then value is set to 0.0
+	 * 
+	 * @param joystickInput the value given to the function to be deadbanded
+	 * @return the input deadbanded. (
 	 */
-	private double joystick_deadband( double joystick_input ) {
-		if( (joystick_input < ctrl_deadband) && (joystick_input > -ctrl_deadband) )
-		{
-			return (double)( 0.0 );
-		}
-		else
-		{
-			return joystick_input;
+	private double joystickDeadband(double joystickInput) {
+		if(Math.abs(joystickInput) < CONTROLLER_DEADBAND) { 
+			//Was (joystickInput < CONTROLLER_DEADBAND) && (joystickInput > -CONTROLLER_DEADBAND)
+			return (double)(0.0);//does this have to be cast?
+		} else {
+			return joystickInput;
 		}
 	}
 	
 	/**
-	 *	Rumble Code!!!
-	 *@return Joystick used for the contorller
+	 * Rumble Code!!! (this code is written on the Programming Laptop.)
 	 */
 	
-//	public void rumble( float l, float r ){
-//		setRumble( RumbleType.kLeftRumble, l );
-//		setRumble( RumbleType.kRightRumble, r );
+//	public void rumble(float l, float r){
+//		joy.setRumble( l, r);
+//		joy.setRumble( l, r)
 //	}
-	
+//	
 	/**
-	 *	Used just in case we need the raw joystick.
+	 * Used just in case we need the raw joystick.
 	 *
-	 * @return Joystick used for the contorller
+	 * @return Joystick used for the controller
 	 */
-	public Joystick get_joystick() {
+	public Joystick getJoystick() {
 		return joy;
 	}
 	
