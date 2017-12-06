@@ -114,9 +114,11 @@ public class Robot extends SampleRobot {
 		double spin;
 		double move;
 		
-
+		HeadingPID heading2 = new HeadingPID();
 		while (isOperatorControl() && isEnabled()) {
 			dt = timer.getDT();
+			heading2.update(dt);
+			
 			// Start of Subsystem Updates
 			RobotMap.Climber.update();
 			//RobotMap.ShooterAssembly.update();
@@ -130,10 +132,15 @@ public class Robot extends SampleRobot {
 			// Start of Drive Code (in testing phase)
 			move = RobotMap.driveController.getDeadbandLeftYAxis();
 			spin = -RobotMap.driveController.getDeadbandRightXAxis();
-			
+			if (RobotMap.driveController.getButtonBack()) {
+				spin = heading2.get();
+				Dashboard.send("Experimental Spin", heading2.get());
+			}
 			RobotMap.drive.arcadeDrive(move, spin);
 			Dashboard.send("Spin", spin);
 			Dashboard.send("Heading Spin Error", RobotMap.Heading.headingPID.get_error());
+			Dashboard.send("Fused Heading", RobotMap.gyro.getFusedHeading());
+			Dashboard.send("Gyro Angle", RobotMap.gyro.getAngle());
 			// End of Drive Code
 			timer.update();
 		}

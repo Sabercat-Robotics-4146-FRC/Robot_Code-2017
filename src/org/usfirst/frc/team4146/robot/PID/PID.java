@@ -12,7 +12,7 @@ public class PID {
 	private double Ki;
 	private double Kd;
 	private double prevError;
-	private double setpoint;
+	protected double setpoint;
 	//private double integral;
 	private double error;
 	private double derivative;
@@ -79,12 +79,14 @@ public class PID {
 	public double steady_state_error() {
 		return error_stack.absolute_mean();
 	}
-	
+	public double getSystemError(){
+		return setpoint - functions.getValue();
+	}
 	int i = 0;
 	double derivative_dt = 0;
 	
 	public void update( double dt ){
-		error = setpoint - functions.getValue();
+		error = getSystemError();
 		error_stack_dt += dt;
 		
 		if( error_stack_dt > (error_stack_sample_rate)) {
