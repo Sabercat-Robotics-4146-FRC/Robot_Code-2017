@@ -1,70 +1,58 @@
 package org.usfirst.frc.team4146.robot;
-
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Talon;
 
 public class Robot extends SampleRobot {
-	RobotDrive myRobot = new RobotDrive(0, 1);
-	Joystick stick = new Joystick(0);
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	SendableChooser<String> chooser = new SendableChooser<>();
-
+	
 	public Robot() {
-		myRobot.setExpiration(0.1);
+		
 	}
-
+	
 	@Override
 	public void robotInit() {
-		RobotMap.init();
-
+		
 	}
 
 	@Override
 	public void autonomous() {
-		String autoSelected = chooser.getSelected();
-		// String autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
-
-		switch (autoSelected) {
-		case customAuto:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 1.0); // spin at half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
-		case defaultAuto:
-		default:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 0.0); // drive forwards half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
-		}
+		
 	}
-
-	/**
-	 * Runs the motors with arcade steering.
-	 */
+	
 	@Override
 	public void operatorControl() {
-		myRobot.setSafetyEnabled(true);
+		Controller driver = new Controller(0);
+		Talon frontLeft = new Talon(0);
+		Talon rearLeft = new Talon(1);
+		Talon frontRight = new Talon(2);
+		Talon rearRight = new Talon(3);
+		
+		frontLeft.setSafetyEnabled(false);
+		rearLeft.setSafetyEnabled(false);
+		frontRight.setSafetyEnabled(false);
+		rearRight.setSafetyEnabled(false);
+		
+		//RobotDrive drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
+		
 		while (isOperatorControl() && isEnabled()) {
-			myRobot.arcadeDrive(stick); // drive with arcade style (use right
-										// stick)
-			Timer.delay(0.005); // wait for a motor update time
+			if (driver.getButtonA()){ // rear right is backward still need to fix!!!
+		//		rearRight.set(0.5);
+			frontRight.set(0.5);
+//				rearLeft.set(0.5);
+//				frontLeft.set(0.5);
+			} else {
+				//rearRight.set(0.0);
+			//	rearRight.set(0.0);
+				frontRight.set(0.0);
+//				rearLeft.set(0.0);
+//				frontLeft.set(0.0);
+			}
+				
 		}
 	}
-
-	/**
-	 * Runs during test mode
-	 */
+	
 	@Override
 	public void test() {
+		
 	}
 }
