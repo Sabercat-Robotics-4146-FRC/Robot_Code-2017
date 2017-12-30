@@ -3,25 +3,21 @@ package org.usfirst.frc.team4146.robot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends SampleRobot {
-	RobotDrive myRobot = new RobotDrive(0, 1);
-	Joystick stick = new Joystick(0);
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	SendableChooser<String> chooser = new SendableChooser<>();
 
 	public Robot() {
-		myRobot.setExpiration(0.1);
+		RobotMap.ROBOT = this;
 	}
 
 	@Override
 	public void robotInit() {
 		RobotMap.init();
-
 	}
 
 	@Override
@@ -33,17 +29,17 @@ public class Robot extends SampleRobot {
 
 		switch (autoSelected) {
 		case customAuto:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 1.0); // spin at half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
+			RobotMap.drive.setSafetyEnabled(false);
+			RobotMap.drive.drive(-0.5, 1.0); // spin at half speed
+			//Timer.delay(2.0); // for 2 seconds
+			RobotMap.drive.drive(0.0, 0.0); // stop robot
 			break;
 		case defaultAuto:
 		default:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 0.0); // drive forwards half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
+			RobotMap.drive.setSafetyEnabled(false);
+			RobotMap.drive.drive(-0.5, 0.0); // drive forwards half speed
+			//Timer.delay(2.0); // for 2 seconds
+			RobotMap.drive.drive(0.0, 0.0); // stop robot
 			break;
 		}
 	}
@@ -53,11 +49,35 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void operatorControl() {
-		myRobot.setSafetyEnabled(true);
+		double spin;
+		double move;
+		Timer timer = new Timer();
+		double dt = 0.0;
+		
+		HeadingPID headingPID = new HeadingPID();
+		
+		RobotMap.drive.setSafetyEnabled(false);
 		while (isOperatorControl() && isEnabled()) {
-			myRobot.arcadeDrive(stick); // drive with arcade style (use right
-										// stick)
-			Timer.delay(0.005); // wait for a motor update time
+			dt = timer.getDT();
+			
+			
+			//RobotMap.drive.arcadeDrive(RobotMap.driveController.getDeadbandRightXAxis(), -RobotMap.driveController.getDeadbandLeftYAxis());
+			
+			move = -RobotMap.driveController.getDeadbandLeftYAxis();
+			spin = RobotMap.driveController.getDeadbandRightXAxis();
+			if (RobotMap.driveController.getButtonBack()) {
+				headingPID.update(dt);
+				spin = headingPID.get();
+				Dashboard.send("Experimental Spin", headingPID.get());
+			}
+			RobotMap.drive.arcadeDrive(spin, move);
+			
+			Dashboard.send("Spin", spin);
+			Dashboard.send("Heading Spin Error", headingPID.get_error());
+			Dashboard.send("Fused Heading", RobotMap.gyro.getFusedHeading());
+			Dashboard.send("Gyro Angle", RobotMap.gyro.getAngle());
+			// End of Drive Code
+timer.update();
 		}
 	}
 
