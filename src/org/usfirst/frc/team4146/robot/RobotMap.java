@@ -1,12 +1,10 @@
 package org.usfirst.frc.team4146.robot;
 
-import com.ctre.CANTalon;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -41,15 +39,11 @@ public class RobotMap {
 	
 	//public static CANTalon canTalon;
 	
-	// Servos Declaration
-	//public static Servo servo;
-	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
 	
 	// Encoders Declaration
-	public static Encoder leftDriveEncoder;
-	public static Encoder rightDriveEncoder;
+	public static Encoder encoder;
 	
 	// Network Table Declaration
 	public static NetworkTable networkTable;
@@ -59,9 +53,6 @@ public class RobotMap {
 	
 	// Vision Declaration
 	//public static Vision vision;
-	
-	// Heading Declaration
-	//public static Heading heading;
 	
 	// Sendable Chooser Declaration
 	public static SendableChooser chooser; //Sendable chooser allows us to choose the autonomous from smartdashboard
@@ -92,11 +83,9 @@ public class RobotMap {
     	gyro = new AHRS(SPI.Port.kMXP);
     	
     	// Encoders Initialization
-    	leftDriveEncoder = new Encoder(6, 7, true, Encoder.EncodingType.k4X);
-    	rightDriveEncoder = new Encoder(8, 9, false, Encoder.EncodingType.k4X);
+    	encoder = new Encoder(0, 1);
     	
-    	leftDriveEncoder.reset();
-    	rightDriveEncoder.reset();
+    	encoder.reset();
 
     	// NetworkTable Initialization
     	networkTable = NetworkTable.getTable("SmartDashboard");
@@ -107,9 +96,6 @@ public class RobotMap {
     	
     	// Vision Initialization
     	//vision = new Vision();
-    	
-    	// Heading Initialization
-    	//heading = new Heading();
     	
     	// Sendable Chooser Initialization
     	chooser = new SendableChooser();

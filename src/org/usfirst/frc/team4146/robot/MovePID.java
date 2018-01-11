@@ -19,8 +19,8 @@ public class MovePID extends PID {
 
 	// Returns average encoder ticks between the two drive encoders
 	private static double encoderTicks() { 
-		return ((RobotMap.leftDriveEncoder.getRaw() + RobotMap.rightDriveEncoder.getRaw()) / 2.0 ); // Test this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//return (RobotMap.leftDriveEncoder.getRaw());
+		//return ((RobotMap.leftDriveEncoder.getRaw() + RobotMap.rightDriveEncoder.getRaw()) / 2.0 ); // Test this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		return (RobotMap.encoder.getRaw());
 	}
 	
 	// Converts encoder ticks to feet 
@@ -30,12 +30,14 @@ public class MovePID extends PID {
 	
 	// Resets Encoders
 	public void resetEncoders() {
-		RobotMap.leftDriveEncoder.reset();
-		RobotMap.rightDriveEncoder.reset();
+//		RobotMap.leftDriveEncoder.reset();
+//		RobotMap.rightDriveEncoder.reset();
+		RobotMap.encoder.reset();
 	}
 	
 	// A testing method because .get() returns encoder with scale factor whereas .getRaw does not. Important difference? // TEST ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	private int scaleFactor(){
-		return RobotMap.leftDriveEncoder.getEncodingScale();
+		//return RobotMap.leftDriveEncoder.getEncodingScale();
+		return RobotMap.encoder.getEncodingScale();
 	}
 }
