@@ -55,11 +55,14 @@ public class Robot extends SampleRobot {
 			spin = RobotMap.driveController.getDeadbandRightXAxis();
 			
 			if(RobotMap.driveController.getButtonA()){
-				RobotMap.frontLeft.set(0.3);
-				RobotMap.rearLeft.set(0.3);
+				RobotMap.frontRight.set(0.5);
+				RobotMap.rearRight.set(0.5);
+			} else if (RobotMap.driveController.getButtonY()){
+				RobotMap.frontRight.set(-0.5);
+				RobotMap.rearRight.set(-0.5);
 			} else {
-				RobotMap.frontLeft.set(0.0);
-				RobotMap.rearLeft.set(0.0);
+				RobotMap.frontRight.set(0.0);
+				RobotMap.rearRight.set(0.0);
 			}
 			
 //			if (RobotMap.driveController.getButtonBack()) {
@@ -68,8 +71,9 @@ public class Robot extends SampleRobot {
 //				Dashboard.send("Experimental Spin", headingPID.get());
 //			}
 			
-			RobotMap.drive.arcadeDrive(spin, move);
+			//RobotMap.drive.arcadeDrive(spin, move);
 			// End of Drive Code
+			//RobotMap.masterArm.set(move);
 			
 			// Printing Stuff to SmartDahsboard
 			Dashboard.send("Spin", spin);

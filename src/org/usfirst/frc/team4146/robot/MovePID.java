@@ -35,6 +35,10 @@ public class MovePID extends PID {
 		RobotMap.encoder.reset();
 	}
 	
+	public void notTolerenceOrTimeout(){
+		
+	}
+	
 	// A testing method because .get() returns encoder with scale factor whereas .getRaw does not. Important difference? // TEST ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	private int scaleFactor(){
 		//return RobotMap.leftDriveEncoder.getEncodingScale();

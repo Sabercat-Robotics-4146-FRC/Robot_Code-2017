@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4146.robot;
 
+import com.ctre.CANTalon;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -37,7 +38,8 @@ public class RobotMap {
 	public static Talon frontRight;
 	public static Talon rearRight;
 	
-	//public static CANTalon canTalon;
+	public static CANTalon masterArm;
+	public static CANTalon slaveArm;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
@@ -64,12 +66,22 @@ public class RobotMap {
     	lifterController = new Controller(1);
     	
     	// Motor Controllers Initialization
-    	frontLeft = new Talon(0);
-    	rearLeft = new Talon(1);
+    	frontLeft = new Talon(4);
+    	rearLeft = new Talon(5);
 		frontRight = new Talon(2);
 		rearRight = new Talon(3);
 		
-		rearRight.setInverted(true);
+		//frontLeft.setInverted(true);
+		masterArm = new CANTalon(0);
+		slaveArm = new CANTalon(1);
+		
+		masterArm.setProfile(0);
+		
+		slaveArm.changeControlMode(CANTalon.TalonControlMode.Follower);
+		slaveArm.set(masterArm.getDeviceID());
+		
+		
+		//rearRight.setInverted(true);
 		
 		frontLeft.setSafetyEnabled(false);
 		rearLeft.setSafetyEnabled(false);
