@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
@@ -41,6 +42,9 @@ public class RobotMap {
 	public static CANTalon masterArm;
 	public static CANTalon slaveArm;
 	
+	public static Spark sparkL;
+	public static Spark sparkR;
+	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
 	
@@ -66,8 +70,8 @@ public class RobotMap {
     	lifterController = new Controller(1);
     	
     	// Motor Controllers Initialization
-    	frontLeft = new Talon(4);
-    	rearLeft = new Talon(5);
+    	frontLeft = new Talon(0);
+    	rearLeft = new Talon(1);
 		frontRight = new Talon(2);
 		rearRight = new Talon(3);
 		
@@ -79,6 +83,9 @@ public class RobotMap {
 		
 		slaveArm.changeControlMode(CANTalon.TalonControlMode.Follower);
 		slaveArm.set(masterArm.getDeviceID());
+		
+		sparkL = new Spark(4);
+		sparkR = new Spark(5);
 		
 		
 		//rearRight.setInverted(true);

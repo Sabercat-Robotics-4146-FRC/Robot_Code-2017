@@ -51,18 +51,19 @@ public class Robot extends SampleRobot {
 		while (isOperatorControl() && isEnabled()) { // Operator Controller Loop
 			dt = timer.getDT();
 			
-			move = -RobotMap.driveController.getDeadbandLeftYAxis();
-			spin = RobotMap.driveController.getDeadbandRightXAxis();
+			move = RobotMap.driveController.getDeadbandLeftYAxis();
+			spin = -RobotMap.driveController.getDeadbandRightXAxis();
 			
 			if(RobotMap.driveController.getButtonA()){
-				RobotMap.frontRight.set(0.5);
-				RobotMap.rearRight.set(0.5);
+				System.out.println("Testtttttt");
+				RobotMap.sparkL.set(-1.0);
+				RobotMap.sparkR.set(1.0);
 			} else if (RobotMap.driveController.getButtonY()){
-				RobotMap.frontRight.set(-0.5);
-				RobotMap.rearRight.set(-0.5);
+				RobotMap.sparkL.set(1.0);
+				RobotMap.sparkR.set(-1.0);
 			} else {
-				RobotMap.frontRight.set(0.0);
-				RobotMap.rearRight.set(0.0);
+				RobotMap.sparkL.set(0.0);
+				RobotMap.sparkR.set(0.0);
 			}
 			
 //			if (RobotMap.driveController.getButtonBack()) {
@@ -71,7 +72,7 @@ public class Robot extends SampleRobot {
 //				Dashboard.send("Experimental Spin", headingPID.get());
 //			}
 			
-			//RobotMap.drive.arcadeDrive(spin, move);
+			RobotMap.drive.arcadeDrive(move, spin);
 			// End of Drive Code
 			//RobotMap.masterArm.set(move);
 			
