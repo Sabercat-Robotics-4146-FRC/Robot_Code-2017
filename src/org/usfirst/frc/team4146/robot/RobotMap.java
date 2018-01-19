@@ -1,13 +1,15 @@
 package org.usfirst.frc.team4146.robot;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotDrive;
+//import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
@@ -39,11 +41,11 @@ public class RobotMap {
 	public static Talon frontRight;
 	public static Talon rearRight;
 	
-	public static CANTalon masterArm;
-	public static CANTalon slaveArm;
+	public static TalonSRX masterArm;
+	public static TalonSRX slaveArm;
 	
-	public static Spark sparkL;
-	public static Spark sparkR;
+//	public static Spark sparkL;
+//	public static Spark sparkR;
 	
 	// Navax Gyro Declaration
 	public static AHRS gyro;
@@ -55,7 +57,8 @@ public class RobotMap {
 	public static NetworkTable networkTable;
 	
 	// Robot Drive Declaration
-	public static RobotDrive drive;
+	//public static RobotDrive drive;
+	public static DifferentialDrive drive;
 	
 	// Vision Declaration
 	//public static Vision vision;
@@ -75,17 +78,23 @@ public class RobotMap {
 		frontRight = new Talon(2);
 		rearRight = new Talon(3);
 		
+		SpeedControllerGroup left = new SpeedControllerGroup(frontLeft, rearLeft);
+		SpeedControllerGroup right = new SpeedControllerGroup(frontRight, rearRight);
+		
 		//frontLeft.setInverted(true);
-		masterArm = new CANTalon(0);
-		slaveArm = new CANTalon(1);
+		masterArm = new TalonSRX(0);
+		slaveArm = new TalonSRX(1);
 		
-		masterArm.setProfile(0);
+		//masterArm.selectProfileSlot(0, 0);
 		
-		slaveArm.changeControlMode(CANTalon.TalonControlMode.Follower);
-		slaveArm.set(masterArm.getDeviceID());
+		slaveArm.follow(masterArm);
 		
-		sparkL = new Spark(4);
-		sparkR = new Spark(5);
+		//masterArm.ramp
+		//slaveArm.changeControlMode(TalonSRX.TalonControlMode.Follower);
+		//slaveArm.set(masterArm.getDeviceID());
+		
+//		sparkL = new Spark(4);
+//		sparkR = new Spark(5);
 		
 		
 		//rearRight.setInverted(true);
@@ -111,7 +120,8 @@ public class RobotMap {
     	Dashboard.setNetworkTable(networkTable);
 
     	// RobotDrive Initialization
-    	drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
+    	//drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
+    	drive = new DifferentialDrive(left, right);
     	
     	// Vision Initialization
     	//vision = new Vision();

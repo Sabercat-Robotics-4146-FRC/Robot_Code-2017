@@ -1,5 +1,8 @@
 package org.usfirst.frc.team4146.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
@@ -27,9 +30,10 @@ public class Robot extends SampleRobot {
 	@Override
 	public void autonomous() {
 		String autoSelected = (String) RobotMap.chooser.getSelected();
+		String randomAuto = DriverStation.getInstance().getGameSpecificMessage();
 		System.out.println("Running: " + autoSelected + " auto.");
 		
-		switch (autoSelected) {
+		switch (randomAuto) {
 			
 		}
 	}
@@ -54,25 +58,25 @@ public class Robot extends SampleRobot {
 			move = RobotMap.driveController.getDeadbandLeftYAxis();
 			spin = -RobotMap.driveController.getDeadbandRightXAxis();
 			
-			if(RobotMap.driveController.getButtonA()){
-				System.out.println("Testtttttt");
-				RobotMap.sparkL.set(-1.0);
-				RobotMap.sparkR.set(1.0);
-			} else if (RobotMap.driveController.getButtonY()){
-				RobotMap.sparkL.set(1.0);
-				RobotMap.sparkR.set(-1.0);
-			} else {
-				RobotMap.sparkL.set(0.0);
-				RobotMap.sparkR.set(0.0);
-			}
+//			if(RobotMap.driveController.getButtonA()){
+//				System.out.println("Testtttttt");
+//				RobotMap.sparkL.set(-1.0);
+//				RobotMap.sparkR.set(1.0);
+//			} else if (RobotMap.driveController.getButtonY()){
+//				RobotMap.sparkL.set(1.0);
+//				RobotMap.sparkR.set(-1.0);
+//			} else {
+//				RobotMap.sparkL.set(0.0);
+//				RobotMap.sparkR.set(0.0);
+//			}
 			
 //			if (RobotMap.driveController.getButtonBack()) {
 //				headingPID.update(dt);
 //				spin = headingPID.get();
 //				Dashboard.send("Experimental Spin", headingPID.get());
 //			}
-			
-			RobotMap.drive.arcadeDrive(move, spin);
+			RobotMap.masterArm.set(ControlMode.PercentOutput, RobotMap.driveController.getDeadbandLeftYAxis());
+//			RobotMap.drive.arcadeDrive(move, spin);
 			// End of Drive Code
 			//RobotMap.masterArm.set(move);
 			
