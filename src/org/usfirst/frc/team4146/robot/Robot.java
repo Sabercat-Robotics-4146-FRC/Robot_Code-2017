@@ -35,23 +35,83 @@ public class Robot extends SampleRobot {
 		
 		
 		//RobotDrive drive = new RobotDrive(frontLeft, rearLeft, frontRight, rearRight);
-		
+		//code for button Y to move forward
 		while (isOperatorControl() && isEnabled()) {
-			if (driver.getButtonA()){ // rear right is backward still need to fix!!!
-			rearRight.set(0.5);
-			frontRight.set(0.5);
+			if (driver.getButtonY()){ // rear right is backward still need to fix!!!
+			//rearRight.set(0.5);
+			//frontRight.set(0.5);
 			rearLeft.set(0.5);
 			frontLeft.set(0.5);
 			} else {
-				rearRight.set(0.0);
-			//	rearRight.set(0.0);
+				//rearRight.set(0.0);
 				frontLeft.set(0.0);
         		rearLeft.set(0.0);
-				frontLeft.set(0.0);
+        		//frontRight.set(0.0);
 			}
 				
 		}
+		
+		//code for button b to move right
+		
+		
+			if (driver.getButtonB()){ // rear right is backward still need to fix!!!
+			//rearRight.set(0.5);
+			//frontRight.set(0.5);
+			rearLeft.set(0.5);
+			frontLeft.set(0.5);
+			} else {
+				//rearRight.set(0.0);
+				frontLeft.set(0.0);
+        		rearLeft.set(0.0);
+        		//frontRight.set(0.0);
+			}
+				
+		
+		
+		
+		// code for button a to move back
+		
+		
+			if (driver.getButtonA()){ // rear right is backward still need to fix!!!
+			rearRight.set(-0.5);
+			frontRight.set(-0.5);
+			rearLeft.set(-0.5);
+			frontLeft.set(-0.5);
+			} else {
+				rearRight.set(0.0);
+				frontLeft.set(0.0);
+        		rearLeft.set(0.0);
+				frontRight.set(0.0);
+			}
+				
+		
+		
+		
+		// code for button x to move left
+		
+		
+		
+			if (driver.getButtonX()){ // rear right is backward still need to fix!!!
+			rearRight.set(0.5);
+			frontRight.set(0.5);
+			//rearLeft.set(0.5);
+			//frontLeft.set(0.5);
+			} else {
+				rearRight.set(0.0);
+				//frontLeft.set(0.0);
+        		//rearLeft.set(0.0);
+				frontRight.set(0.0);
+			}
+				
+		
+		
+		
+		
+		
+		
 	}
+	
+	
 	
 	@Override
 	public void test() {
