@@ -17,7 +17,7 @@ public class Controller {
 	Joystick joy;
 	
 	// Define buttons
-	public static final int aButton = 1;
+  public static final int aButton = 1;
   public static final int bButton = 2;
   public static final int xButton = 3;
   public static final int yButton = 4;
@@ -35,6 +35,9 @@ public class Controller {
   public static final int rightTrigger = 3;
   public static final int rightXAxis = 4;
   public static final int rightYAxis = 5;
+  
+  //define Pov
+  
   
   // Constant Variables
   /**
@@ -283,5 +286,18 @@ public class Controller {
 	public Joystick getJoystick() {
 		return joy;
 	}
+
+	public void setRumble(RumbleType kleftrumble, int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
 	
 }
